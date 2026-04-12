@@ -1,0 +1,11 @@
+export const ReportReason = {
+  NOT_INTERESTED: "NOT_INTERESTED",
+  BULLYING: "BULLYING",
+  SELF_HARM: "SELF_HARM",
+  VIOLENCE: "VIOLENCE",
+  RESTRICTED_ITEMS: "RESTRICTED_ITEMS",
+  NUDITY: "NUDITY",
+  SPAM: "SPAM",
+  FALSE_INFO: "FALSE_INFO",
+} as const;
+export type ReportReason = (typeof ReportReason)[keyof typeof ReportReason];

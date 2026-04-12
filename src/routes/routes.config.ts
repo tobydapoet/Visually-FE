@@ -1,0 +1,17 @@
+export const routes = {
+  root: "/",
+  login: "/login",
+  register: "/register",
+  user: "/:username",
+  postDetail: "/post/:postId",
+  oauth_success: "/oauth_success",
+  unauthorized: "/unauthorized",
+  edit_profile: "/account/edit",
+  music_library: "/music_library",
+  story_manage: "/content/story",
+  storage: "/storage",
+  highlight: "/stories/highlight/:highlight",
+  story: "/stories/:id",
+  inbox: "/inbox",
+  inboxDetail: "/inbox/:id",
+};
