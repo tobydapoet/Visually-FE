@@ -8,8 +8,6 @@ import { handleGetShort } from "../api/short.api";
 import {
   X,
   Heart,
-  Share2,
-  User,
   Bookmark,
   MoreHorizontal,
   ChevronLeft,
@@ -17,6 +15,7 @@ import {
   Volume2,
   VolumeOff,
   Flag,
+  Repeat2,
 } from "lucide-react";
 import MessageInput, { type MessageInputRef } from "./MessageInput";
 import { useContentInteraction } from "../hooks/useInteraction";
@@ -28,6 +27,8 @@ import { ParsedContent } from "./ParseContent";
 import type { MentionItem } from "../types/api/mention.type";
 import { useUser } from "../contexts/user.context";
 import LikeListPopUp from "./LikeListPopUp";
+import CreateAdPopUp from "./CreateAdPopUp";
+import assets from "../assets";
 
 type Props = {
   open: boolean;
@@ -40,6 +41,7 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
   const [currentContent, setCurrentContent] = useState<
     PostDetailResponse | ShortDetailResponse | null
   >(null);
+  const [isOpenAd, setIsOpenAd] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isOpenReport, setIsOpenReport] = useState(false);
   const [isOpenLikeList, setIsOpenLikeList] = useState(false);
@@ -47,14 +49,14 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
   const [muted, setMuted] = useState(true);
   const {
     isLiked,
-    isShared,
     isSaved,
+    isReposted,
     likeCount,
     commentCount,
     toggleLike,
     onComment,
-    toggleShare,
     toggleSave,
+    toggleRepost,
     onUpdateComment,
     toggleCommentLike,
   } = useContentInteraction(currentContent, type);
@@ -133,10 +135,12 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
   const isPost = type === "POST";
   const mediaItems =
     isPost && "medias" in currentContent ? currentContent.medias : [];
-  const isVideo = !isPost && "mediaUrl" in currentContent;
+  const isShort = !isPost && "mediaUrl" in currentContent;
   const mediaUrl =
     !isPost && "mediaUrl" in currentContent ? currentContent.mediaUrl : "";
-
+  const isVideo = (url: string) =>
+    url.endsWith(".mp4") || url.includes("/video/");
+  const currentMedia = mediaItems[currentMediaIndex];
   return (
     <>
       <Dialog open={open} onClose={handleOnclose} className="relative z-50">
@@ -160,11 +164,38 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
                   <div className="relative h-full flex items-center justify-center">
                     {mediaItems.length > 0 && (
                       <>
-                        <img
-                          src={mediaItems[currentMediaIndex].url}
-                          alt={`Media ${currentMediaIndex + 1}`}
-                          className="max-w-full h-[90vh] object-contain"
-                        />
+                        {isVideo(currentMedia.url) ? (
+                          <div>
+                            <video
+                              src={currentMedia.url}
+                              className="max-w-full max-h-[90vh]"
+                              autoPlay
+                              loop
+                              playsInline
+                              muted={muted}
+                              onClick={(e) => {
+                                const video = e.currentTarget;
+                                video.paused ? video.play() : video.pause();
+                              }}
+                            />
+                            <button
+                              onClick={() => setMuted(!muted)}
+                              className="absolute bottom-2 cursor-pointer right-2 z-10 p-2.5 bg-black/60 hover:bg-black/80 backdrop-blur-sm rounded-full transition-all duration-200 hover:scale-110 active:scale-95 border border-white/10 shadow-lg"
+                            >
+                              {muted ? (
+                                <VolumeOff size={18} className="text-white" />
+                              ) : (
+                                <Volume2 size={18} className="text-white" />
+                              )}
+                            </button>
+                          </div>
+                        ) : (
+                          <img
+                            src={currentMedia.url}
+                            alt={`Media ${currentMediaIndex + 1}`}
+                            className="max-w-full max-h-[90vh] object-contain"
+                          />
+                        )}
 
                         {mediaItems.length > 1 && (
                           <>
@@ -195,7 +226,7 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
                   </div>
                 ) : (
                   <div className="relative flex items-center justify-center">
-                    {isVideo ? (
+                    {isShort ? (
                       <div>
                         <video
                           src={mediaUrl}
@@ -236,15 +267,11 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
                 <div className="px-4">
                   <div className="flex items-center gap-3 mt-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                      {currentContent.avatarUrl ? (
-                        <img
-                          src={currentContent.avatarUrl}
-                          alt={currentContent.username}
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        <User className="w-6 h-6 text-white" />
-                      )}
+                      <img
+                        src={currentContent.avatarUrl || assets.profile}
+                        alt={currentContent.username}
+                        className="w-full h-full rounded-full object-cover"
+                      />
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold text-white">
@@ -326,107 +353,111 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
                   />
                 </div>
 
-                <div className="px-2 pt-1 border-zinc-800">
-                  <div className="flex justify-between">
-                    <div className="flex gap-3">
+                {currentUser && currentUser.role.includes("CLIENT") && (
+                  <div className="px-2 pt-1 border-zinc-800">
+                    <div className="flex justify-between">
+                      <div className="flex gap-3">
+                        <button
+                          onClick={toggleLike}
+                          className="flex flex-col items-center gap-1 group"
+                        >
+                          <div
+                            className={`p-2 rounded-full transition-colors cursor-pointer ${
+                              isLiked
+                                ? "text-red-500"
+                                : "text-white hover:text-red-500"
+                            }`}
+                          >
+                            <Heart
+                              className={`w-6 h-6 ${isLiked ? "fill-current" : ""}`}
+                            />
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={toggleSave}
+                          className="flex flex-col items-center gap-1 group cursor-pointer disabled:opacity-40 disabled:cursor-default"
+                        >
+                          <div
+                            className={`py-2 px-1 rounded-full transition-colors ${
+                              isSaved
+                                ? "text-yellow-500"
+                                : isSaved
+                                  ? "text-zinc-600"
+                                  : "text-white hover:text-yellow-500"
+                            }`}
+                          >
+                            <Bookmark
+                              className={`w-6 h-6 ${isSaved ? "fill-current" : ""}`}
+                            />
+                          </div>
+                        </button>
+                        {currentUser &&
+                          currentUser.id !== currentContent.userId && (
+                            <button
+                              onClick={toggleRepost}
+                              className="flex flex-col items-center gap-1 group cursor-pointer"
+                            >
+                              <div
+                                className={`py-2 px-1 rounded-full transition-colors ${
+                                  isReposted
+                                    ? "text-green-500"
+                                    : "text-white hover:text-green-500"
+                                }`}
+                              >
+                                <Repeat2
+                                  className={`w-6 h-6 ${isReposted ? "fill-current" : ""}`}
+                                />
+                              </div>
+                            </button>
+                          )}
+                      </div>
+
                       <button
-                        onClick={toggleLike}
                         className="flex flex-col items-center gap-1 group"
+                        onClick={() => setIsOpenReport(true)}
                       >
                         <div
-                          className={`p-2 rounded-full transition-colors cursor-pointer ${
-                            isLiked
-                              ? "text-red-500"
-                              : "text-white hover:text-red-500"
-                          }`}
+                          className={`p-2 rounded-full cursor-pointer transition-colors text-white hover:text-red-500`}
                         >
-                          <Heart
-                            className={`w-6 h-6 ${isLiked ? "fill-current" : ""}`}
-                          />
+                          <Flag className={`w-6 h-6`} />
                         </div>
                       </button>
-
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center">
-                          <button
-                            className="flex flex-col items-center gap-1 group cursor-pointer disabled:opacity-40 disabled:cursor-default"
-                            onClick={toggleShare}
-                            disabled={isSaved}
-                          >
-                            <div
-                              className={`py-2 px-1 rounded-full ${
-                                isShared
-                                  ? "text-green-500"
-                                  : isSaved
-                                    ? "text-zinc-600"
-                                    : "text-white hover:text-green-500"
-                              } transition-colors`}
-                            >
-                              <Share2
-                                className={`w-6 h-6 ${isShared ? "fill-current" : ""}`}
-                              />
-                            </div>
-                          </button>
-
-                          <div className="flex flex-col items-center">
-                            <div className="w-px h-6 bg-zinc-700" />
-                          </div>
-
-                          <button
-                            onClick={toggleSave}
-                            disabled={isShared}
-                            className="flex flex-col items-center gap-1 group cursor-pointer disabled:opacity-40 disabled:cursor-default"
-                          >
-                            <div
-                              className={`py-2 px-1 rounded-full transition-colors ${
-                                isSaved
-                                  ? "text-yellow-500"
-                                  : isShared
-                                    ? "text-zinc-600"
-                                    : "text-white hover:text-yellow-500"
-                              }`}
-                            >
-                              <Bookmark
-                                className={`w-6 h-6 ${isSaved ? "fill-current" : ""}`}
-                              />
-                            </div>
-                          </button>
-                        </div>
-                      </div>
                     </div>
-
-                    <button
-                      className="flex flex-col items-center gap-1 group"
-                      onClick={() => setIsOpenReport(true)}
+                  </div>
+                )}
+                <div className="flex items-center justify-between px-4 py-2 text-sm text-gray-500">
+                  <div>
+                    <div
+                      className="text-lg text-white font-bold hover:underline cursor-pointer"
+                      onClick={() => setIsOpenLikeList(true)}
                     >
-                      <div
-                        className={`p-2 rounded-full cursor-pointer transition-colors text-white hover:text-red-500`}
-                      >
-                        <Flag className={`w-6 h-6`} />
-                      </div>
+                      {formatCount(likeCount)} likes
+                    </div>
+                    <div className="text-gray-400 text-xs">
+                      {formatDateFull(currentContent.createdAt)}
+                    </div>
+                  </div>
+                  {currentUser && currentUser.id === currentContent.userId && (
+                    <button
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors bg-blue-600 text-white hover:bg-blue-700`}
+                      onClick={() => setIsOpenAd(true)}
+                    >
+                      Boots post
                     </button>
-                  </div>
+                  )}
                 </div>
-                <div className="flex flex-col justify-between px-4 py-2 text-sm text-gray-500">
-                  <div
-                    className="text-lg text-white font-bold hover:underline cursor-pointer"
-                    onClick={() => setIsOpenLikeList(true)}
-                  >
-                    {formatCount(likeCount)} likes
+                {currentUser && currentUser.role.includes("CLIENT") && (
+                  <div>
+                    <MessageInput
+                      ref={messageInputRef}
+                      mode="COMMENT"
+                      onSend={async (message, mentions) => {
+                        handleSend(message, mentions);
+                      }}
+                    />
                   </div>
-                  <div className="text-gray-400 text-xs">
-                    {formatDateFull(currentContent.createdAt)}
-                  </div>
-                </div>
-                <div>
-                  <MessageInput
-                    ref={messageInputRef}
-                    mode="COMMENT"
-                    onSend={async (message, mentions) => {
-                      handleSend(message, mentions);
-                    }}
-                  />
-                </div>
+                )}
               </div>
             </div>
           </DialogPanel>
@@ -444,6 +475,13 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
         open={isOpenLikeList}
         targetId={contentId}
         targetType={type}
+      />
+
+      <CreateAdPopUp
+        open={isOpenAd}
+        onClose={() => setIsOpenAd(false)}
+        contentId={contentId}
+        type={type}
       />
     </>
   );

@@ -41,6 +41,20 @@ export const handleUnfollow = async (userId: string) => {
   return status;
 };
 
+export const handleBlock = async (userId: string) => {
+  const res = await axiosInstance.post(
+    `${import.meta.env.VITE_API_URL}follows/block/${userId}`,
+  );
+  return res.data;
+};
+
+export const handleUnblock = async (userId: string) => {
+  const res = await axiosInstance.delete(
+    `${import.meta.env.VITE_API_URL}follows/block/${userId}`,
+  );
+  return res.data;
+};
+
 export const handleSearchRelationship = async (
   search: string,
 ): Promise<FollowPageResponse> => {

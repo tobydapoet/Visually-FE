@@ -3,13 +3,13 @@ import {
   Home,
   SquarePlay,
   Search,
-  Heart,
   Bell,
   MessageCircle,
   Plus,
   Play,
   BookPlus,
   SquareStar,
+  Megaphone,
 } from "lucide-react";
 import { useState, Fragment } from "react";
 import {
@@ -24,6 +24,8 @@ import { useNavigate } from "react-router-dom";
 import PostPopUp from "./PostPopUp";
 import ShortPopUp from "./ShortPopUp";
 import StoryPopUp from "./StoryPopUp";
+import SearchPopup from "../pages/SearchPopup";
+import NotificationPopUp from "../pages/NotificationPopUp";
 
 const SideBar: React.FC = () => {
   const [activeItem, setActiveItem] = useState("Home");
@@ -32,6 +34,8 @@ const SideBar: React.FC = () => {
   const [openShortPopUp, setOpenShortPopUp] = useState(false);
   const [openStoryPopUp, setOpenStoryPopUp] = useState(false);
   const [openPostPopUp, setOpenPostPopUp] = useState(false);
+  const [isOpenSearch, setIsOpenSearch] = useState(false);
+  const [isOpenNotification, setIsOpenNotification] = useState(false);
 
   const { currentUser } = useUser();
   const navigate = useNavigate();
@@ -40,20 +44,19 @@ const SideBar: React.FC = () => {
 
   const menuItems = [
     { id: "Home", icon: Home, label: "Home", hasFill: true, link: "/" },
-    { id: "Shorts", icon: SquarePlay, label: "Shorts", link: "/short" },
+    { id: "Shorts", icon: SquarePlay, label: "Reels", link: "/reels" },
     {
       id: "Messages",
       icon: MessageCircle,
       label: "Messages",
       link: "/inbox",
     },
-    { id: "Search", icon: Search, label: "Search", link: "/search" },
-    { id: "Favourites", icon: Heart, label: "Favourites", link: "/favourites" },
+    { id: "Search", icon: Search, label: "Search" },
+    { id: "Boosted", icon: Megaphone, label: "Boosts", link: "/ad" },
     {
       id: "Notifications",
       icon: Bell,
       label: "Notifications",
-      link: "/notifications",
     },
   ];
 
@@ -86,7 +89,13 @@ const SideBar: React.FC = () => {
                   key={item.id}
                   onClick={() => {
                     setActiveItem(item.id);
-                    navigate(item.link);
+                    if (item.link) {
+                      navigate(item.link);
+                    } else if (item.id === "Notifications") {
+                      setIsOpenNotification(true);
+                    } else if (item.id === "Search") {
+                      setIsOpenSearch(true);
+                    }
                   }}
                   className={`
                     flex items-center gap-4 h-12 p-3 text-sm rounded-xl cursor-pointer
@@ -237,6 +246,12 @@ const SideBar: React.FC = () => {
       <StoryPopUp
         open={openStoryPopUp}
         onClose={() => setOpenStoryPopUp(false)}
+      />
+      <SearchPopup open={isOpenSearch} onClose={() => setIsOpenSearch(false)} />
+
+      <NotificationPopUp
+        open={isOpenNotification}
+        onClose={() => setIsOpenNotification(false)}
       />
     </>
   );

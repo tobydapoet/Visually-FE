@@ -7,7 +7,6 @@ import {
   ChevronDown,
   Film,
   FileText,
-  Play,
   Music,
 } from "lucide-react";
 import { useUser } from "../contexts/user.context";
@@ -62,12 +61,6 @@ const SidebarManage: React.FC = () => {
           label: "Post",
           icon: <FileText size={18} />,
           path: "/content/post",
-        },
-        {
-          id: "story",
-          label: "Story",
-          icon: <Play size={18} />,
-          path: "/content/story",
         },
       ],
     },

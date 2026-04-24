@@ -11,7 +11,7 @@ function ManageLayout() {
   useEffect(() => {
     if (token) {
       const payload = parseJwt(token);
-      const isAdmin = payload?.roles?.includes("ADMIN");
+      const isAdmin = payload?.role === "ADMIN";
 
       if (!isAdmin) {
         navigate("/unauthorized", { replace: true });

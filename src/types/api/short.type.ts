@@ -9,11 +9,11 @@ export type ShortResponse = {
   thumbnailUrl: string;
   likeCount: number;
   commentCount: number;
-  shareCount: number;
+  saveCount: number;
+  repostCount: number;
 
   isLiked: false;
   isCommented: false;
-  isShared: false;
   isSaved: false;
 
   createdAt: string;
@@ -43,12 +43,13 @@ export type ShortDetailResponse = {
 
   likeCount: number;
   commentCount: number;
-  shareCount: number;
+  saveCount: number;
+  repostCount: number;
 
   isLiked: boolean;
   isCommented: boolean;
-  isShared: boolean;
   isSaved: boolean;
+  isReposted: boolean;
 
   status: ContentStatus;
   createdAt: string;

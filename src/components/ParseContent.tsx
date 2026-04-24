@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/user.context";
 
 export const ParsedContent: React.FC<{
   caption: string;
@@ -8,7 +9,7 @@ export const ParsedContent: React.FC<{
   const navigate = useNavigate();
 
   const safeMentions = mentions ?? [];
-
+  const { currentUser } = useUser();
   const parts = caption.split(/(@[a-zA-Z0-9_.]+)/g);
   return (
     <p className="text-white whitespace-pre-wrap">
@@ -22,7 +23,13 @@ export const ParsedContent: React.FC<{
           return (
             <span
               key={index}
-              onClick={() => navigate(`/${mention.username}`)}
+              onClick={() => {
+                if (currentUser && currentUser.role !== "CLIENT") {
+                  navigate(`/user/${mention.username}`);
+                } else {
+                  navigate(`/${mention.username}`);
+                }
+              }}
               className={classname}
             >
               {part}

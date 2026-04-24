@@ -1,21 +1,12 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import type React from "react";
-import { HandFist, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useState } from "react";
-import {
-  EyeOff,
-  MessageCircleWarning,
-  HeartCrack,
-  PackageX,
-  Eye,
-  Mail,
-  CircleAlert,
-  CheckCircle2,
-  Loader2,
-} from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import type { ReportTargetType } from "../constants/interaction.enum";
 import { handleReport } from "../api/interaction.api";
 import { toast } from "sonner";
+import { reasonConfig } from "../constants/ReportReasoConfig";
 
 export const ReportReason = {
   NOT_INTERESTED: "NOT_INTERESTED",
@@ -34,52 +25,6 @@ type Props = {
   onClose: () => void;
   targetId: number;
   targetType: ReportTargetType;
-};
-
-const reasonConfig: Record<
-  ReportReason,
-  { label: string; icon: React.ElementType; description: string }
-> = {
-  NOT_INTERESTED: {
-    label: "Not interested",
-    icon: EyeOff,
-    description: "You don't want to see this content",
-  },
-  BULLYING: {
-    label: "Bullying / Harassment",
-    icon: MessageCircleWarning,
-    description: "Targeted harassment or threats",
-  },
-  SELF_HARM: {
-    label: "Self-harm",
-    icon: HeartCrack,
-    description: "Content promoting self-harm or suicide",
-  },
-  VIOLENCE: {
-    label: "Violence",
-    icon: HandFist,
-    description: "Graphic violence or threats",
-  },
-  RESTRICTED_ITEMS: {
-    label: "Restricted items",
-    icon: PackageX,
-    description: "Illegal or regulated goods",
-  },
-  NUDITY: {
-    label: "Nudity / Sexual content",
-    icon: Eye,
-    description: "Sexually explicit material",
-  },
-  SPAM: {
-    label: "Spam",
-    icon: Mail,
-    description: "Repetitive or unwanted content",
-  },
-  FALSE_INFO: {
-    label: "False information",
-    icon: CircleAlert,
-    description: "Misleading or fake news",
-  },
 };
 
 const ReportPopUp: React.FC<Props> = ({

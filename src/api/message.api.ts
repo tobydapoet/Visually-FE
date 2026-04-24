@@ -32,6 +32,8 @@ export const handleGetConversationWithUser = async (
   const res = await axiosInstance.get(
     `${import.meta.env.VITE_API_URL}messages/conversation/user/${userId}`,
   );
+  console.log("RESDATA: ", res.data);
+
   return res.data;
 };
 

@@ -3,7 +3,7 @@ import {
   CommentTargetType,
   LikeTargetType,
   ReportTargetType,
-  ShareTargetType,
+  SaveTargetType,
 } from "../../constants/interaction.enum";
 import { ReportReason } from "../../constants/reportReason.enum";
 
@@ -32,13 +32,12 @@ export const CommentReqSchema = z.object({
 
 export type CommentReqType = z.infer<typeof CommentReqSchema>;
 
-export const ShareReqSchema = z.object({
+export const SaveReqSchema = z.object({
   targetId: z.number(),
-  targetType: z.enum(ShareTargetType),
-  isPublic: z.boolean(),
+  targetType: z.enum(SaveTargetType),
 });
 
-export type ShareReqType = z.infer<typeof ShareReqSchema>;
+export type SaveReqType = z.infer<typeof SaveReqSchema>;
 
 export const ReportReqSchema = z.object({
   targetId: z.number(),

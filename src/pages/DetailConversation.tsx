@@ -138,17 +138,19 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
               className="w-30 h-30 rounded-full object-cover"
             />
           )}
-          <div className="font-bold text-2xl mt-4 flex gap-3 items-center ml-10">
+          <div className="font-bold text-2xl mt-4 flex gap-3 items-center">
             <span>
               {selectedConversation.name ||
                 selectedConversation.otherUsers[0].username}
             </span>
-            <button
-              className="cursor-pointer"
-              onClick={() => setIsOpenEdit(true)}
-            >
-              <SquarePen size={20} />
-            </button>
+            {selectedConversation.type === "GROUP" && (
+              <button
+                className="cursor-pointer"
+                onClick={() => setIsOpenEdit(true)}
+              >
+                <SquarePen size={20} />
+              </button>
+            )}
           </div>
         </div>
 

@@ -1,182 +1,74 @@
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Heart, Plus, Volume2, VolumeX } from "lucide-react";
-
-import { handleGetStory, handleRemoveFromStorage } from "../api/story.api";
-import type { StoryResponse } from "../types/api/storage.type";
+import {
+  BookmarkMinus,
+  BookmarkPlus,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { useUser } from "../contexts/user.context";
 import StoragePopUp from "../components/StoragePopUp";
+import StoryMedia from "../components/StoryMedia";
+import { handleRemoveFromStorage } from "../api/story.api";
+import { useStory } from "../contexts/story.context";
+import assets from "../assets";
+import ConfirmDialog from "../components/ConfirmDialog";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useStoryInteraction } from "../hooks/useStoryInteraction";
+import LikeListPopUp from "../components/LikeListPopUp";
+import { formatCount } from "../utils/formatCount";
+import { handleView } from "../api/interaction.api";
 
 const StoryPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-
-  const [story, setStory] = useState<StoryResponse | null>(null);
-  const [isMuted, setIsMuted] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isOpenStorage, setIsOpenStorage] = useState(false);
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const mediaContainerRef = useRef<HTMLDivElement>(null);
-  const progressIntervalRef = useRef<number | null>(null);
-
+  const {
+    currentStory,
+    currentIndex,
+    total,
+    isMuted,
+    progress,
+    mediaWidth,
+    isOpenStorage,
+    audioRef,
+    setIsMuted,
+    setIsOpenStorage,
+    handleLongPress,
+    handleRelease,
+    goNext,
+    goPrev,
+  } = useStory();
   const { currentUser } = useUser();
+  const [openRemoveDialog, setOpenRemoveDialog] = useState(false);
+  const { updateCurrentStory } = useStory();
+  const { isLiked, likeCount, toggleLike } = useStoryInteraction(
+    currentStory ?? null,
+  );
+  const [isOpenLikeList, setIsOpenLikeList] = useState(false);
+  const viewStartRef = useRef<number>(Date.now());
+  const hasSentViewRef = useRef<boolean>(false);
+
+  const flushView = useCallback(() => {
+    if (!currentStory || hasSentViewRef.current) return;
+
+    const watchTime = Math.floor((Date.now() - viewStartRef.current) / 1000);
+    hasSentViewRef.current = true;
+    handleView(currentStory.id, "STORY", watchTime);
+  }, [currentStory]);
 
   useEffect(() => {
-    const fetchStory = async () => {
-      if (!id) return;
-
-      try {
-        setIsLoading(true);
-        const data = await handleGetStory(Number(id));
-        setStory(data);
-      } catch (error) {
-        console.error("Failed to fetch story:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchStory();
-  }, [id, navigate]);
+    viewStartRef.current = Date.now();
+    hasSentViewRef.current = false;
+  }, [currentIndex]);
 
   useEffect(() => {
-    if (!story || !audioRef.current) return;
-
-    let isActive = true;
-
-    const playAudio = async () => {
-      if (!audioRef.current || !isActive) return;
-
-      try {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-
-        if (story.musicUrl) {
-          audioRef.current.src = story.musicUrl;
-          audioRef.current.muted = isMuted;
-          audioRef.current.loop = true;
-
-          await audioRef.current.load();
-
-          const startTime = story.startMusicTime ?? 0;
-          audioRef.current.currentTime = startTime;
-
-          if (isActive && audioRef.current) {
-            await audioRef.current.play();
-          }
-        } else {
-          audioRef.current.src = "";
-        }
-      } catch (error) {
-        if (error instanceof Error && error.name !== "AbortError") {
-        }
-      }
-    };
-
-    playAudio();
-
     return () => {
-      isActive = false;
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
+      flushView();
     };
-  }, [story, isMuted]);
+  }, [currentIndex, flushView]);
 
-  useEffect(() => {
-    if (!story) return;
-
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-    }
-
-    if (isPaused) return;
-
-    const isVideoFile = isVideo(story.mediaUrl);
-
-    if (isVideoFile && videoRef.current) {
-      return;
-    }
-
-    const duration = 5000;
-    const interval = 100;
-    const step = (100 / duration) * interval;
-
-    progressIntervalRef.current = setInterval(() => {
-      setProgress((prev) => {
-        const newProgress = prev + step;
-        if (newProgress >= 100) {
-          if (progressIntervalRef.current) {
-            clearInterval(progressIntervalRef.current);
-          }
-          handleClose();
-          return 100;
-        }
-        return newProgress;
-      });
-    }, interval);
-
-    return () => {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
-    };
-  }, [story, isPaused]);
-
-  useEffect(() => {
-    if (!videoRef.current || !isVideo(story?.mediaUrl)) return;
-
-    const video = videoRef.current;
-
-    const updateProgress = () => {
-      if (video.duration) {
-        const percent = (video.currentTime / video.duration) * 100;
-        setProgress(percent);
-      }
-    };
-
-    const handleEnded = () => {
-      handleClose();
-    };
-
-    video.addEventListener("timeupdate", updateProgress);
-    video.addEventListener("ended", handleEnded);
-
-    return () => {
-      video.removeEventListener("timeupdate", updateProgress);
-      video.removeEventListener("ended", handleEnded);
-    };
-  }, [story]);
-
-  const handleClose = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-    }
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-    }
-    // navigate(-1);
-  };
-
-  const handleLongPress = () => {
-    setIsPaused(true);
-    if (videoRef.current && isVideo(story?.mediaUrl)) {
-      videoRef.current.pause();
-    }
-  };
-
-  const handleRelease = () => {
-    setIsPaused(false);
-    if (videoRef.current && isVideo(story?.mediaUrl)) {
-      videoRef.current.play().catch((err) => console.log("Play error:", err));
-    }
-  };
+  const isVideo = (url?: string) =>
+    url?.includes(".mp4") || url?.includes("/video/");
 
   const timeAgo = (date: Date | string) => {
     const diff = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
@@ -186,148 +78,240 @@ const StoryPage: React.FC = () => {
     return `${Math.floor(diff / 86400)}d`;
   };
 
-  const isVideo = (url?: string) =>
-    url?.includes(".mp4") || url?.includes("/video/");
-
-  if (!story && !isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen text-white">
-        Story not found
-      </div>
-    );
-  }
-
   return (
     <>
-      <div className="inset-0 z-50">
-        <div className="flex min-h-screen">
-          <audio ref={audioRef} loop />
+      <div className="relative flex items-center justify-center min-h-screen bg-black">
+        {currentIndex > 0 && (
+          <button
+            onClick={goPrev}
+            className="absolute left-2 cursor-pointer z-20 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-all"
+            style={{ left: `calc(50% - ${mediaWidth / 2}px - 4.5rem)` }}
+          >
+            <ChevronLeft className="w-8 h-8 text-white" />
+          </button>
+        )}
 
-          <div className="relative w-full max-w-sm">
+        {currentIndex < total - 1 && (
+          <button
+            onClick={goNext}
+            className="absolute z-20 p-3 rounded-full cursor-pointer bg-black/50 hover:bg-black/70 transition-all"
+            style={{ right: `calc(50% - ${mediaWidth / 2}px - 4.5rem)` }}
+          >
+            <ChevronRight className="w-8 h-8 text-white" />
+          </button>
+        )}
+
+        <div className="flex min-h-screen" style={{ width: `${mediaWidth}px` }}>
+          <audio ref={audioRef} loop />
+          <div className="relative w-full">
             <div className="absolute top-2 left-0 right-0 z-10 px-2">
-              <div className="h-0.5 bg-white/30 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-white transition-all duration-100 ease-linear"
-                  style={{ width: `${progress}%` }}
-                />
+              <div className="flex gap-1">
+                {Array.from({ length: total }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 h-0.5 bg-white/30 rounded-full overflow-hidden"
+                  >
+                    <div
+                      className="h-full bg-white transition-none"
+                      style={{
+                        width:
+                          i < currentIndex
+                            ? "100%"
+                            : i === currentIndex
+                              ? `${progress}%`
+                              : "0%",
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 
             <div className="absolute top-5 left-0 right-0 z-10 flex items-center justify-between px-3">
               <div className="flex items-center gap-2">
                 <img
-                  src={story?.avatarUrl}
+                  src={currentStory?.avatarUrl || assets.profile}
                   className="w-9 h-9 rounded-full border-2 border-white object-cover"
                 />
                 <div>
                   <p className="text-white text-sm font-semibold drop-shadow">
-                    {story?.username}
+                    {currentStory?.username}
                   </p>
                   <p className="text-white/70 text-xs drop-shadow">
-                    {story?.createdAt ? timeAgo(story.createdAt) : ""}
+                    {currentStory?.createdAt
+                      ? timeAgo(currentStory.createdAt)
+                      : ""}
                   </p>
                 </div>
               </div>
-
               <div className="flex items-center gap-3">
-                {story?.musicUrl ? (
+                {(currentStory?.musicUrl ||
+                  isVideo(currentStory?.mediaUrl)) && (
                   <button
-                    onClick={() => setIsMuted((m) => !m)}
+                    onClick={() => setIsMuted(!isMuted)}
                     className="text-white"
                   >
                     {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
                   </button>
-                ) : (
-                  isVideo(story?.mediaUrl) && (
-                    <button
-                      onClick={() => setIsMuted((m) => !m)}
-                      className="text-white"
-                    >
-                      {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-                    </button>
-                  )
                 )}
               </div>
             </div>
-
             <div
-              ref={mediaContainerRef}
-              className="relative w-auto h-screen"
+              className="relative h-screen"
               onMouseDown={handleLongPress}
               onMouseUp={handleRelease}
               onMouseLeave={handleRelease}
               onTouchStart={handleLongPress}
               onTouchEnd={handleRelease}
             >
-              {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                </div>
-              )}
-
-              {story && isVideo(story.mediaUrl) ? (
-                <video
-                  ref={videoRef}
-                  key={story.id}
-                  src={story.mediaUrl}
-                  className="w-auto h-screen object-cover"
-                  muted={!!story.musicUrl || isMuted}
-                  playsInline
-                  autoPlay
-                  onCanPlay={() => setIsLoading(false)}
-                  onLoadStart={() => setIsLoading(true)}
-                />
-              ) : (
-                <img
-                  key={story?.id}
-                  src={story?.mediaUrl}
-                  className="w-full h-full object-cover"
-                  onLoad={() => setIsLoading(false)}
-                  onLoadStart={() => setIsLoading(true)}
-                />
-              )}
+              <StoryMedia />
             </div>
 
-            {currentUser && currentUser.id !== story?.userId ? (
-              <div className="absolute bottom-0 left-0 right-0 z-10 p-3 bg-linear-to-t from-black/60 to-transparent">
-                <div className="flex items-center gap-2">
-                  <Heart size={22} className="text-white cursor-pointer" />
-                </div>
-              </div>
-            ) : (
-              <div className="absolute bottom-0 right-0 z-10 p-3 bg-linear-to-t cursor-pointer from-black/60 to-transparent">
-                {story?.storageId ? (
-                  <div
-                    className="flex items-center gap-2 rounded-full bg-red-600 p-2 hover:bg-red-700 transition-colors"
-                    onClick={() => {
-                      if (!story.storageId) return;
-                      handleRemoveFromStorage(story.id, story.storageId);
-                    }}
-                  >
-                    <Plus size={22} className="text-white" />
-                    <span>Remove from Highlight</span>
-                  </div>
-                ) : (
-                  <div
-                    className="flex items-center gap-2 rounded-full bg-blue-600 p-2 hover:bg-blue-700 transition-colors"
-                    onClick={() => setIsOpenStorage(true)}
-                  >
-                    <Plus size={22} className="text-white" />
-                    <span>Add to Highlight</span>
+            <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+              <div className="flex items-center justify-between">
+                {currentUser && currentUser.id === currentStory?.userId && (
+                  <div>
+                    {currentStory?.storageId ? (
+                      <button
+                        onClick={() => setOpenRemoveDialog(true)}
+                        className="flex cursor-pointer items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-red-500/80 hover:border-red-400 transition-all duration-200 group"
+                      >
+                        <BookmarkMinus
+                          size={18}
+                          className="text-white/80 group-hover:text-white"
+                        />
+                        <span className="text-sm font-medium text-white/90 group-hover:text-white">
+                          Remove
+                        </span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setIsOpenStorage(true)}
+                        className="flex cursor-pointer items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-blue-500/80 hover:border-blue-400 transition-all duration-200 group"
+                      >
+                        <BookmarkPlus
+                          size={18}
+                          className="text-white/80 group-hover:text-white"
+                        />
+                        <span className="text-sm font-medium text-white/90 group-hover:text-white">
+                          Highlight
+                        </span>
+                      </button>
+                    )}
                   </div>
                 )}
+
+                <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+                  <div className="flex items-center">
+                    {currentUser && currentUser.id === currentStory?.userId && (
+                      <div>
+                        {currentStory?.storageId ? (
+                          <button
+                            onClick={() => setOpenRemoveDialog(true)}
+                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-red-500/80 transition-all duration-200"
+                          >
+                            <BookmarkMinus size={18} className="text-white" />
+                            <span className="text-sm cursor-pointer font-medium text-white">
+                              Remove
+                            </span>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setIsOpenStorage(true)}
+                            className="flex cursor-pointer items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-blue-500/80 transition-all duration-200"
+                          >
+                            <BookmarkPlus size={18} className="text-white" />
+                            <span className="text-sm font-medium text-white">
+                              Highlight
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex items-center ml-auto">
+                      <button
+                        onClick={toggleLike}
+                        disabled={currentUser?.id === currentStory?.userId}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onMouseUp={(e) => e.stopPropagation()}
+                        className={`
+                          p-1.5 rounded-full transition-transform
+                          ${
+                            currentUser?.id === currentStory?.userId
+                              ? "pointer-events-none"
+                              : "active:scale-90 hover:scale-105"
+                          }
+                        `}
+                      >
+                        <Heart
+                          size={24}
+                          className={`transition-all duration-200 cursor-pointer ${
+                            isLiked
+                              ? "text-red-500 fill-red-500 drop-shadow-lg"
+                              : "text-white/90 hover:text-red-400"
+                          }`}
+                        />
+                      </button>
+
+                      <button
+                        onClick={
+                          currentUser &&
+                          currentStory &&
+                          currentUser?.id === currentStory.userId
+                            ? () => setIsOpenLikeList(true)
+                            : undefined
+                        }
+                        className={`text-sm font-medium ${
+                          currentUser &&
+                          currentStory &&
+                          currentUser?.id === currentStory.userId
+                            ? "hover:underline cursor-pointer text-white/80 hover:text-white"
+                            : "text-white/80 cursor-default"
+                        } transition-colors`}
+                      >
+                        {formatCount(likeCount)}{" "}
+                        {likeCount === 1 ? "like" : "likes"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
-        {story && (
+
+        {currentStory && (
           <StoragePopUp
             onClose={() => setIsOpenStorage(false)}
             open={isOpenStorage}
-            storyId={story.id}
+            storyId={currentStory.id}
           />
         )}
+
+        <ConfirmDialog
+          message="Di you want to remove this story from highlight?"
+          onClose={() => setOpenRemoveDialog(false)}
+          onConfirm={async () => {
+            if (currentStory && currentStory.storageId)
+              await handleRemoveFromStorage(
+                currentStory.id,
+                currentStory.storageId,
+              );
+            updateCurrentStory((s) => ({ ...s, storageId: undefined }));
+          }}
+          open={openRemoveDialog}
+          title="Remove from hightlight"
+        />
       </div>
+      {currentStory && (
+        <LikeListPopUp
+          onClose={() => setIsOpenLikeList(false)}
+          open={isOpenLikeList}
+          targetId={currentStory.id}
+          targetType="STORY"
+        />
+      )}
     </>
   );
 };

@@ -3,6 +3,10 @@ import axios from "axios";
 import type { RegisterType } from "../types/schemas/register.schema";
 import Cookies from "js-cookie";
 import axiosInstance from "../utils/axiosInstance";
+import type {
+  ResendOtpType,
+  ResetPasswordType,
+} from "../types/schemas/resetPassword.schema";
 
 export const handleLogin = async (req: LoginType) => {
   try {
@@ -56,6 +60,67 @@ export const handleLogout = async () => {
   try {
     const res = await axiosInstance.delete(
       `${import.meta.env.VITE_API_URL}users/auth/logout`,
+    );
+    return {
+      success: true,
+      message: res.data.message,
+    };
+  } catch (err: any) {
+    const message = err.response?.data?.message;
+    return {
+      success: false,
+      message,
+    };
+  }
+};
+
+export const handleVerifyOtp = async (email: string, otp: string) => {
+  try {
+    const res = await axiosInstance.post(
+      `${import.meta.env.VITE_API_URL}users/auth/verify-otp`,
+      {
+        email,
+        otp,
+      },
+    );
+    return {
+      success: true,
+      message: res.data.message,
+      resetToken: res.data.resetToken,
+    };
+  } catch (err: any) {
+    const message = err.response?.data?.message;
+    return {
+      success: false,
+      message,
+    };
+  }
+};
+
+export const handleResetPasswod = async (data: ResetPasswordType) => {
+  try {
+    const res = await axiosInstance.post(
+      `${import.meta.env.VITE_API_URL}users/auth/reset-password`,
+      data,
+    );
+    return {
+      success: true,
+      message: res.data.message,
+    };
+  } catch (err: any) {
+    const message = err.response?.data?.message;
+    return {
+      success: false,
+      message,
+    };
+  }
+};
+
+export const handleSendOtp = async (data: ResendOtpType) => {
+  try {
+    const res = await axiosInstance.post(
+      `${import.meta.env.VITE_API_URL}users/auth/resend-otp`,
+      data,
     );
     return {
       success: true,

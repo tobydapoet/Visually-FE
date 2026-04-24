@@ -8,16 +8,16 @@ export class PostResponse {
   avatarUrl?: string;
   likeCount!: number;
   commentCount!: number;
-  shareCount!: number;
+  saveCount!: number;
   mediaUrl?: string;
 }
 
-export class PostResponsePage {
-  page!: number;
-  size!: number;
-  total!: number;
-  content!: PostResponse[];
-}
+export type PostResponsePage = {
+  page: number;
+  size: number;
+  total: number;
+  content: PostResponse[];
+};
 
 export type PostDetailResponse = {
   id: number;
@@ -28,7 +28,8 @@ export type PostDetailResponse = {
 
   likeCount: number;
   commentCount: number;
-  shareCount: number;
+  saveCount: number;
+  repostCount: number;
 
   medias: {
     id: number;
@@ -39,8 +40,8 @@ export type PostDetailResponse = {
 
   isLiked: boolean;
   isCommented: boolean;
-  isShared: boolean;
   isSaved: boolean;
+  isReposted: boolean;
 
   createdAt: string;
 

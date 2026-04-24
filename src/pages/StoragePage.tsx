@@ -65,7 +65,7 @@ const StoragePage: React.FC = () => {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleStoryClick = (storyId: number) => {
-    navigate(`/stories/${storyId}`);
+    navigate(`/story/${storyId}`);
   };
 
   return (

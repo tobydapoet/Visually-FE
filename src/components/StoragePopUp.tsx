@@ -7,6 +7,7 @@ import { useUser } from "../contexts/user.context";
 import { handleAddToStorage, handleGetStorageByUser } from "../api/story.api";
 import { toast } from "sonner";
 import { CircularProgress } from "@mui/material";
+import { useStory } from "../contexts/story.context";
 
 type Props = {
   open: boolean;
@@ -19,6 +20,7 @@ const StoragePopUp: React.FC<Props> = ({ open, onClose, storyId }) => {
   const [selectedStorageId, setSelectedStorageId] = useState<number | null>(
     null,
   );
+  const { updateCurrentStory } = useStory();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { currentUser } = useUser();
@@ -58,6 +60,7 @@ const StoragePopUp: React.FC<Props> = ({ open, onClose, storyId }) => {
       const res = await handleAddToStorage(storyId, selectedStorageId);
       if (res.success) {
         toast.success(res.message);
+        updateCurrentStory((s) => ({ ...s, storageId: selectedStorageId }));
         onClose();
       } else {
         toast.error(res.message);
@@ -78,7 +81,7 @@ const StoragePopUp: React.FC<Props> = ({ open, onClose, storyId }) => {
         >
           <DialogTitle className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
             <div className="text-md font-semibold text-white">
-              Lưu vào Highlight
+              Save to hightlight
             </div>
             <button
               onClick={onClose}

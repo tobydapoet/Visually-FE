@@ -10,7 +10,7 @@ function RoleBasedLayout() {
 
   const payload = parseJwt(token);
 
-  const isAdmin = payload?.roles?.includes("ADMIN");
+  const isAdmin = payload?.role === "ADMIN";
 
   return isAdmin ? <ManageLayout /> : <DefaultLayout />;
 }

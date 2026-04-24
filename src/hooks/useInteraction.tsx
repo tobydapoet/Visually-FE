@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import {
   handleLike,
   handleComment,
-  handleShare,
+  handleSave,
   handleDislike,
-  handleUnshare,
+  handleUnsave,
   handleUpdateComment,
 } from "../api/interaction.api";
 import type { PostDetailResponse } from "../types/api/post.type";
@@ -12,33 +12,42 @@ import type { ShortDetailResponse } from "../types/api/short.type";
 import type {
   CommentTargetType,
   LikeTargetType,
-  ShareTargetType,
+  RepostTargetType,
+  SaveTargetType,
 } from "../constants/interaction.enum";
 import type { CommentResponse } from "../types/api/interaction.type";
 import type { MentionItem } from "../types/api/mention.type";
+import { handleDeleteRepost, handleRepost } from "../api/post.api";
+import type { FeedContentResponse } from "../types/api/feed.type";
 
 export const useContentInteraction = (
-  content: PostDetailResponse | ShortDetailResponse | null,
+  content:
+    | PostDetailResponse
+    | ShortDetailResponse
+    | FeedContentResponse
+    | null,
   type: "POST" | "SHORT",
 ) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isCommented, setIsCommented] = useState(false);
-  const [isShared, setIsShared] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isReposted, setIsReposted] = useState(false);
 
   const [likeCount, setLikeCount] = useState(0);
   const [commentCount, setCommentCount] = useState(0);
-  const [shareCount, setShareCount] = useState(0);
+  const [saveCount, setSaveCount] = useState(0);
+  const [repostCount, setRepostCount] = useState(0);
 
   useEffect(() => {
     if (!content) return;
     setIsLiked(content.isLiked ?? false);
     setIsCommented(content.isCommented ?? false);
-    setIsShared(content.isShared ?? false);
     setIsSaved(content.isSaved ?? false);
+    setIsReposted(content.isReposted ?? false);
     setLikeCount(content.likeCount ?? 0);
     setCommentCount(content.commentCount ?? 0);
-    setShareCount(content.shareCount ?? content.shareCount ?? 0);
+    setRepostCount(content.repostCount ?? 0);
+    setSaveCount(content.saveCount ?? 0);
   }, [content]);
 
   const toggleLike = async () => {
@@ -73,11 +82,17 @@ export const useContentInteraction = (
     parentId?: number,
   ): Promise<CommentResponse | null> => {
     if (!content) return null;
+    console.log("metions: ", mentions);
     const newComment = await handleComment({
       targetId: content.id,
       targetType: type as CommentTargetType,
       content: message,
-      mentions,
+      mentions: mentions?.map((mention) => {
+        return {
+          userId: mention.userId,
+          username: mention.username,
+        };
+      }),
       replyToId: parentId,
     });
     if (newComment) {
@@ -103,45 +118,43 @@ export const useContentInteraction = (
     );
   };
 
-  const toggleShare = async () => {
-    if (!content) return;
-    const prevShare = isShared;
-    setIsShared(!prevShare);
-    setShareCount((prev) => (prevShare ? prev - 1 : prev + 1));
-    try {
-      if (prevShare) {
-        await handleUnshare(content.id, type as ShareTargetType);
-      } else {
-        await handleShare({
-          targetId: content.id,
-          targetType: type as ShareTargetType,
-          isPublic: true,
-        });
-      }
-    } catch (err) {
-      setIsShared(prevShare);
-      setShareCount((prev) => (prevShare ? prev + 1 : prev - 1));
-    }
-  };
-
   const toggleSave = async () => {
     if (!content) return;
     const prevSave = isSaved;
     setIsSaved(!prevSave);
-    setShareCount((prev) => (prevSave ? prev - 1 : prev + 1));
+    setSaveCount((prev) => (prevSave ? prev - 1 : prev + 1));
     try {
       if (prevSave) {
-        await handleUnshare(content.id, type as ShareTargetType);
+        await handleUnsave(content.id, type as SaveTargetType);
       } else {
-        await handleShare({
+        await handleSave({
           targetId: content.id,
-          targetType: type as ShareTargetType,
-          isPublic: false,
+          targetType: type as SaveTargetType,
         });
       }
     } catch (err) {
       setIsSaved(prevSave);
-      setShareCount((prev) => (prevSave ? prev + 1 : prev - 1));
+      setSaveCount((prev) => (prevSave ? prev + 1 : prev - 1));
+    }
+  };
+
+  const toggleRepost = async () => {
+    if (!content) return;
+    const prevReposted = isReposted;
+    setIsReposted(!prevReposted);
+    setRepostCount((prev) => (prevReposted ? prev - 1 : prev + 1));
+
+    try {
+      if (prevReposted) {
+        await handleDeleteRepost(content.id, type as RepostTargetType);
+        console.log("LOST");
+      } else {
+        await handleRepost(content.id, type as RepostTargetType);
+        console.log("POST");
+      }
+    } catch {
+      setIsReposted(prevReposted);
+      setRepostCount((prev) => (prevReposted ? prev + 1 : prev - 1));
     }
   };
 
@@ -171,16 +184,17 @@ export const useContentInteraction = (
   return {
     isLiked,
     isCommented,
-    isShared,
     isSaved,
+    isReposted,
     likeCount,
     commentCount,
-    shareCount,
+    saveCount,
+    repostCount,
     toggleLike,
     onUpdateComment,
     onComment,
-    toggleShare,
     toggleSave,
     toggleCommentLike,
+    toggleRepost,
   };
 };

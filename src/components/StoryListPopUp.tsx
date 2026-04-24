@@ -37,7 +37,7 @@ const StoryListPopUp: React.FC<Props> = ({ open, onClose }) => {
           ? nextPage
           : undefined;
       },
-      enabled: !!currentUser?.id,
+      enabled: open,
       refetchOnMount: true,
     });
 

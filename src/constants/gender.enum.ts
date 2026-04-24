@@ -4,3 +4,10 @@ export const Gender = {
   OTHER: "OTHER",
 } as const;
 export type Gender = (typeof Gender)[keyof typeof Gender];
+
+export const GenderSelect = {
+  MALE: "MALE",
+  FEMALE: "FEMALE",
+  ALL: "ALL",
+} as const;
+export type GenderSelect = (typeof GenderSelect)[keyof typeof GenderSelect];

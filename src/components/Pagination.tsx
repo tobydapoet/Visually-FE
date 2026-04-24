@@ -1,155 +1,83 @@
-import React from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  hasFirst: boolean;
-  hasLast: boolean;
 }
-
-type PageNumber = number | "...";
 
 const Pagination: React.FC<PaginationProps> = ({
   currentPage,
   totalPages,
   onPageChange,
-  hasFirst,
-  hasLast,
 }) => {
-  const getPageNumbers = (): PageNumber[] => {
-    const delta = 2;
-    const range: number[] = [];
-    const rangeWithDots: PageNumber[] = [];
-    let l: number | undefined;
+  if (totalPages <= 1) return null;
 
-    for (let i = 1; i <= totalPages; i++) {
-      if (
-        i === 1 ||
-        i === totalPages ||
-        (i >= currentPage - delta && i <= currentPage + delta)
-      ) {
-        range.push(i);
-      }
-    }
+  const maxVisible = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+  if (endPage - startPage + 1 < maxVisible) {
+    startPage = Math.max(1, endPage - maxVisible + 1);
+  }
 
-    range.forEach((i) => {
-      if (l !== undefined) {
-        if (i - l === 2) {
-          rangeWithDots.push(l + 1);
-        } else if (i - l !== 1) {
-          rangeWithDots.push("...");
-        }
-      }
-      rangeWithDots.push(i);
-      l = i;
-    });
-
-    return rangeWithDots;
-  };
-
-  const handlePageClick = (page: PageNumber) => {
-    if (typeof page === "number") {
-      onPageChange(page);
-    }
-  };
+  const pages = [];
+  for (let i = startPage; i <= endPage; i++) pages.push(i);
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
-      <div className="flex flex-1 justify-between sm:hidden">
-        <button
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={hasFirst}
-          className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Previous page"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={hasLast}
-          className="relative ml-3 inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Next page"
-        >
-          Next
-        </button>
-      </div>
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="p-2 border cursor-pointer border-gray-700 rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-auto transition-colors text-gray-300"
+      >
+        <ChevronLeft className="w-4 h-4" />
+      </button>
 
-      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm text-gray-700">
-            Page <span className="font-medium">{currentPage}</span> of{" "}
-            <span className="font-medium">{totalPages}</span>
-          </p>
-        </div>
-        <div>
-          <nav
-            className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-            aria-label="Pagination"
+      {startPage > 1 && (
+        <>
+          <button
+            onClick={() => onPageChange(1)}
+            className="px-3 py-1 border border-gray-700 rounded-md hover:bg-gray-800 transition-colors text-gray-300"
           >
-            <button
-              onClick={() => onPageChange(1)}
-              disabled={hasFirst}
-              className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="First page"
-            >
-              <ChevronsLeft className="h-5 w-5" aria-hidden="true" />
-            </button>
-            <button
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={hasFirst}
-              className="relative inline-flex items-center px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Previous page"
-            >
-              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-            </button>
+            1
+          </button>
+          {startPage > 2 && <span className="px-2 text-gray-500">...</span>}
+        </>
+      )}
 
-            {getPageNumbers().map((page, idx) => (
-              <button
-                key={idx}
-                onClick={() => handlePageClick(page)}
-                disabled={page === "..."}
-                className={`
-                  relative inline-flex items-center px-4 py-2 text-sm font-semibold
-                  ${
-                    page === currentPage
-                      ? "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                  }
-                  ${page === "..." ? "cursor-default" : "cursor-pointer"}
-                `}
-                aria-label={page === "..." ? "More pages" : `Page ${page}`}
-                aria-current={page === currentPage ? "page" : undefined}
-              >
-                {page}
-              </button>
-            ))}
+      {pages.map((page) => (
+        <button
+          key={page}
+          onClick={() => onPageChange(page)}
+          className={`px-3 py-1 border rounded-md transition-colors cursor-pointer ${
+            page === currentPage
+              ? "bg-blue-600 text-white border-blue-600"
+              : "border-gray-700 hover:bg-gray-800 text-gray-300"
+          }`}
+        >
+          {page}
+        </button>
+      ))}
 
-            <button
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={hasLast}
-              className="relative inline-flex items-center px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Next page"
-            >
-              <ChevronRight className="h-5 w-5" aria-hidden="true" />
-            </button>
-            <button
-              onClick={() => onPageChange(totalPages)}
-              disabled={hasLast}
-              className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Last page"
-            >
-              <ChevronsRight className="h-5 w-5" aria-hidden="true" />
-            </button>
-          </nav>
-        </div>
-      </div>
+      {endPage < totalPages - 1 && (
+        <>
+          <span className="px-2 text-gray-500">...</span>
+          <button
+            onClick={() => onPageChange(totalPages)}
+            className="px-3 py-1 border border-gray-700 rounded-md hover:bg-gray-800 transition-colors text-gray-300"
+          >
+            {totalPages}
+          </button>
+        </>
+      )}
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage >= totalPages}
+        className="p-2 border border-gray-700 rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-auto cursor-pointer transition-colors text-gray-300"
+      >
+        <ChevronRight className="w-4 h-4" />
+      </button>
     </div>
   );
 };

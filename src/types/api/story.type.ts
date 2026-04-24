@@ -15,3 +15,18 @@ export class StoryResponsePage {
   total!: number;
   content!: StoryResponse[];
 }
+
+export class StoryUserResponse {
+  id!: number;
+  userId!: string;
+  username!: string;
+  avatarUrl?: string;
+  isViewed!: boolean;
+}
+
+export class StoryUserPageResponse {
+  page!: number;
+  size!: number;
+  total!: number;
+  content!: StoryUserResponse[];
+}

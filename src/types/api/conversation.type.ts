@@ -14,4 +14,5 @@ export interface ConversationType {
   lastMessage?: string | null;
   otherUsers: UserConverstation[];
   isRead: boolean;
+  isBlocked: boolean;
 }

@@ -12,7 +12,6 @@ type UseMentionKeyboardProps = {
 export const useMentionKeyboard = ({
   open,
   searchResultsLength,
-  activeIndex,
   setActiveIndex,
   onSelectUser,
   onClose,

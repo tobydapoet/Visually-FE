@@ -9,6 +9,7 @@ interface ConfirmDialogProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
+  onConfirmClose?: () => void;
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -17,6 +18,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   onConfirm,
   title,
   message,
+  onConfirmClose,
   confirmText = "Yes",
   cancelText = "Cancel",
 }) => {
@@ -42,7 +44,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             <button
               onClick={() => {
                 onConfirm();
-                onClose();
+                (onConfirmClose ?? onClose)?.();
               }}
               className="px-4 py-2 rounded-lg cursor-pointer bg-red-600 hover:bg-red-700 transition-colors"
             >

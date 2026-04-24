@@ -1,13 +1,13 @@
 import type React from "react";
 import SideBarMessage from "../components/SideBarMessage";
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import assets from "../assets";
 import { CircularProgress } from "@mui/material";
 import MessageInput, { type MessageInputRef } from "../components/MessageInput";
 import { useMessage } from "../contexts/message.context";
 import { useUser } from "../contexts/user.context";
-import { EllipsisVertical, Eraser, Pencil, Reply, X } from "lucide-react";
+import { Ban, EllipsisVertical, Eraser, Pencil, Reply, X } from "lucide-react";
 import DetailConversation from "./DetailConversation";
 import type { Message } from "../types/api/message.type";
 import { ParsedContent } from "../components/ParseContent";
@@ -35,6 +35,7 @@ const MessagePage: React.FC = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
   const messageInputRef = useRef<MessageInputRef>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (id && currentUser) {
@@ -141,7 +142,12 @@ const MessagePage: React.FC = () => {
                         selectedConversation.name ||
                         selectedConversation.otherUsers[0].username
                       }
-                      className="w-10 h-10 rounded-full object-cover"
+                      className="w-10 h-10 cursor-pointer rounded-full object-cover"
+                      onClick={() =>
+                        navigate(
+                          `/${selectedConversation.otherUsers[0].username}`,
+                        )
+                      }
                     />
                   )}
                   <div className="font-bold">
@@ -195,7 +201,7 @@ const MessagePage: React.FC = () => {
                           )}
 
                           <div className="group relative flex">
-                            {!msg.isOwn && (
+                            {!msg.isOwn && !selectedConversation.isBlocked && (
                               <div className="opacity-0 ml-2 flex order-1 justify-center items-center group-hover:opacity-100 transition-all duration-200 mr-1">
                                 <button
                                   onClick={() => setReplyTo(msg)}
@@ -207,7 +213,7 @@ const MessagePage: React.FC = () => {
                               </div>
                             )}
 
-                            {msg.isOwn && (
+                            {msg.isOwn && !selectedConversation.isBlocked && (
                               <div
                                 className="mr-2
                                 opacity-0 group-hover:opacity-100 
@@ -360,21 +366,30 @@ const MessagePage: React.FC = () => {
                 </div>
               )}
 
-              <MessageInput
-                ref={messageInputRef}
-                key={inputResetKey}
-                mode="MESSAGE"
-                conversationId={selectedConversation.id}
-                onSend={async (message, files, mentions) => {
-                  if (editingId) {
-                    await updateMessage(editingId, message, mentions);
-                    setEditingId(null);
-                  } else {
-                    await sendMessage(message, files, replyTo?.id, mentions);
-                    setReplyTo(null);
-                  }
-                }}
-              />
+              {selectedConversation.isBlocked ? (
+                <div className="flex items-center justify-center px-4 py-3 border-t border-neutral-800">
+                  <div className="flex items-center gap-2 text-neutral-500 text-sm">
+                    <Ban className="w-4 h-4 shrink-0" />
+                    <span>You can't reply to this conversation</span>
+                  </div>
+                </div>
+              ) : (
+                <MessageInput
+                  ref={messageInputRef}
+                  key={inputResetKey}
+                  mode="MESSAGE"
+                  conversationId={selectedConversation.id}
+                  onSend={async (message, files, mentions) => {
+                    if (editingId) {
+                      await updateMessage(editingId, message, mentions);
+                      setEditingId(null);
+                    } else {
+                      await sendMessage(message, files, replyTo?.id, mentions);
+                      setReplyTo(null);
+                    }
+                  }}
+                />
+              )}
             </div>
             <DetailConversation
               open={isOpenDetail}

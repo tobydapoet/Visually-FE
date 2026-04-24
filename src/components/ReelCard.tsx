@@ -1,0 +1,335 @@
+import { useState, useRef, useEffect } from "react";
+import {
+  Heart,
+  MessageCircle,
+  Bookmark,
+  Send,
+  MoreHorizontal,
+} from "lucide-react";
+import type { FeedContentResponse } from "../types/api/feed.type";
+import { MediaCarousel } from "./MediaCarousel";
+import assets from "../assets";
+import { useContentInteraction } from "../hooks/useInteraction";
+import CommentComponent, { type CommentComponentRef } from "./CommentComponent";
+import type { MessageInputRef } from "./MessageInput";
+import { useUser } from "../contexts/user.context";
+import MessageInput from "./MessageInput";
+import type { MentionItem } from "../types/api/mention.type";
+import ActionBtn from "./ActionButton";
+import { handleView } from "../api/interaction.api";
+import { useNavigate } from "react-router-dom";
+
+interface ReelCardProps {
+  reel: FeedContentResponse;
+  isActive: boolean;
+}
+
+export function ReelCard({ reel, isActive }: ReelCardProps) {
+  const [expanded, setExpanded] = useState(false);
+  const [heartAnim, setHeartAnim] = useState(false);
+  const [isOpenComment, setIsOpenComment] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const commentRef = useRef<CommentComponentRef>(null);
+  const [replyingToId, setReplyingToId] = useState<number | null>(null);
+
+  const messageInputRef = useRef<MessageInputRef>(null);
+  const { currentUser } = useUser();
+  const startTimeRef = useRef<number | null>(null);
+  const accumulatedTimeRef = useRef<number>(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isActive) {
+      startTimeRef.current = Date.now();
+    }
+
+    return () => {
+      if (startTimeRef.current) {
+        accumulatedTimeRef.current += Date.now() - startTimeRef.current;
+        startTimeRef.current = null;
+
+        handleView(
+          reel.id,
+          reel.contentType as "POST" | "SHORT",
+          Math.floor(accumulatedTimeRef.current / 1000),
+        );
+      }
+    };
+  }, [isActive]);
+
+  const lastTap = useRef(0);
+
+  const {
+    isLiked,
+    isSaved,
+    isReposted,
+    likeCount,
+    saveCount,
+    repostCount,
+    commentCount,
+    onComment,
+    toggleLike,
+    toggleSave,
+    onUpdateComment,
+    toggleRepost,
+    toggleCommentLike,
+  } = useContentInteraction(reel, reel.contentType as "POST" | "SHORT");
+
+  const handleTap = () => {
+    const now = Date.now();
+    if (now - lastTap.current < 300) {
+      if (!isLiked) toggleLike();
+      setHeartAnim(true);
+      setTimeout(() => setHeartAnim(false), 900);
+    }
+    lastTap.current = now;
+  };
+
+  const caption = reel.caption ?? "";
+  const isLong = caption.length > 80;
+  const displayCaption =
+    isLong && !expanded ? caption.slice(0, 80) + "…" : caption;
+
+  const handleSend = async (content: string, mentions?: MentionItem[]) => {
+    if (editingCommentId) {
+      await onUpdateComment(editingCommentId, content, mentions);
+      commentRef.current?.updateComment(editingCommentId, content, mentions);
+      setEditingCommentId(null);
+    } else {
+      const newComment = await onComment(
+        content,
+        mentions,
+        replyingToId ?? undefined,
+      );
+      if (newComment) {
+        if (replyingToId) {
+          commentRef.current?.addReply(replyingToId, {
+            ...newComment,
+            mentions: newComment.mentions ?? mentions ?? [],
+          });
+        } else {
+          commentRef.current?.addComment({
+            ...newComment,
+            mentions: newComment.mentions ?? mentions ?? [],
+          });
+        }
+      }
+      setReplyingToId(null);
+      messageInputRef.current?.clearText();
+    }
+  };
+
+  return (
+    <div className="relative h-full flex" style={{ scrollSnapAlign: "start" }}>
+      <div
+        className="relative w-150 object-cover h-full shrink-0 overflow-hidden"
+        onClick={handleTap}
+        style={{ scrollSnapAlign: "start" }}
+      >
+        <MediaCarousel medias={reel.medias ?? []} isActive={isActive} />
+
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 42%, rgba(0,0,0,0.15) 100%)",
+            zIndex: 10,
+          }}
+        />
+
+        {heartAnim && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
+            <Heart
+              size={110}
+              fill="#ff3b5c"
+              color="#ff3b5c"
+              style={{
+                filter: "drop-shadow(0 0 30px #ff3b5c88)",
+                animation: "heartPop 0.9s ease forwards",
+              }}
+            />
+          </div>
+        )}
+
+        <div
+          className="absolute right-3 bottom-24 flex flex-col items-center gap-5 z-20"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <ActionBtn
+            icon={
+              isLiked ? (
+                <Heart size={28} fill="#ff3b5c" color="#ff3b5c" />
+              ) : (
+                <Heart size={28} fill="none" color="white" strokeWidth={2} />
+              )
+            }
+            label={likeCount}
+            onClick={toggleLike}
+            active={isLiked}
+            activeColor="#ff3b5c"
+          />
+
+          <ActionBtn
+            icon={<MessageCircle size={28} color="white" strokeWidth={2} />}
+            label={reel.commentCount}
+            onClick={() => setIsOpenComment((prev) => !prev)}
+          />
+
+          <ActionBtn
+            icon={
+              isSaved ? (
+                <Bookmark size={28} fill="white" color="white" />
+              ) : (
+                <Bookmark size={28} fill="none" color="white" strokeWidth={2} />
+              )
+            }
+            label={saveCount}
+            onClick={toggleSave}
+            active={isSaved}
+            activeColor="white"
+          />
+
+          <ActionBtn
+            icon={
+              <Send
+                size={26}
+                color={isReposted ? "#3b82f6" : "white"}
+                strokeWidth={2}
+              />
+            }
+            label={repostCount}
+            onClick={toggleRepost}
+            active={isReposted}
+            activeColor="#3b82f6"
+          />
+
+          <ActionBtn icon={<MoreHorizontal size={26} color="white" />} />
+        </div>
+
+        <div
+          className="absolute bottom-6 left-4 right-16 z-20"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            className="flex items-center gap-2 mb-2 cursor-pointer w-fit"
+            onClick={() => navigate(`/${reel.username}`)}
+          >
+            <img
+              src={reel.avatarUrl || assets.profile}
+              alt={reel.username}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <span
+              className="text-white font-bold text-sm"
+              style={{ textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}
+            >
+              {reel.username}
+            </span>
+          </div>
+
+          {caption && (
+            <p
+              className="text-white text-sm leading-snug mb-2"
+              style={{ textShadow: "0 1px 4px rgba(0,0,0,0.7)" }}
+            >
+              {displayCaption}
+              {isLong && (
+                <button
+                  className="ml-1 text-white/60 font-semibold cursor-pointer"
+                  onClick={() => setExpanded((v) => !v)}
+                >
+                  {expanded ? " less" : " more"}
+                </button>
+              )}
+            </p>
+          )}
+
+          {(reel.tags?.length ?? 0) > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {reel.tags.map((t) => (
+                <span
+                  key={t.id}
+                  className="text-xs font-semibold"
+                  style={{
+                    color: "rgba(255,255,255,0.7)",
+                    textShadow: "0 1px 3px rgba(0,0,0,0.8)",
+                  }}
+                >
+                  #{t.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {isOpenComment && (
+        <div
+          className="
+            h-full flex flex-col overflow-hidden relative
+            w-100 
+            bg-[rgba(15,15,15,0.98)]
+            border-l border-[rgba(255,255,255,0.08)]
+            "
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex-1 overflow-y-auto relative">
+            <div className="flex-1 overflow-y-auto py-2 px-3 relative">
+              <CommentComponent
+                ref={commentRef}
+                targetId={reel.id}
+                targetType={reel.contentType}
+                commentCount={commentCount}
+                toggleCommentLike={toggleCommentLike}
+                onEditComment={(comment) => {
+                  setReplyingToId(null);
+                  setEditingCommentId(comment.id);
+                  messageInputRef.current?.setText(
+                    comment.content,
+                    comment.mentions,
+                    true,
+                  );
+                }}
+                onDeleteComment={(commentId) => {
+                  commentRef.current?.deleteComment(commentId);
+                }}
+                onReplyComment={(comment) => {
+                  setEditingCommentId(null);
+                  setReplyingToId(comment.id);
+
+                  if (comment.username !== currentUser?.username) {
+                    messageInputRef.current?.setText(
+                      `@${comment.username} `,
+                      [
+                        {
+                          userId: comment.userId,
+                          username: comment.username,
+                        },
+                      ],
+                      false,
+                    );
+                    messageInputRef.current?.setReplyingTo(comment.username);
+                  } else {
+                    messageInputRef.current?.setText("", [], false);
+                    messageInputRef.current?.setReplyingTo(comment.username);
+                  }
+                }}
+              />
+            </div>
+            {currentUser && currentUser.role.includes("CLIENT") && (
+              <div className="absolute bottom-0 w-full">
+                <MessageInput
+                  ref={messageInputRef}
+                  mode="COMMENT"
+                  onSend={async (message, mentions) => {
+                    handleSend(message, mentions);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

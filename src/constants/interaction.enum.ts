@@ -14,12 +14,12 @@ export const CommentTargetType = {
 export type CommentTargetType =
   (typeof CommentTargetType)[keyof typeof CommentTargetType];
 
-export const ShareTargetType = {
+export const SaveTargetType = {
   POST: "POST",
   SHORT: "SHORT",
 } as const;
-export type ShareTargetType =
-  (typeof ShareTargetType)[keyof typeof ShareTargetType];
+export type SaveTargetType =
+  (typeof SaveTargetType)[keyof typeof SaveTargetType];
 
 export const ReportTargetType = {
   POST: "POST",
@@ -27,3 +27,10 @@ export const ReportTargetType = {
 } as const;
 export type ReportTargetType =
   (typeof ReportTargetType)[keyof typeof ReportTargetType];
+
+export const RepostTargetType = {
+  POST: "POST",
+  SHORT: "SHORT",
+} as const;
+export type RepostTargetType =
+  (typeof RepostTargetType)[keyof typeof RepostTargetType];

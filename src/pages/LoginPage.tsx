@@ -10,6 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema, type LoginType } from "../types/schemas/login.schema";
 import { handleLogin } from "../api/auth.api";
 import { toast } from "sonner";
+import parseJwt from "../utils/parseToken";
+import Cookies from "js-cookie";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -27,7 +29,18 @@ const LoginPage: React.FC = () => {
     const res = await handleLogin(data);
     if (res.success) {
       toast.success("Login success!");
-      navigate("/");
+      const token = Cookies.get("access_token");
+      if (!token) {
+        navigate("/login");
+      } else {
+        const payload = parseJwt(token);
+        const isAdmin = payload?.role === "ADMIN";
+        if (isAdmin) {
+          navigate("/music_library");
+        } else {
+          navigate("/");
+        }
+      }
     } else {
       toast.error(res.message);
     }
@@ -129,7 +142,7 @@ const LoginPage: React.FC = () => {
                 )}
               />
               <Link
-                to="#"
+                to="/forgot"
                 className="text-sm font-medium text-blue-400 hover:underline"
               >
                 Forgot password?

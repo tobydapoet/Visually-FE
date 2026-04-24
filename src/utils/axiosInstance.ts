@@ -38,6 +38,7 @@ axiosInstance.interceptors.response.use(
     console.log("❌ err:", err);
     console.log("❌ err.config:", err.config);
     console.log("❌ err.response?.status:", err.response?.status);
+    console.log("❌ err.response?.data:", err.response?.data);
 
     if (err.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(err);

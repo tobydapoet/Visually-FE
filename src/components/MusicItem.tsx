@@ -40,13 +40,13 @@ const statusActions: Record<
       label: "Approve",
       status: MusicStatus.ACTIVE,
       icon: <CheckCircle size={14} />,
-      className: "text-green-600 hover:bg-green-50",
+      className: "text-emerald-400 hover:bg-emerald-500/10",
     },
     {
       label: "Delete",
       status: MusicStatus.DELETED,
       icon: <Trash2 size={14} />,
-      className: "text-red-600 hover:bg-red-50",
+      className: "text-red-400 hover:bg-red-500/10",
     },
   ],
   [MusicStatus.ACTIVE]: [
@@ -54,13 +54,13 @@ const statusActions: Record<
       label: "Suspend",
       status: MusicStatus.SUSPENDED,
       icon: <Ban size={14} />,
-      className: "text-yellow-600 hover:bg-yellow-50",
+      className: "text-amber-400 hover:bg-amber-500/10",
     },
     {
       label: "Delete",
       status: MusicStatus.DELETED,
       icon: <Trash2 size={14} />,
-      className: "text-red-600 hover:bg-red-50",
+      className: "text-red-400 hover:bg-red-500/10",
     },
   ],
   [MusicStatus.SUSPENDED]: [
@@ -68,13 +68,13 @@ const statusActions: Record<
       label: "Activate",
       status: MusicStatus.ACTIVE,
       icon: <Play size={14} />,
-      className: "text-green-600 hover:bg-green-50",
+      className: "text-emerald-400 hover:bg-emerald-500/10",
     },
     {
       label: "Delete",
       status: MusicStatus.DELETED,
       icon: <Trash2 size={14} />,
-      className: "text-red-600 hover:bg-red-50",
+      className: "text-red-400 hover:bg-red-500/10",
     },
   ],
   [MusicStatus.DELETED]: [],
@@ -118,17 +118,17 @@ const MusicItem: React.FC<MusicItemProps> = ({
   return (
     <>
       <div
-        className={`flex items-center gap-3 p-3 bg-white rounded-lg border transition-all relative ${
+        className={`flex items-center gap-3 p-3 bg-neutral-900 rounded-lg border transition-all relative cursor-pointer ${
           isSelected
-            ? "border-indigo-400 shadow-sm bg-indigo-50"
-            : "border-gray-200 hover:shadow-sm hover:border-indigo-300"
+            ? "border-indigo-500 shadow-sm bg-indigo-500/10"
+            : "border-neutral-800 hover:shadow-sm hover:border-indigo-500/50 hover:bg-neutral-800/50"
         }`}
         onClick={() => onSelect?.(music)}
       >
         <img
           src={music.img}
           alt={music.title}
-          className="w-12 h-12 rounded-lg object-cover"
+          className="w-12 h-12 rounded-lg object-cover bg-neutral-800"
           onError={(e) => {
             e.currentTarget.src =
               "https://via.placeholder.com/48x48?text=No+Image";
@@ -136,11 +136,11 @@ const MusicItem: React.FC<MusicItemProps> = ({
         />
 
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold text-gray-900 truncate">
+          <h4 className="text-sm font-semibold text-white truncate">
             {music.title}
           </h4>
           <div className="flex items-center gap-1 mt-0.5">
-            <p className="text-xs text-gray-500 truncate">{music.artist}</p>
+            <p className="text-xs text-neutral-400 truncate">{music.artist}</p>
           </div>
         </div>
 
@@ -149,29 +149,29 @@ const MusicItem: React.FC<MusicItemProps> = ({
             onClick={handleTogglePlay}
             className={`p-1.5 rounded-full transition-colors ${
               isPlaying
-                ? "bg-indigo-100 hover:bg-indigo-200"
-                : "bg-gray-50 hover:bg-indigo-50"
+                ? "bg-indigo-500/20 hover:bg-indigo-500/30"
+                : "bg-neutral-800 hover:bg-indigo-500/10"
             }`}
           >
             {isPlaying ? (
-              <Pause size={14} className="text-indigo-500" />
+              <Pause size={14} className="text-indigo-400" />
             ) : (
-              <Music size={14} className="text-gray-500" />
+              <Music size={14} className="text-neutral-400" />
             )}
           </button>
 
           <Menu as="div" className="relative">
             <MenuButton
               onClick={(e) => e.stopPropagation()}
-              className="p-1.5 bg-gray-50 rounded-full hover:bg-gray-100 transition-colors"
+              className="p-1.5 bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors"
             >
-              <MoreVertical size={14} className="text-gray-500" />
+              <MoreVertical size={14} className="text-neutral-400" />
             </MenuButton>
 
             <MenuItems
               transition
               anchor="bottom end"
-              className="w-40 bg-white origin-top-right rounded-xl border border-gray-200 shadow-lg p-1 z-50 focus:outline-none
+              className="w-40 bg-neutral-900 origin-top-right rounded-xl border border-neutral-800 shadow-lg p-1 z-50 focus:outline-none
                   transition duration-150 ease-out
                   data-closed:scale-95 data-closed:opacity-0"
             >
@@ -179,8 +179,10 @@ const MusicItem: React.FC<MusicItemProps> = ({
                 {({ focus }) => (
                   <button
                     onClick={handleEdit}
-                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 rounded-lg transition-colors ${
-                      focus ? "bg-gray-50" : ""
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
+                      focus
+                        ? "bg-neutral-800 text-white"
+                        : "text-neutral-300 hover:bg-neutral-800"
                     }`}
                   >
                     <Edit size={14} />
@@ -190,7 +192,7 @@ const MusicItem: React.FC<MusicItemProps> = ({
               </MenuItem>
 
               {actions.length > 0 && (
-                <div className="my-1 border-t border-gray-100" />
+                <div className="my-1 border-t border-neutral-800" />
               )}
 
               {actions.map((action) => (
@@ -200,7 +202,7 @@ const MusicItem: React.FC<MusicItemProps> = ({
                       onClick={() => handleUpdateStatus(action.status)}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
                         action.className
-                      } ${focus ? "opacity-80" : ""}`}
+                      } ${focus ? "bg-neutral-800" : ""}`}
                     >
                       {action.icon}
                       <span>{action.label}</span>

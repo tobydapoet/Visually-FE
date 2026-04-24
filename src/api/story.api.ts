@@ -1,10 +1,11 @@
-import axios from "axios";
 import type {
-  StoryPageResponse,
   StoryResponse,
   StoryStorageResponse,
 } from "../types/api/storage.type";
-import type { StoryResponsePage } from "../types/api/story.type";
+import type {
+  StoryResponsePage,
+  StoryUserPageResponse,
+} from "../types/api/story.type";
 import type { CreateStorageType } from "../types/schemas/storage.schema";
 import axiosInstance from "../utils/axiosInstance";
 
@@ -41,6 +42,15 @@ export const handleGetStoryByUser = async (
   return res.data;
 };
 
+export const handleValidStoryByUser = async (
+  username: string,
+): Promise<StoryResponse[]> => {
+  const res = await axiosInstance.get(
+    `${import.meta.env.VITE_API_URL}contents/story/user-valid/${username}`,
+  );
+  return res.data;
+};
+
 export const handleCreateStorage = async (data: CreateStorageType) => {
   try {
     const res = await axiosInstance.post(
@@ -70,12 +80,10 @@ export const handleGetStorageByUser = async (
 
 export const handleGetStoryInStorage = async (
   storageId: number,
-  page = 1,
-): Promise<StoryPageResponse> => {
+): Promise<StoryResponse[]> => {
   const res = await axiosInstance.get(
-    `${import.meta.env.VITE_API_URL}contents/story/storage/${storageId}?page=${page}`,
+    `${import.meta.env.VITE_API_URL}contents/story/storage/${storageId}`,
   );
-  console.log("RES: ", res.data);
   return res.data;
 };
 
@@ -83,7 +91,6 @@ export const handleGetStory = async (id: number): Promise<StoryResponse> => {
   const res = await axiosInstance.get(
     `${import.meta.env.VITE_API_URL}contents/story/${id}`,
   );
-  console.log("RES: ", res.data);
   return res.data;
 };
 
@@ -125,4 +132,15 @@ export const handleRemoveFromStorage = async (
       message: err.response?.data?.message || "Remove failed",
     };
   }
+};
+
+export const handleGetNonExpiredStories = async (
+  page: number,
+  size: number,
+): Promise<StoryUserPageResponse> => {
+  const res = await axiosInstance.get(
+    `${import.meta.env.VITE_API_URL}contents/story/valid?page=${page}&size=${size}`,
+  );
+
+  return res.data;
 };

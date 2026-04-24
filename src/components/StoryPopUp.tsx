@@ -34,7 +34,6 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [openMusicDialog, setOpenMusicDialog] = useState(false);
   const [selectedMusic, setSelectedMusic] = useState<MusicResponse>();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
   const [musicStartTime, setMusicStartTime] = useState(0);
 
@@ -91,7 +90,6 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
       reset();
       file.handleRemove();
       mention.reset();
-      setSelectedId(null);
       setBgImage(null);
       setActivePanel(null);
       setSelectedMusic(undefined);
@@ -106,7 +104,6 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
     reset();
     file.handleRemove();
     mention.reset();
-    setSelectedId(null);
     setBgImage(null);
     setActivePanel(null);
     setSelectedMusic(undefined);
@@ -116,7 +113,6 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
 
   const handleRemoveFile = () => {
     file.handleRemove();
-    setSelectedId(null);
     setBgImage(null);
     setActivePanel(null);
     setSelectedMusic(undefined);
@@ -247,15 +243,7 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
                         />
                       )}
 
-                      <Stage
-                        ref={stageRef}
-                        width={STAGE_W}
-                        height={STAGE_H}
-                        onMouseDown={(e) => {
-                          if (e.target === e.target.getStage())
-                            setSelectedId(null);
-                        }}
-                      >
+                      <Stage ref={stageRef} width={STAGE_W} height={STAGE_H}>
                         <Layer>
                           {bgImage && (
                             <KonvaImage

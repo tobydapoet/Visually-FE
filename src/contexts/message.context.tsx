@@ -310,7 +310,6 @@ export const MessageProvider = ({
     mentions?: MentionItem[],
   ) => {
     try {
-      console.log("DATA: ", { id, message, mentions });
       await handleUpdateMessage(
         id,
         message,

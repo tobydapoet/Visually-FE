@@ -12,20 +12,39 @@ import EditProfilePage from "../pages/EditProfilePage";
 import SettingLayout from "../layouts/SettingLayout";
 import ManageLayout from "../layouts/ManagerLayout";
 import MusicLibraryPage from "../pages/MusicLibraryPage";
-import StoryManagePage from "../pages/StoryManagePage";
 import { MusicProvider } from "../contexts/music.context";
 import StoragePage from "../pages/StoragePage";
-import StoryHighlightPage from "../pages/StoryHighlightPage";
 import StoryPage from "../pages/StoryPage";
 import MessagePage from "../pages/MessagePage";
 import { MessageProvider } from "../contexts/message.context";
+import BoostedPostPage from "../pages/BoostedPostPage";
+import ShortManangePage from "../pages/ShortMangePage";
+import { ShortProvider } from "../contexts/short.context";
+import { PostProvider } from "../contexts/post.context";
+import PostManagePage from "../pages/PostMangePage";
+import ReportManagePage from "../pages/ReportManagePage";
+import ContentPage from "../pages/ContentPage";
+import UserMangePage from "../pages/UserMangePage";
+import SearchPage from "../pages/SearchPage";
+import { AdProvider } from "../contexts/ad.context";
+import { StoryProvider } from "../contexts/story.context";
+import ReelsPage from "../pages/ReelsPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/ResetPasswordPage";
 
 export const router = createBrowserRouter([
   // {
   //   path: routes.root,
   //   element: <RootPage />,
   // },
-
+  {
+    path: routes.forgot,
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: routes.reset,
+    element: <ResetPasswordPage />,
+  },
   {
     element: <AuthLayout />,
     children: [
@@ -35,7 +54,6 @@ export const router = createBrowserRouter([
       },
     ],
   },
-
   {
     element: <DefaultLayout />,
     children: [
@@ -52,12 +70,36 @@ export const router = createBrowserRouter([
         path: routes.storage,
       },
       {
-        element: <StoryHighlightPage />,
+        element: (
+          <StoryProvider>
+            <StoryPage />
+          </StoryProvider>
+        ),
         path: routes.highlight,
       },
       {
-        element: <StoryPage />,
+        element: (
+          <StoryProvider>
+            <StoryPage />
+          </StoryProvider>
+        ),
         path: routes.story,
+      },
+      {
+        element: (
+          <StoryProvider>
+            <StoryPage />
+          </StoryProvider>
+        ),
+        path: routes.single_story,
+      },
+      {
+        element: (
+          <AdProvider>
+            <BoostedPostPage />
+          </AdProvider>
+        ),
+        path: routes.ad,
       },
       {
         element: (
@@ -68,12 +110,24 @@ export const router = createBrowserRouter([
         path: routes.inbox,
       },
       {
+        element: <SearchPage />,
+        path: routes.search,
+      },
+      {
         element: (
           <MessageProvider>
             <MessagePage />
           </MessageProvider>
         ),
         path: routes.inboxDetail,
+      },
+      {
+        element: <ReelsPage />,
+        path: routes.reel,
+      },
+      {
+        element: <ReelsPage />,
+        path: routes.reels,
       },
     ],
   },
@@ -89,8 +143,48 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: routes.story_manage,
-        element: <StoryManagePage />,
+        path: routes.user_manage_detail,
+        element: <UserPage />,
+      },
+      {
+        path: routes.short_manage,
+        element: (
+          <ShortProvider>
+            <ShortManangePage />
+          </ShortProvider>
+        ),
+      },
+      {
+        path: routes.post_manage,
+        element: (
+          <PostProvider>
+            <PostManagePage />
+          </PostProvider>
+        ),
+      },
+
+      {
+        path: routes.report_manage,
+        element: (
+          <PostProvider>
+            <ReportManagePage />{" "}
+          </PostProvider>
+        ),
+      },
+      {
+        path: routes.content,
+        element: (
+          <ShortProvider>
+            <PostProvider>
+              <ContentPage />
+            </PostProvider>
+          </ShortProvider>
+        ),
+      },
+
+      {
+        path: routes.user_manage,
+        element: <UserMangePage />,
       },
     ],
   },

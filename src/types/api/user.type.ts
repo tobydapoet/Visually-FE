@@ -1,4 +1,6 @@
 import type { Gender } from "../../constants/gender.enum";
+import type { UserRole } from "../../constants/userRole.enum";
+import type { UserStatus } from "../../constants/userStatus";
 
 export type CurrentUserType = {
   id: string;
@@ -12,6 +14,7 @@ export type CurrentUserType = {
   bio: string;
   createdAt: Date;
   updatedAt: Date;
+  role: UserRole;
 };
 
 export type UserType = {
@@ -29,6 +32,8 @@ export type UserType = {
   followingCount: number;
   postCount: number;
   shortCount: number;
+  isBlocked: boolean;
+  isFollowed: boolean;
 };
 
 export interface UserSummaryType {
@@ -47,3 +52,17 @@ export interface UserPageResponse {
   first: boolean;
   last: boolean;
 }
+
+export type UserStatusSummaryType = UserSummaryType & {
+  status: UserStatus;
+};
+
+export type UserStatusPageResponse = {
+  content: UserStatusSummaryType[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+};

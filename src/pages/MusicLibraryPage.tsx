@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Library,
   Music,
   Search,
   X,
@@ -24,7 +23,7 @@ const MusicLibraryPage: React.FC = () => {
   const currentPage = Number(searchParams.get("page") ?? 0);
   const currentSearch = searchParams.get("search") ?? "";
   const statusFilter =
-    (searchParams.get("status") as MusicStatus) ?? MusicStatus.PENDING;
+    (searchParams.get("status") as MusicStatus) ?? MusicStatus.ACTIVE;
 
   const [searchInput, setSearchInput] = useState(currentSearch);
 
@@ -83,8 +82,8 @@ const MusicLibraryPage: React.FC = () => {
   };
 
   const tabs = [
-    { key: MusicStatus.PENDING, label: "Pending", color: "yellow" },
     { key: MusicStatus.ACTIVE, label: "Active", color: "green" },
+    { key: MusicStatus.PENDING, label: "Pending", color: "yellow" },
     { key: MusicStatus.SUSPENDED, label: "Suspended", color: "gray" },
   ];
 
@@ -94,7 +93,6 @@ const MusicLibraryPage: React.FC = () => {
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <Library size={28} className="text-indigo-400" />
               <h1 className="text-2xl font-bold text-white">Music Library</h1>
             </div>
             <button
@@ -132,7 +130,7 @@ const MusicLibraryPage: React.FC = () => {
               placeholder={`Search ${statusFilter.toLowerCase()} songs...`}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none placeholder:text-gray-500"
+              className="w-full pl-9 pr-4 py-2 bg-neutral-900 border border-neutral-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-neutral-500 text-sm"
             />
             {searchInput && (
               <button
@@ -154,7 +152,7 @@ const MusicLibraryPage: React.FC = () => {
                 <MusicItem key={music.id} music={music} />
               ))
             ) : (
-              <div className="text-center py-12 bg-gray-800 rounded-lg border border-gray-700">
+              <div className="text-center py-12 rounded-lg">
                 <Music size={48} className="mx-auto text-gray-600 mb-2" />
                 <p className="text-gray-400 text-sm">
                   {currentSearch
