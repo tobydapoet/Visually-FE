@@ -12,6 +12,7 @@ import { handleRemoveMemberFromConversation } from "../api/message.api"; // impo
 import { useUser } from "../contexts/user.context";
 import MemberInvitePopUp from "../components/MemberInvitePopUp";
 import { toast } from "sonner";
+import { timeAgo } from "../utils/timeAgot";
 
 interface DetailConversationProps {
   open: boolean;
@@ -179,10 +180,20 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
                         className="w-10 h-10 object-cover rounded-full"
                         alt={member.username}
                       />
+                      {member.lastSeen === null && (
+                        <span className="absolute bottom-0 -right-0.5 w-3 h-3 bg-green-500 border-2 border-gray-800 rounded-full" />
+                      )}
                     </div>
                     <div className="flex-1">
-                      <div className="text-sm font-medium text-white group-hover:text-blue-400 transition-colors">
-                        {member.username}
+                      <div>
+                        <div className="text-sm font-medium text-white group-hover:text-blue-400 transition-colors">
+                          {member.username}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {member.lastSeen === null
+                            ? "Active now"
+                            : `Active ${timeAgo(member.lastSeen)} ago`}
+                        </div>
                       </div>
                     </div>
                   </div>

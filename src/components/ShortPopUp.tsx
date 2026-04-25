@@ -11,7 +11,6 @@ import {
 } from "../types/schemas/short.schema";
 import { useUser } from "../contexts/user.context";
 import { useFileUpload } from "../hooks/useFileUpload";
-import { CollaboratorsField } from "./CollaboratorsField";
 import { useVideoFrames } from "../hooks/useVideoFrames";
 import { VideoFrameStrip } from "./VideoFrameStrip";
 import HashTagsField from "./HashTagField";
@@ -56,17 +55,6 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
     formState: { errors, isSubmitting },
   } = useForm<CreateShortType>({ resolver: zodResolver(CreateShortSchema) });
   const tags = watch("tagsName") ?? [];
-  const collabs = watch("collabUserId") ?? [];
-
-  const hasTags = tags.length > 0;
-  const hasCollabs = collabs.length > 0;
-
-  const heightClass =
-    hasTags && hasCollabs
-      ? "h-[35.5rem]"
-      : hasTags || hasCollabs
-        ? "h-[32.5rem]"
-        : "h-120";
 
   const video = useFileUpload({
     accept: "video/*",
@@ -183,10 +171,6 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
     }
 
     payload.tagsName?.forEach((tag) => formData.append("tagsName[]", tag));
-
-    payload.collabUserId?.forEach((id) =>
-      formData.append("collabUserId[]", id),
-    );
 
     start();
     const res = await handleCreateShort(formData);
@@ -309,7 +293,7 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
                       </div>
                     </div>
                   ) : (
-                    <div className={`animate-fade-in w-full ${heightClass}`}>
+                    <div className={`animate-fade-in w-full `}>
                       <div className="relative rounded-xl overflow-hidden bg-black w-full h-full">
                         <video
                           ref={videoRef}
@@ -380,21 +364,6 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
                       </div>
 
                       <div>
-                        <Controller
-                          name="collabUserId"
-                          control={control}
-                          render={({ field }) => (
-                            <CollaboratorsField
-                              value={field.value || []}
-                              onChange={(newValue) => {
-                                field.onChange(newValue);
-                                setValue("collabUserId", newValue, {
-                                  shouldValidate: true,
-                                });
-                              }}
-                            />
-                          )}
-                        />
                         <Controller
                           name="tagsName"
                           control={control}

@@ -144,16 +144,16 @@ const SearchPage: FC = () => {
   ];
 
   return (
-    <div className="w-272 mt-5 mx-auto">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
+    <div className="w-full md:w-272 mt-5 mx-auto">
+      <div className="relative px-2 md:px-0">
+        <Search className="absolute left-5 md:left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
         <input
           type="text"
           placeholder="Search users, contents, or tags..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="w-full pl-9 pr-4 py-2 bg-neutral-900 border border-neutral-800 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-neutral-500 text-md"
+          className="w-full  pl-9 pr-4 py-2 bg-neutral-900 border border-neutral-800 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-neutral-500 text-md"
         />
       </div>
 
@@ -248,7 +248,7 @@ const SearchPage: FC = () => {
                 )}
 
                 {!loadingContents && contents.length === 0 && (
-                  <div className="col-span-3 text-center text-gray-500 py-10">
+                  <div className="col-span-4 text-center text-gray-500 py-10">
                     No contents found
                   </div>
                 )}

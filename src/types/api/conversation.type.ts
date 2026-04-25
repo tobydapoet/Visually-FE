@@ -4,6 +4,7 @@ export type UserConverstation = {
   userId: string;
   avatarUrl?: string | null;
   username: string;
+  lastSeen: Date;
 };
 
 export interface ConversationType {

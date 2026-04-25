@@ -23,6 +23,7 @@ export const handleGetUserConverstaion = async (
   const res = await axiosInstance.get(
     `${import.meta.env.VITE_API_URL}messages/conversation?page=${page}&size=${size}${keyword ? `&keyword=${keyword}` : ""}`,
   );
+
   return res.data;
 };
 
@@ -32,7 +33,6 @@ export const handleGetConversationWithUser = async (
   const res = await axiosInstance.get(
     `${import.meta.env.VITE_API_URL}messages/conversation/user/${userId}`,
   );
-  console.log("RESDATA: ", res.data);
 
   return res.data;
 };
@@ -43,6 +43,8 @@ export const handleGetConversationWithId = async (
   const res = await axiosInstance.get(
     `${import.meta.env.VITE_API_URL}messages/conversation/${id}`,
   );
+  console.log("RESDATA: ", res.data);
+
   return res.data;
 };
 
@@ -146,6 +148,7 @@ export const handleGetConversationMembers = async (
   const res = await axiosInstance.get(
     `${import.meta.env.VITE_API_URL}messages/conversation-member/conversation/${conversationId}`,
   );
+  console.log("RES: ", res.data);
   return res.data;
 };
 

@@ -17,14 +17,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import ReportPopUp from "./ReportPopUp";
 import assets from "../assets";
 import { handleView } from "../api/interaction.api";
-
-const timeAgo = (date: Date | string) => {
-  const diff = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-  if (diff < 60) return `${diff}s`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
-  return `${Math.floor(diff / 86400)}d`;
-};
+import { timeAgo } from "../utils/timeAgot";
 
 const isVideo = (url?: string) =>
   url?.includes(".mp4") || url?.includes("/video/");
@@ -35,13 +28,37 @@ export const formatCount = (n: number) => {
   return n.toString();
 };
 
-const MediaSlider = ({ medias }: { medias: string[] }) => {
-  const [muted, setMuted] = useState(true);
+const MediaSlider = ({
+  medias,
+  muted,
+  onMuteToggle,
+}: {
+  medias: string[];
+  muted: boolean;
+  onMuteToggle: () => void;
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const index = Math.round(el.scrollLeft / el.clientWidth);
+    setCurrentIndex(index);
+  };
+
+  const scrollTo = (index: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({ left: index * el.clientWidth, behavior: "smooth" });
+  };
 
   return (
     <div className="relative">
       <div
-        className="flex overflow-x-auto snap-x snap-mandatory"
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex overflow-x-auto snap-x snap-mandatory touch-pan-x"
         style={{ scrollbarWidth: "none" }}
       >
         {medias.map((url, i) => (
@@ -65,7 +82,7 @@ const MediaSlider = ({ medias }: { medias: string[] }) => {
             )}
             {isVideo(url) && (
               <button
-                onClick={() => setMuted(!muted)}
+                onClick={onMuteToggle}
                 className="absolute bottom-2 cursor-pointer right-2 bg-black/50 rounded-full p-1"
               >
                 {muted ? (
@@ -78,22 +95,27 @@ const MediaSlider = ({ medias }: { medias: string[] }) => {
           </div>
         ))}
       </div>
+
       {medias.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-          {medias.map((_, i) => (
-            <div
-              key={i}
-              className={`rounded-full transition-all ${
-                i === 0 ? "w-1.5 h-1.5 bg-blue-400" : "w-1.5 h-1.5 bg-white/30"
-              }`}
-            />
-          ))}
-        </div>
-      )}
-      {medias.length > 1 && (
-        <div className="absolute top-2 right-2 bg-black/50 text-white/80 text-xs px-2 py-0.5 rounded-full">
-          1/{medias.length}
-        </div>
+        <>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {medias.map((_, i) => (
+              <div
+                key={i}
+                onClick={() => scrollTo(i)}
+                className={`rounded-full cursor-pointer transition-all ${
+                  i === currentIndex
+                    ? "w-1.5 h-1.5 bg-blue-400"
+                    : "w-1.5 h-1.5 bg-white/30"
+                }`}
+              />
+            ))}
+          </div>
+
+          <div className="absolute top-2 right-2 bg-black/50 text-white/80 text-xs px-2 py-0.5 rounded-full">
+            {currentIndex + 1}/{medias.length}
+          </div>
+        </>
       )}
     </div>
   );
@@ -120,6 +142,7 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
   const startTimeRef = useRef<number | null>(null);
   const accumulatedTimeRef = useRef<number>(0);
   const hasSeen = useRef(false);
+  const [muted, setMuted] = useState(true);
 
   useEffect(() => {
     const el = cardRef.current;
@@ -128,7 +151,7 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasSeen.current) {
-          startTimeRef.current = Date.now(); // bắt đầu đếm
+          startTimeRef.current = Date.now();
         } else {
           if (startTimeRef.current) {
             accumulatedTimeRef.current += Date.now() - startTimeRef.current;
@@ -165,6 +188,29 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
     };
   }, [post.id]);
 
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const videos = el.querySelectorAll("video");
+        videos.forEach((v) => {
+          if (entry.isIntersecting) {
+            v.play().catch(() => {});
+          } else {
+            v.pause();
+            setMuted(true);
+          }
+        });
+      },
+      { threshold: 0.5 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <ContentPopUp
@@ -197,10 +243,11 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
               className="text-sm cursor-pointer hover:underline w-fit font-semibold text-white truncate"
             >
               {post.username}
+              <span className="text-xs text-neutral-500">
+                <span className="ml-1.5 mr-1">•</span> {timeAgo(post.createdAt)}
+              </span>
             </p>
-            <p className="text-xs text-neutral-500">
-              {timeAgo(post.createdAt)}
-            </p>
+            {post.isAd && <span className="text-xs">Ad</span>}
           </div>
 
           <Menu>
@@ -235,7 +282,11 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
         </div>
 
         {post.medias && post.medias.length > 0 && (
-          <MediaSlider medias={post.medias} />
+          <MediaSlider
+            medias={post.medias}
+            muted={muted}
+            onMuteToggle={() => setMuted((prev) => !prev)}
+          />
         )}
 
         <div className="px-3 pt-2.5 pb-2">

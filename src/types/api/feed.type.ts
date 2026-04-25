@@ -47,6 +47,8 @@ export type FeedContentResponse = {
     userId: string;
     username: string;
   }[];
+
+  isAd: boolean;
 };
 
 export type FeedContentPageResponse = {

@@ -18,7 +18,6 @@ export default function ReelsPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const isFetching = useRef(false);
 
-  // Cập nhật URL chỉ với feedId
   useEffect(() => {
     if (reels.length === 0) return;
     if (!feedId) {
@@ -31,7 +30,6 @@ export default function ReelsPage() {
     navigate(`/reels/${reels[activeIndex].id}`, { replace: true });
   }, [activeIndex, reels]);
 
-  // Mark current reel mỗi khi activeIndex thay đổi
   useEffect(() => {
     if (!reels[activeIndex]) return;
     const current = reels[activeIndex];
@@ -40,7 +38,6 @@ export default function ReelsPage() {
     );
   }, [activeIndex, reels]);
 
-  // Scroll về đúng reel trong URL sau khi fetch xong
   useEffect(() => {
     if (reels.length === 0 || !feedId) return;
     const idx = reels.findIndex((r) => String(r.id) === feedId);
@@ -82,7 +79,6 @@ export default function ReelsPage() {
     [hasMore],
   );
 
-  // Fetch từ đầu, không cần page
   useEffect(() => {
     fetchReels(1);
   }, []);

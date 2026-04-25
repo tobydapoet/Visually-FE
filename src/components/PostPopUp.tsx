@@ -5,7 +5,6 @@ import { useState, useRef, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser } from "../contexts/user.context";
-import { CollaboratorsField } from "./CollaboratorsField";
 import HashTagsField from "./HashTagField";
 import { CaptionField } from "./CaptionFiled";
 import type { MentionItem } from "../types/api/mention.type";
@@ -117,9 +116,6 @@ const PostPopUp: React.FC<Props> = ({ open, onClose }) => {
     if (payload.mentions?.length)
       formData.append("mentions", JSON.stringify(payload.mentions));
     payload.tagsName?.forEach((tag) => formData.append("tagsName[]", tag));
-    payload.collabUserId?.forEach((id) =>
-      formData.append("collabUserId[]", id),
-    );
 
     setIsUploading(true);
     start();
@@ -320,22 +316,6 @@ const PostPopUp: React.FC<Props> = ({ open, onClose }) => {
                           onChange={field.onChange}
                           onMentionsExtracted={setMentions}
                           captionRef={captionRef}
-                        />
-                      )}
-                    />
-
-                    <Controller
-                      name="collabUserId"
-                      control={control}
-                      render={({ field }) => (
-                        <CollaboratorsField
-                          value={field.value || []}
-                          onChange={(val) => {
-                            field.onChange(val);
-                            setValue("collabUserId", val, {
-                              shouldValidate: true,
-                            });
-                          }}
                         />
                       )}
                     />

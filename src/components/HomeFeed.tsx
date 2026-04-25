@@ -55,7 +55,6 @@ const HomeFeed = () => {
             isFetchingRef.current = false;
           });
         } else if (!hasNextPage && feedType === FeedEnum.HOME) {
-          // Lưu scroll height hiện tại trước khi fetch reel
           scrollAnchorRef.current = document.documentElement.scrollHeight;
           setFeedType(FeedEnum.REEL);
         }
@@ -73,7 +72,6 @@ const HomeFeed = () => {
       const fresh = newFeeds.filter((f) => !existingIds.has(f.id));
       if (fresh.length === 0) return prev;
 
-      // Restore scroll sau khi DOM update
       if (feedType === FeedEnum.REEL && scrollAnchorRef.current > 0) {
         requestAnimationFrame(() => {
           window.scrollTo({

@@ -15,7 +15,7 @@ export const UserProfileHeader: React.FC<Props> = ({
   onFollowerClick,
   onFollowingClick,
 }) => {
-  console.log("USSER: ", user);
+  console.log("USER: ", user);
   return (
     <div className="flex flex-col md:flex-row items-start gap-8 w-145 mx-auto">
       <div className="relative group">

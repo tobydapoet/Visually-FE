@@ -126,10 +126,6 @@ const UserPage: React.FC = () => {
   return (
     <>
       <div className="min-h-screen w-272">
-        <div className="fixed inset-0 opacity-20">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.1)_0%,transparent_50%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(59,130,246,0.1)_0%,transparent_50%)]" />
-        </div>
         {user.isBlocked && (
           <ConfirmDialog
             open={isOpenUnBlock}

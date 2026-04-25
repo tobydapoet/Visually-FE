@@ -62,7 +62,7 @@ const SideBarMessage: React.FC = () => {
 
   return (
     <>
-      <div className="w-85 px-5 pt-5 border-r border-gray-600 h-screen flex flex-col">
+      <div className="w-full md:w-85 px-5 pt-5 border-r border-gray-600 h-screen flex flex-col">
         <div className="flex justify-between">
           <div className="font-bold text-2xl">{currentUser?.username}</div>
           <button
@@ -158,17 +158,22 @@ const SideBarMessage: React.FC = () => {
                           </div>
                         )
                       ) : (
-                        <img
-                          src={
-                            conversation.otherUsers[0].avatarUrl ||
-                            assets.profile
-                          }
-                          alt={
-                            conversation.name ||
-                            conversation.otherUsers[0].username
-                          }
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
+                        <div className="relative">
+                          <img
+                            src={
+                              conversation.otherUsers[0].avatarUrl ||
+                              assets.profile
+                            }
+                            alt={
+                              conversation.name ||
+                              conversation.otherUsers[0].username
+                            }
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                          {conversation.otherUsers[0].lastSeen === null && (
+                            <span className="absolute bottom-0 -right-0.5 w-3 h-3 bg-green-500 border-2 border-gray-800 rounded-full" />
+                          )}
+                        </div>
                       )}
 
                       <div className="flex flex-col flex-1">

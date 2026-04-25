@@ -20,6 +20,7 @@ import { useStoryInteraction } from "../hooks/useStoryInteraction";
 import LikeListPopUp from "../components/LikeListPopUp";
 import { formatCount } from "../utils/formatCount";
 import { handleView } from "../api/interaction.api";
+import { timeAgo } from "../utils/timeAgot";
 
 const StoryPage: React.FC = () => {
   const {
@@ -69,14 +70,6 @@ const StoryPage: React.FC = () => {
 
   const isVideo = (url?: string) =>
     url?.includes(".mp4") || url?.includes("/video/");
-
-  const timeAgo = (date: Date | string) => {
-    const diff = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-    if (diff < 60) return `${diff}s`;
-    if (diff < 3600) return `${Math.floor(diff / 60)}m`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
-    return `${Math.floor(diff / 86400)}d`;
-  };
 
   return (
     <>

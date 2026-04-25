@@ -25,4 +25,5 @@ export type MemberType = {
   userId: string;
   username: string;
   avatarUrl?: string;
+  lastSeen: Date | null;
 };

@@ -17,7 +17,7 @@ const CommentItem: React.FC<{
   onReply?: (comment: CommentResponse) => void;
   onDelete?: (commentId: number) => void;
   isReply?: boolean;
-  toggleCommentLike?: (commentId: number, isLiked: boolean) => Promise<boolean>; // ✅
+  toggleCommentLike?: (commentId: number, isLiked: boolean) => Promise<boolean>;
 }> = ({
   comment,
   onEdit,

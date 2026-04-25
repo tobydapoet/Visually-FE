@@ -122,8 +122,10 @@ export function ReelCard({ reel, isActive }: ReelCardProps) {
   return (
     <div className="relative h-full flex" style={{ scrollSnapAlign: "start" }}>
       <div
-        className="relative w-150 object-cover h-full shrink-0 overflow-hidden"
-        onClick={handleTap}
+        className={`relative h-full shrink-0 overflow-hidden transition-all duration-300
+          ${isOpenComment ? "w-full md:w-150" : "w-full"}
+          md:w-150
+        `}
         style={{ scrollSnapAlign: "start" }}
       >
         <MediaCarousel medias={reel.medias ?? []} isActive={isActive} />
@@ -264,71 +266,89 @@ export function ReelCard({ reel, isActive }: ReelCardProps) {
       </div>
 
       {isOpenComment && (
-        <div
-          className="
-            h-full flex flex-col overflow-hidden relative
-            w-100 
-            bg-[rgba(15,15,15,0.98)]
-            border-l border-[rgba(255,255,255,0.08)]
-            "
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex-1 overflow-y-auto relative">
-            <div className="flex-1 overflow-y-auto py-2 px-3 relative">
-              <CommentComponent
-                ref={commentRef}
-                targetId={reel.id}
-                targetType={reel.contentType}
-                commentCount={commentCount}
-                toggleCommentLike={toggleCommentLike}
-                onEditComment={(comment) => {
-                  setReplyingToId(null);
-                  setEditingCommentId(comment.id);
-                  messageInputRef.current?.setText(
-                    comment.content,
-                    comment.mentions,
-                    true,
-                  );
-                }}
-                onDeleteComment={(commentId) => {
-                  commentRef.current?.deleteComment(commentId);
-                }}
-                onReplyComment={(comment) => {
-                  setEditingCommentId(null);
-                  setReplyingToId(comment.id);
+        <>
+          {/* Overlay mobile */}
+          <div
+            className="fixed inset-0 bg-black/50 z-30 md:hidden"
+            onClick={() => setIsOpenComment(false)}
+          />
 
-                  if (comment.username !== currentUser?.username) {
-                    messageInputRef.current?.setText(
-                      `@${comment.username} `,
-                      [
-                        {
-                          userId: comment.userId,
-                          username: comment.username,
-                        },
-                      ],
-                      false,
-                    );
-                    messageInputRef.current?.setReplyingTo(comment.username);
-                  } else {
-                    messageInputRef.current?.setText("", [], false);
-                    messageInputRef.current?.setReplyingTo(comment.username);
-                  }
-                }}
-              />
+          <div
+            className="
+              fixed bottom-0 left-0 right-0 z-40
+              h-[70vh] rounded-t-2xl
+              md:static md:h-full md:rounded-none md:z-auto
+              flex flex-col overflow-hidden
+              w-full md:w-100
+              bg-[rgba(15,15,15,0.98)]
+              border-t border-[rgba(255,255,255,0.08)]
+              md:border-t-0 md:border-l
+              transition-transform duration-300
+            "
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle bar — chỉ hiện mobile */}
+            <div className="flex justify-center pt-2 pb-1 md:hidden">
+              <div className="w-10 h-1 rounded-full bg-white/20" />
             </div>
-            {currentUser && currentUser.role.includes("CLIENT") && (
-              <div className="absolute bottom-0 w-full">
-                <MessageInput
-                  ref={messageInputRef}
-                  mode="COMMENT"
-                  onSend={async (message, mentions) => {
-                    handleSend(message, mentions);
+
+            <div className="flex-1 overflow-y-auto relative">
+              <div className="py-2 px-3">
+                <CommentComponent
+                  ref={commentRef}
+                  targetId={reel.id}
+                  targetType={reel.contentType}
+                  commentCount={commentCount}
+                  toggleCommentLike={toggleCommentLike}
+                  onEditComment={(comment) => {
+                    setReplyingToId(null);
+                    setEditingCommentId(comment.id);
+                    messageInputRef.current?.setText(
+                      comment.content,
+                      comment.mentions,
+                      true,
+                    );
+                  }}
+                  onDeleteComment={(commentId) => {
+                    commentRef.current?.deleteComment(commentId);
+                  }}
+                  onReplyComment={(comment) => {
+                    setEditingCommentId(null);
+                    setReplyingToId(comment.id);
+                    if (comment.username !== currentUser?.username) {
+                      messageInputRef.current?.setText(
+                        `@${comment.username} `,
+                        [
+                          {
+                            userId: comment.userId,
+                            username: comment.username,
+                          },
+                        ],
+                        false,
+                      );
+                      messageInputRef.current?.setReplyingTo(comment.username);
+                    } else {
+                      messageInputRef.current?.setText("", [], false);
+                      messageInputRef.current?.setReplyingTo(comment.username);
+                    }
                   }}
                 />
               </div>
-            )}
+
+              {currentUser && currentUser.role.includes("CLIENT") && (
+                <div className="absolute bottom-0 w-full">
+                  <MessageInput
+                    ref={messageInputRef}
+                    mode="COMMENT"
+                    onSend={async (message, mentions) => {
+                      handleSend(message, mentions);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
