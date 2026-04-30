@@ -120,8 +120,8 @@ const MusicItem: React.FC<MusicItemProps> = ({
       <div
         className={`flex items-center gap-3 p-3 bg-neutral-900 rounded-lg border transition-all relative cursor-pointer ${
           isSelected
-            ? "border-indigo-500 shadow-sm bg-indigo-500/10"
-            : "border-neutral-800 hover:shadow-sm hover:border-indigo-500/50 hover:bg-neutral-800/50"
+            ? "border-blue-500 shadow-sm bg-blue-500/10"
+            : "border-neutral-800 hover:shadow-sm hover:border-blue-500/50 hover:bg-neutral-800/50"
         }`}
         onClick={() => onSelect?.(music)}
       >
@@ -149,12 +149,12 @@ const MusicItem: React.FC<MusicItemProps> = ({
             onClick={handleTogglePlay}
             className={`p-1.5 rounded-full transition-colors ${
               isPlaying
-                ? "bg-indigo-500/20 hover:bg-indigo-500/30"
-                : "bg-neutral-800 hover:bg-indigo-500/10"
+                ? "bg-blue-500/20 hover:bg-blue-500/30"
+                : "bg-neutral-800 hover:bg-blue-500/10"
             }`}
           >
             {isPlaying ? (
-              <Pause size={14} className="text-indigo-400" />
+              <Pause size={14} className="text-blue-400" />
             ) : (
               <Music size={14} className="text-neutral-400" />
             )}

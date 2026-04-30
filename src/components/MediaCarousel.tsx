@@ -58,7 +58,7 @@ export function MediaCarousel({ medias, isActive }: MediaCarouselProps) {
   return (
     <div
       ref={carouselRef}
-      className="absolute inset-0 overflow-hidden"
+      className="absolute inset-0 overflow-hidden h-[calc(100vh-2rem)] md:h-screen"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

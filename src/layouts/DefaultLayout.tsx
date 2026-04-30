@@ -3,6 +3,7 @@ import SideBar from "../components/SideBar";
 import parseJwt from "../utils/parseToken";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import { MessageProvider } from "../contexts/message.context";
 
 function DefaultLayout() {
   const token = Cookies.get("access_token");
@@ -32,18 +33,19 @@ function DefaultLayout() {
   }, [token, navigate]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-neutral-950">
-      <SideBar />
-
-      <div
-        className={`
-          flex-1 overflow-auto flex justify-center w-272 bg-neutral-950
+    <MessageProvider>
+      <div className="flex h-screen overflow-hidden bg-zinc-900">
+        <SideBar />
+        <div
+          className={`
+          flex-1 overflow-auto flex justify-center w-full bg-zinc-900
           ${isMobile ? "pb-16" : ""}
         `}
-      >
-        <Outlet />
+        >
+          <Outlet />
+        </div>
       </div>
-    </div>
+    </MessageProvider>
   );
 }
 

@@ -192,3 +192,30 @@ export const handleSeachMember = async (
   );
   return res.data;
 };
+
+export const handleGetUnReactCount = async (): Promise<number> => {
+  const res = await axiosInstance.get(
+    `${import.meta.env.VITE_API_URL}messages/conversation-member/unread`,
+  );
+  return res.data;
+};
+
+export const handleMuteConversation = async (
+  id: number,
+  option: "15m" | "1h" | "8h" | "24h" | "forever",
+): Promise<number> => {
+  const res = await axiosInstance.put(
+    `${import.meta.env.VITE_API_URL}messages/conversation-member/${id}/mute`,
+    {
+      option,
+    },
+  );
+  return res.data;
+};
+
+export const handleUnMuteConversation = async (id: number): Promise<number> => {
+  const res = await axiosInstance.put(
+    `${import.meta.env.VITE_API_URL}messages/conversation-member/${id}/unmute`,
+  );
+  return res.data;
+};

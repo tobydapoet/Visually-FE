@@ -15,6 +15,7 @@ export const handleGetUser = async (
     const res = await axiosInstance.get(
       `${import.meta.env.VITE_API_URL}users/account/username/${username}`,
     );
+
     return res.data;
   } catch (error: any) {
     console.log(error.response?.data?.message);

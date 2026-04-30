@@ -131,7 +131,7 @@ const ReportSidebar = forwardRef<ReportSidebarRef, ReportSidebarProps>(
     };
 
     return (
-      <div className="w-full lg:w-80 xl:w-96 bg-zinc-900 border-l border-zinc-800 flex flex-col max-h-[50vh] md:flex lg:max-h-full">
+      <div className="w-full h-full bg-zinc-900 border-l border-zinc-800 flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-zinc-800 shrink-0">
           <div className="flex items-center gap-2">
             <Flag className="w-5 h-5 text-red-500" />

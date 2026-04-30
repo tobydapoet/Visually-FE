@@ -73,11 +73,11 @@ const StoryPage: React.FC = () => {
 
   return (
     <>
-      <div className="relative flex items-center justify-center min-h-screen bg-black">
+      <div className="relative flex items-center justify-center h-[calc(100vh-4rem)] md:min-h-screen bg-black">
         {currentIndex > 0 && (
           <button
             onClick={goPrev}
-            className="absolute left-2 cursor-pointer z-20 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-all"
+            className="hidden md:flex absolute z-20 p-3 rounded-full cursor-pointer bg-black/50 hover:bg-black/70 transition-all"
             style={{ left: `calc(50% - ${mediaWidth / 2}px - 4.5rem)` }}
           >
             <ChevronLeft className="w-8 h-8 text-white" />
@@ -87,16 +87,20 @@ const StoryPage: React.FC = () => {
         {currentIndex < total - 1 && (
           <button
             onClick={goNext}
-            className="absolute z-20 p-3 rounded-full cursor-pointer bg-black/50 hover:bg-black/70 transition-all"
+            className="hidden md:flex absolute z-20 p-3 rounded-full cursor-pointer bg-black/50 hover:bg-black/70 transition-all"
             style={{ right: `calc(50% - ${mediaWidth / 2}px - 4.5rem)` }}
           >
             <ChevronRight className="w-8 h-8 text-white" />
           </button>
         )}
 
-        <div className="flex min-h-screen" style={{ width: `${mediaWidth}px` }}>
+        <div
+          className="flex h-[calc(100vh-4rem)] md:min-h-screen w-full md:w-auto"
+          style={{ width: undefined }}
+        >
           <audio ref={audioRef} loop />
           <div className="relative w-full">
+            {/* Progress bar */}
             <div className="absolute top-2 left-0 right-0 z-10 px-2">
               <div className="flex gap-1">
                 {Array.from({ length: total }).map((_, i) => (
@@ -120,6 +124,7 @@ const StoryPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Header: avatar + mute */}
             <div className="absolute top-5 left-0 right-0 z-10 flex items-center justify-between px-3">
               <div className="flex items-center gap-2">
                 <img
@@ -149,8 +154,10 @@ const StoryPage: React.FC = () => {
                 )}
               </div>
             </div>
+
+            {/* Media */}
             <div
-              className="relative h-screen"
+              className="relative h-[calc(100vh-4rem)] md:h-screen"
               onMouseDown={handleLongPress}
               onMouseUp={handleRelease}
               onMouseLeave={handleRelease}
@@ -160,114 +167,79 @@ const StoryPage: React.FC = () => {
               <StoryMedia />
             </div>
 
+            {/* Bottom bar */}
             <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
               <div className="flex items-center justify-between">
-                {currentUser && currentUser.id === currentStory?.userId && (
-                  <div>
-                    {currentStory?.storageId ? (
-                      <button
-                        onClick={() => setOpenRemoveDialog(true)}
-                        className="flex cursor-pointer items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-red-500/80 hover:border-red-400 transition-all duration-200 group"
-                      >
-                        <BookmarkMinus
-                          size={18}
-                          className="text-white/80 group-hover:text-white"
-                        />
-                        <span className="text-sm font-medium text-white/90 group-hover:text-white">
-                          Remove
-                        </span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => setIsOpenStorage(true)}
-                        className="flex cursor-pointer items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-blue-500/80 hover:border-blue-400 transition-all duration-200 group"
-                      >
-                        <BookmarkPlus
-                          size={18}
-                          className="text-white/80 group-hover:text-white"
-                        />
-                        <span className="text-sm font-medium text-white/90 group-hover:text-white">
-                          Highlight
-                        </span>
-                      </button>
-                    )}
-                  </div>
+                {/* Bookmark - trái */}
+                {currentUser && currentUser.id === currentStory?.userId ? (
+                  currentStory?.storageId ? (
+                    <button
+                      onClick={() => setOpenRemoveDialog(true)}
+                      className="flex cursor-pointer items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-red-500/80 hover:border-red-400 transition-all duration-200 group"
+                    >
+                      <BookmarkMinus
+                        size={18}
+                        className="text-white/80 group-hover:text-white"
+                      />
+                      <span className="text-sm font-medium text-white/90 group-hover:text-white">
+                        Remove
+                      </span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setIsOpenStorage(true)}
+                      className="flex cursor-pointer items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-blue-500/80 hover:border-blue-400 transition-all duration-200 group"
+                    >
+                      <BookmarkPlus
+                        size={18}
+                        className="text-white/80 group-hover:text-white"
+                      />
+                      <span className="text-sm font-medium text-white/90 group-hover:text-white">
+                        Highlight
+                      </span>
+                    </button>
+                  )
+                ) : (
+                  <div />
                 )}
 
-                <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-                  <div className="flex items-center">
-                    {currentUser && currentUser.id === currentStory?.userId && (
-                      <div>
-                        {currentStory?.storageId ? (
-                          <button
-                            onClick={() => setOpenRemoveDialog(true)}
-                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-red-500/80 transition-all duration-200"
-                          >
-                            <BookmarkMinus size={18} className="text-white" />
-                            <span className="text-sm cursor-pointer font-medium text-white">
-                              Remove
-                            </span>
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => setIsOpenStorage(true)}
-                            className="flex cursor-pointer items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-blue-500/80 transition-all duration-200"
-                          >
-                            <BookmarkPlus size={18} className="text-white" />
-                            <span className="text-sm font-medium text-white">
-                              Highlight
-                            </span>
-                          </button>
-                        )}
-                      </div>
-                    )}
-
-                    <div className="flex items-center ml-auto">
-                      <button
-                        onClick={toggleLike}
-                        disabled={currentUser?.id === currentStory?.userId}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onMouseUp={(e) => e.stopPropagation()}
-                        className={`
-                          p-1.5 rounded-full transition-transform
-                          ${
-                            currentUser?.id === currentStory?.userId
-                              ? "pointer-events-none"
-                              : "active:scale-90 hover:scale-105"
-                          }
-                        `}
-                      >
-                        <Heart
-                          size={24}
-                          className={`transition-all duration-200 cursor-pointer ${
-                            isLiked
-                              ? "text-red-500 fill-red-500 drop-shadow-lg"
-                              : "text-white/90 hover:text-red-400"
-                          }`}
-                        />
-                      </button>
-
-                      <button
-                        onClick={
-                          currentUser &&
-                          currentStory &&
-                          currentUser?.id === currentStory.userId
-                            ? () => setIsOpenLikeList(true)
-                            : undefined
-                        }
-                        className={`text-sm font-medium ${
-                          currentUser &&
-                          currentStory &&
-                          currentUser?.id === currentStory.userId
-                            ? "hover:underline cursor-pointer text-white/80 hover:text-white"
-                            : "text-white/80 cursor-default"
-                        } transition-colors`}
-                      >
-                        {formatCount(likeCount)}{" "}
-                        {likeCount === 1 ? "like" : "likes"}
-                      </button>
-                    </div>
-                  </div>
+                {/* Like - phải */}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={toggleLike}
+                    disabled={currentUser?.id === currentStory?.userId}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onMouseUp={(e) => e.stopPropagation()}
+                    className={`p-1.5 rounded-full transition-transform ${
+                      currentUser?.id === currentStory?.userId
+                        ? "pointer-events-none"
+                        : "active:scale-90 hover:scale-105"
+                    }`}
+                  >
+                    <Heart
+                      size={24}
+                      className={`transition-all duration-200 cursor-pointer ${
+                        isLiked
+                          ? "text-red-500 fill-red-500 drop-shadow-lg"
+                          : "text-white/90 hover:text-red-400"
+                      }`}
+                    />
+                  </button>
+                  <button
+                    onClick={
+                      currentUser?.id === currentStory?.userId
+                        ? () => setIsOpenLikeList(true)
+                        : undefined
+                    }
+                    className={`text-sm font-medium transition-colors ${
+                      currentUser?.id === currentStory?.userId
+                        ? "hover:underline cursor-pointer text-white/80 hover:text-white"
+                        : "text-white/80 cursor-default"
+                    }`}
+                  >
+                    {formatCount(likeCount)}{" "}
+                    {likeCount === 1 ? "like" : "likes"}
+                  </button>
                 </div>
               </div>
             </div>
@@ -283,7 +255,7 @@ const StoryPage: React.FC = () => {
         )}
 
         <ConfirmDialog
-          message="Di you want to remove this story from highlight?"
+          message="Do you want to remove this story from highlight?"
           onClose={() => setOpenRemoveDialog(false)}
           onConfirm={async () => {
             if (currentStory && currentStory.storageId)
@@ -294,9 +266,10 @@ const StoryPage: React.FC = () => {
             updateCurrentStory((s) => ({ ...s, storageId: undefined }));
           }}
           open={openRemoveDialog}
-          title="Remove from hightlight"
+          title="Remove from highlight"
         />
       </div>
+
       {currentStory && (
         <LikeListPopUp
           onClose={() => setIsOpenLikeList(false)}

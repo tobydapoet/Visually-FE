@@ -217,4 +217,5 @@ export const handleView = async (
     targetType,
     watchTime,
   });
+  console.log("ACTION23: ", watchTime);
 };

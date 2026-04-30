@@ -91,7 +91,7 @@ export const UserProfileTabs: React.FC<Props> = ({
   return (
     <>
       <div className="mt-10 w-full border-b border-gray-700">
-        <div className="flex border-b border-blue-500/20 w-145 mx-auto">
+        <div className="flex border-b border-blue-500/20 w-full max-w-[580px]  mx-auto">
           {visibleTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -99,14 +99,14 @@ export const UserProfileTabs: React.FC<Props> = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 relative py-3 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 rounded-t-lg ${
+                className={`flex-1 cursor-pointer relative py-3 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 rounded-t-lg ${
                   isActive
                     ? "text-blue-400 bg-blue-500/10"
                     : "text-gray-400 hover:text-gray-300 hover:bg-blue-500/5"
                 }`}
               >
                 <Icon className="w-4 h-4" />
-                {tab.label}
+                <span className="hidden sm:inline">{tab.label}</span>
                 {isActive && (
                   <div className="absolute -bottom-px left-0 right-0 h-0.5 bg-blue-400 rounded-full" />
                 )}

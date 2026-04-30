@@ -69,7 +69,7 @@ const StoragePage: React.FC = () => {
   };
 
   return (
-    <div className="w-272 pt-10">
+    <div className="w-full max-w-272 pt-10">
       <div
         className="flex gap-3 cursor-pointer items-center mb-4"
         onClick={() => navigate(`/${currentUser?.username}`)}

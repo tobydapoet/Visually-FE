@@ -21,6 +21,7 @@ import Pagination from "../components/Pagination";
 import ContentPopUp from "../components/ContentPopUp";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { usePost } from "../contexts/post.context";
+import assets from "../assets";
 
 const PostManagePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -115,7 +116,7 @@ const PostManagePage: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen w-full bg-neutral-950 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="min-h-screen w-full bg-zinc-900 px-4 py-6 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-4">
           <div className="rounded-xl">
             <h1 className="text-2xl font-bold text-white mb-4">
@@ -154,7 +155,7 @@ const PostManagePage: React.FC = () => {
           </div>
 
           <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full min-w-150">
                 <thead className="bg-neutral-950 border-b border-neutral-800">
                   <tr>
@@ -211,7 +212,9 @@ const PostManagePage: React.FC = () => {
                         key={post.id}
                         className="hover:bg-neutral-800/50 transition-colors cursor-pointer"
                         onClick={() => {
-                          navigate(`/content?contentId=${post.id}&type=POST`);
+                          navigate(
+                            `/manage/content?contentId=${post.id}&type=POST`,
+                          );
                         }}
                       >
                         <td className="px-4 py-3 text-sm text-neutral-400 font-medium whitespace-nowrap">
@@ -243,17 +246,12 @@ const PostManagePage: React.FC = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            {post.avatarUrl ? (
-                              <img
-                                src={post.avatarUrl}
-                                alt={post.username}
-                                className="w-8 h-8 rounded-full object-cover shrink-0"
-                              />
-                            ) : (
-                              <div className="w-8 h-8 bg-neutral-800 rounded-full flex items-center justify-center shrink-0">
-                                <User className="w-4 h-4 text-neutral-600" />
-                              </div>
-                            )}
+                            <img
+                              src={post.avatarUrl || assets.profile}
+                              alt={post.username}
+                              className="w-8 h-8 rounded-full object-cover shrink-0"
+                            />
+
                             <p className="text-sm text-neutral-300 whitespace-nowrap">
                               {post.username}
                             </p>
@@ -288,6 +286,98 @@ const PostManagePage: React.FC = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            <div className="sm:hidden divide-y divide-neutral-800">
+              {loading && posts.length === 0 ? (
+                <div className="px-4 py-12 text-center">
+                  <Loader2 className="w-7 h-7 animate-spin text-neutral-500 mx-auto mb-2" />
+                  <p className="text-neutral-500 text-sm">Loading data...</p>
+                </div>
+              ) : posts.length === 0 ? (
+                <div className="px-4 py-12 text-center">
+                  <div className="flex flex-col items-center gap-2">
+                    <Filter className="w-10 h-10 text-neutral-700" />
+                    <p className="text-neutral-400 text-sm">No posts found</p>
+                    <p className="text-xs text-neutral-600">
+                      Try changing the filter or search keyword
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                posts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="flex items-start gap-3 px-4 py-3 hover:bg-neutral-800/50 transition-colors cursor-pointer"
+                    onClick={() =>
+                      navigate(`/manage/content?contentId=${post.id}&type=POST`)
+                    }
+                  >
+                    {/* Thumbnail */}
+                    {post.thumbnailUrl ? (
+                      <img
+                        src={post.thumbnailUrl}
+                        alt="thumbnail"
+                        className="w-14 h-14 object-cover rounded-lg shrink-0"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 bg-neutral-800 rounded-lg flex items-center justify-center shrink-0">
+                        <ImageOff className="w-5 h-5 text-neutral-600" />
+                      </div>
+                    )}
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-xs text-neutral-500 font-medium">
+                          #{post.id}
+                        </span>
+                        <span className="text-xs text-neutral-500">
+                          {new Date(post.createdAt).toLocaleDateString("en-US")}
+                        </span>
+                      </div>
+
+                      <div className="text-sm text-neutral-300 line-clamp-2 mb-2">
+                        {post.caption && (
+                          <ParsedContent
+                            caption={post.caption}
+                            classname="font-bold"
+                            mentions={post.mentions}
+                          />
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <img
+                            src={post.avatarUrl || assets.profile}
+                            alt={post.username}
+                            className="w-5 h-5 rounded-full object-cover"
+                          />
+                          <span className="text-xs text-neutral-400">
+                            @{post.username}
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedContentId(post.id);
+                            setIsOpenDialog(true);
+                          }}
+                          className="p-1 rounded-lg group"
+                        >
+                          {status === "ACTIVE" ? (
+                            <Ban className="w-4 h-4 text-red-500 group-hover:text-red-400" />
+                          ) : (
+                            <CheckCircle className="w-4 h-4 text-emerald-500 group-hover:text-emerald-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             <div className="px-4 py-3 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-3">

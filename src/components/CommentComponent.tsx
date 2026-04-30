@@ -188,7 +188,9 @@ const CommentComponent = forwardRef<CommentComponentRef, Props>(
 
     return (
       <div className="space-y-4">
-        <div className="font-semibold text-lg">Comments ({commentCount})</div>
+        <div className="font-semibold text-lg p-2">
+          Comments ({commentCount})
+        </div>
 
         <div className="space-y-3">
           {allComments.map((comment: CommentResponse) => (
@@ -218,7 +220,7 @@ const CommentComponent = forwardRef<CommentComponentRef, Props>(
         )}
 
         {allComments.length === 0 && (
-          <div className="text-center text-gray-500 py-8">
+          <div className="text-center text-sm text-gray-500 py-8">
             No comments yet. Be the first to comment!
           </div>
         )}

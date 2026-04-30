@@ -8,8 +8,11 @@ import {
   handleGetConversationMessages,
   handleGetConversationWithId,
   handleGetConversationWithUser,
+  handleGetUnReactCount,
   handleGetUserConverstaion,
+  handleMuteConversation,
   handleSendMessage,
+  handleUnMuteConversation,
   handleUpdateLastSeen,
   handleUpdateMessage,
 } from "../api/message.api";
@@ -17,6 +20,8 @@ import { useUser } from "./user.context";
 import { getSocket } from "../utils/socket";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import type { MentionItem } from "../types/api/mention.type";
+import { toast } from "sonner";
+import assets from "../assets";
 
 type MessageContextType = {
   selectedConversation: ConversationType | null;
@@ -26,7 +31,7 @@ type MessageContextType = {
   loadConversationById: (id: number) => Promise<void>;
   handleSelectUser: (userId: string) => Promise<void>;
   handleSelectConversation: (id: number) => Promise<void>;
-
+  unreadConversationCount: number;
   sendMessage: (
     message: string,
     files: File[],
@@ -51,6 +56,11 @@ type MessageContextType = {
     mentions?: MentionItem[],
   ) => Promise<void>;
   deleteMessage: (id: number) => Promise<void>;
+  muteConversation: (
+    memberId: number,
+    option: "15m" | "1h" | "8h" | "24h" | "forever",
+  ) => Promise<void>;
+  unmuteConversation: (memberId: number) => Promise<void>;
 };
 
 const MessageContext = createContext<MessageContextType | null>(null);
@@ -74,6 +84,7 @@ export const MessageProvider = ({
   const [memberList, setMemberList] = useState<MemberType[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const selectedConversationRef = useRef<ConversationType | null>(null);
+  const [unreadConversationCount, setUnreadConversationCount] = useState(0);
 
   useEffect(() => {
     selectedConversationRef.current = selectedConversation;
@@ -90,6 +101,16 @@ export const MessageProvider = ({
     }
   };
 
+  const fetchUnreadCount = async () => {
+    if (!currentUser?.id) return;
+    const count = await handleGetUnReactCount();
+    setUnreadConversationCount(count);
+  };
+
+  useEffect(() => {
+    fetchUnreadCount();
+  }, [currentUser?.id]);
+
   useEffect(() => {
     fetchMember();
   }, [selectedConversation?.id]);
@@ -98,18 +119,72 @@ export const MessageProvider = ({
     if (!currentUser?.id) return;
     const socket = getSocket(currentUser.id);
 
-    socket.on("connected", () => {
+    const handleConnected = () => {
       if (selectedConversationRef.current?.id) {
         joinConversationRoom(selectedConversationRef.current.id);
       }
-    });
+    };
+
+    if (socket.connected) {
+      handleConnected();
+    }
+
+    socket.on("connect", handleConnected);
+    socket.on("connected", handleConnected);
 
     socket.on("new_message", (event) => {
+      const isOwnMessage = event.senderId === currentUser?.id;
+      const isCurrentConversation =
+        selectedConversationRef.current?.id === event.conversationId;
+      const isMuted = event.mutedUserIds?.includes(currentUser?.id);
+
+      if (!isOwnMessage && !isCurrentConversation && !isMuted) {
+        toast.custom(
+          (t) => (
+            <div
+              className="flex items-center gap-3 bg-white shadow-lg rounded-xl p-4 w-80 cursor-pointer"
+              onClick={() => {
+                window.location.href = `/inbox/${event.conversationId}`;
+                toast.dismiss(t);
+              }}
+            >
+              <img
+                src={event.senderAvatar || assets.profile}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-800">
+                  {event.senderUsername}
+                </p>
+                <p className="text-sm text-gray-600 truncate">
+                  {event.content}
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5">Just now</p>
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toast.dismiss(t);
+                }}
+                className="ml-auto text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+          ),
+          { duration: 4000, position: "bottom-right" },
+        );
+      }
+
+      fetchUnreadCount();
+      refetchConversations();
+
       if (selectedConversationRef.current?.id !== event.conversationId) {
-        refetchConversations();
         return;
       }
       setMessages((prev) => {
+        if (prev.some((m) => m.id === event.id)) return prev;
+
         const newMessage = {
           id: event.id,
           content: event.content,
@@ -128,7 +203,6 @@ export const MessageProvider = ({
         return updated;
       });
 
-      refetchConversations();
       if (selectedConversationRef.current?.id === event.conversationId) {
         handleUpdateLastSeen(event.conversationId);
       }
@@ -148,7 +222,8 @@ export const MessageProvider = ({
     });
 
     return () => {
-      socket.off("connected");
+      socket.off("connect", handleConnected);
+      socket.off("connected", handleConnected);
       socket.off("new_message");
       socket.off("message_updated");
       socket.off("message_deleted");
@@ -157,6 +232,19 @@ export const MessageProvider = ({
 
   const setNullForConversation = () => {
     setSelectedConversation(null);
+  };
+
+  const muteConversation = async (
+    memberId: number,
+    option: "15m" | "1h" | "8h" | "24h" | "forever",
+  ) => {
+    await handleMuteConversation(memberId, option);
+    await fetchMember();
+  };
+
+  const unmuteConversation = async (memberId: number) => {
+    await handleUnMuteConversation(memberId);
+    await fetchMember();
   };
 
   const loadMessages = async (conversationId: number, page = 1) => {
@@ -252,7 +340,9 @@ export const MessageProvider = ({
     setMessagePage(1);
     setHasMoreMessages(false);
     await loadMessages(res.id);
-    await handleUpdateLastSeen(res.id);
+    await handleUpdateLastSeen(id);
+    refetchConversations();
+    fetchUnreadCount();
   };
 
   const {
@@ -343,6 +433,7 @@ export const MessageProvider = ({
         allConversations,
         fetchNextPage,
         hasNextPage,
+        unreadConversationCount,
         isFetchingNextPage,
         isLoadingConversations,
         loadingMoreMessages,
@@ -353,6 +444,8 @@ export const MessageProvider = ({
         setNullForConversation,
         updateMessage,
         deleteMessage,
+        muteConversation,
+        unmuteConversation,
       }}
     >
       {children}

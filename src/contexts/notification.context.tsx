@@ -7,6 +7,8 @@ import {
   hanleGetNotifications,
 } from "../api/notification.api";
 import { useSocket } from "../hooks/useSocket";
+import { toast } from "sonner";
+import assets from "../assets";
 
 type NotificationContextType = {
   notifications: NotificationResponse[];
@@ -16,6 +18,8 @@ type NotificationContextType = {
   isFetchingNextPage: boolean;
   isLoading: boolean;
   markAllAsRead: () => void;
+  toastNotification: NotificationResponse | null;
+  clearToast: () => void;
 };
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
@@ -29,6 +33,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   const queryClient = useQueryClient();
   const socket = useSocket(currentUser?.id ?? null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [toastNotification, setToastNotification] =
+    useState<NotificationResponse | null>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
@@ -53,6 +59,30 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
 
     socket.on("new_notification", (newNotification: NotificationResponse) => {
       queryClient.setQueryData(["notifications"], (old: any) => {
+        setToastNotification(newNotification);
+        toast.custom(
+          (t) => (
+            <div className="flex items-center gap-3 bg-white shadow-lg rounded-xl p-4 w-80">
+              <img
+                src={newNotification.snapshotUrl || assets.profile}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <div className="flex-1">
+                <p className="text-sm text-gray-800">
+                  {newNotification.content}
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5">Just now</p>
+              </div>
+              <button
+                onClick={() => toast.dismiss(t)}
+                className="ml-auto text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+          ),
+          { duration: 4000, position: "bottom-right" },
+        );
         if (!old) return old;
         return {
           ...old,
@@ -100,6 +130,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
         isFetchingNextPage,
         isLoading,
         markAllAsRead,
+        toastNotification,
+        clearToast: () => setToastNotification(null),
       }}
     >
       {children}

@@ -130,19 +130,23 @@ export default function ReelsPage() {
         ref={containerRef}
         className="reels-scroll"
         style={{
-          height: "100dvh",
           overflowY: "scroll",
           scrollSnapType: "y mandatory",
-          background: "#000",
         }}
       >
         {reels.map((reel, i) => (
           <div
             key={reel.id}
             data-index={i}
-            style={{ width: "100%", height: "100dvh", position: "relative" }}
+            className="relative md:w-full md:h-screen w-screen h-screen flex justify-center items-center"
           >
-            <ReelCard reel={reel} isActive={i === activeIndex} />
+            {i === activeIndex && (
+              <div className="bg-zinc-900 absolute inset-0 blur-3xl opacity-40" />
+            )}
+
+            <div className="relative z-10">
+              <ReelCard reel={reel} isActive={i === activeIndex} />
+            </div>
           </div>
         ))}
 

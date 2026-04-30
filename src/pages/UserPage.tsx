@@ -50,23 +50,19 @@ const UserPage: React.FC = () => {
   const { currentUser } = useUser();
   const [isOpenUnBlock, setIsOpenUnblock] = useState(user?.isBlocked || false);
 
-  const [activeTab, setActiveTab] = useState<TabUserType>(() => {
+  const activeTab = ((): TabUserType => {
     const tab = searchParams.get("tab") as TabUserType;
     return tab && ["posts", "shorts", "saved", "reposted"].includes(tab)
       ? tab
       : "posts";
-  });
+  })();
 
+  // Đổi setActiveTab thành
+  const setActiveTab = (tab: TabUserType) => {
+    setSearchParams({ tab }, { replace: true });
+  };
   const { posts, shorts, reposted, postsQuery, shortsQuery, repostedQuery } =
     useUserPageData(user, activeTab);
-
-  const getGradientByFollowers = () => {
-    if (!user) return "from-blue-400 to-blue-600";
-    if (user.followersCount > 10000) return "from-blue-400 to-cyan-400";
-    if (user.followersCount > 5000) return "from-blue-400 to-indigo-400";
-    if (user.followersCount > 1000) return "from-blue-400 to-blue-500";
-    return "from-blue-400 to-blue-600";
-  };
 
   const tabs = [
     { id: "posts" as const, label: "Posts", icon: Grid },
@@ -125,7 +121,7 @@ const UserPage: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen w-272">
+      <div className="min-h-screen w-full lg:w-272">
         {user.isBlocked && (
           <ConfirmDialog
             open={isOpenUnBlock}
@@ -145,7 +141,6 @@ const UserPage: React.FC = () => {
           <div className="relative">
             <UserProfileHeader
               user={user}
-              gradientClass={getGradientByFollowers()}
               onFollowerClick={() => {
                 setIsOpenFollow(true);
                 setFollowRelationType("FOLLOWER");
@@ -159,7 +154,7 @@ const UserPage: React.FC = () => {
             {currentUser &&
               currentUser.role === "CLIENT" &&
               (isOwner ? (
-                <div className="flex flex-wrap gap-3 mt-8 w-145 mx-auto">
+                <div className="flex flex-wrap gap-3 mt-8 w-full max-w-[580px] mx-auto">
                   <button
                     className="flex-1 min-w-30 bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-600 transition-all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
                     onClick={() => navigate("/account/edit")}
@@ -177,10 +172,10 @@ const UserPage: React.FC = () => {
               ) : (
                 <div>
                   {!user.isFollowed ? (
-                    <div className="flex flex-wrap gap-3 w-145 mx-auto mt-8">
+                    <div className="flex flex-wrap gap-3 w-full max-w-[580px] mx-auto mt-8">
                       <button
                         onClick={() => onFollow()}
-                        className="cursor-pointer flex-1 w-145 min-w-30 bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-600 transition-all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
+                        className="cursor-pointer flex-1 w-full max-w-[580px] min-w-30 bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-600 transition-all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
                       >
                         <UserPlus className="w-4 h-4" /> Follow
                       </button>
@@ -192,7 +187,7 @@ const UserPage: React.FC = () => {
                       </button>
                     </div>
                   ) : (
-                    <div className="flex flex-wrap gap-3 w-145 mx-auto mt-8">
+                    <div className="flex flex-wrap gap-3 w-full max-w-[580px] mx-auto mt-8">
                       <button
                         onClick={() => onUnfollow()}
                         className="cursor-pointer flex-1 min-w-30 bg-blue-500/10 text-blue-400 font-semibold py-3 px-6 rounded-xl hover:bg-blue-500/20 transition-all transform hover:scale-105 flex items-center justify-center gap-2 border border-blue-500/30"
@@ -221,18 +216,18 @@ const UserPage: React.FC = () => {
                 </div>
               ))}
 
-            <div className="w-145 mx-auto mt-5 flex gap-3">
+            <div className="w-full max-w-[580px] mx-auto mt-5 flex gap-3">
               {storageList.map((storage) => (
                 <div key={storage.id}>
                   <div
                     className="relative w-fit cursor-pointer"
                     onClick={() => navigate(`/stories/highlight/${storage.id}`)}
                   >
-                    <div className="rounded-full p-0.5 bg-linear-to-tr from-blue-400 via-cyan-500 to-indigo-600">
-                      <div className="rounded-full bg-gray-900 transition-all duration-300 hover:scale-105">
+                    <div className="rounded-full p-0.5 bg-linear-to-tr from-blue-400 to-blue-600">
+                      <div className="rounded-full bg-gray-900 transition-all duration-300 0-0.5">
                         <video
                           src={storage.url}
-                          className="w-20 h-20 object-cover rounded-full"
+                          className="w-20 h-20 object-cover rounded-full p-0.5"
                           muted
                         />
                       </div>
@@ -249,8 +244,8 @@ const UserPage: React.FC = () => {
                     className="relative w-fit cursor-pointer"
                     onClick={() => setIsOpenStorage(true)}
                   >
-                    <div className="rounded-full p-0.5 bg-linear-to-tr from-blue-400 via-cyan-500 to-indigo-600">
-                      <div className="rounded-full bg-gray-900 p-6 transition-all duration-300 hover:scale-105">
+                    <div className="rounded-full p-0.5 bg-linear-to-tr from-blue-400 to-blue-600">
+                      <div className="rounded-full bg-gray-900 p-6 transition-all duration-300 ">
                         <Plus
                           size={28}
                           className="text-gray-300 hover:text-blue-400 transition-colors"
@@ -258,25 +253,27 @@ const UserPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <p className="text-center text-sm text-gray-400 mt-3 hover:text-blue-400 transition-colors">
+                  <p className="text-center text-sm text-gray-400 mt-3ransition-colors">
                     New
                   </p>
                 </div>
               )}
             </div>
 
-            <UserProfileTabs
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              visibleTabs={visibleTabs}
-              posts={posts}
-              shorts={shorts}
-              reposted={reposted}
-              postsQuery={postsQuery}
-              shortsQuery={shortsQuery}
-              repostedQuery={repostedQuery}
-              isOwner={isOwner}
-            />
+            <div data-tabs>
+              <UserProfileTabs
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                visibleTabs={visibleTabs}
+                posts={posts}
+                shorts={shorts}
+                reposted={reposted}
+                postsQuery={postsQuery}
+                shortsQuery={shortsQuery}
+                repostedQuery={repostedQuery}
+                isOwner={isOwner}
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -89,7 +89,7 @@ const MusicLibraryPage: React.FC = () => {
 
   return (
     <>
-      <div className="py-6 w-full min-h-screen">
+      <div className="py-6 w-full min-h-screen bg-zinc-900">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
@@ -97,7 +97,7 @@ const MusicLibraryPage: React.FC = () => {
             </div>
             <button
               onClick={() => setOpenDialog(true)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-500 transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-500 transition-colors"
             >
               <Plus size={16} />
               <span>Add</span>
@@ -109,7 +109,7 @@ const MusicLibraryPage: React.FC = () => {
               <button
                 key={tab.key}
                 onClick={() => handleTabChange(tab.key)}
-                className={`px-4 py-2 text-sm font-medium transition-all ${
+                className={`px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
                   statusFilter === tab.key
                     ? `border-b-2 border-${tab.color}-500 text-${tab.color}-400`
                     : "text-gray-400 hover:text-gray-300"
@@ -145,7 +145,7 @@ const MusicLibraryPage: React.FC = () => {
           <div className="space-y-2">
             {loading ? (
               <div className="flex justify-center py-12">
-                <Loader2 size={28} className="animate-spin text-indigo-400" />
+                <Loader2 size={28} className="animate-spin text-blue-400" />
               </div>
             ) : musicList?.length > 0 ? (
               musicList.map((music) => (
@@ -187,7 +187,7 @@ const MusicLibraryPage: React.FC = () => {
                     onClick={() => handlePageChange(page as number)}
                     className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                       currentPage === page
-                        ? "bg-indigo-600 text-white"
+                        ? "bg-blue-600 text-white"
                         : "text-gray-400 hover:text-white hover:bg-gray-700"
                     }`}
                   >

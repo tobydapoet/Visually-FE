@@ -18,6 +18,8 @@ import ReportPopUp from "./ReportPopUp";
 import assets from "../assets";
 import { handleView } from "../api/interaction.api";
 import { timeAgo } from "../utils/timeAgot";
+import { toast } from "sonner";
+import type { ContentType } from "../constants/contentType.enum";
 
 const isVideo = (url?: string) =>
   url?.includes(".mp4") || url?.includes("/video/");
@@ -137,6 +139,12 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
     toggleSave,
     toggleRepost,
   } = useContentInteraction(post, post.contentType as "POST" | "SHORT");
+
+  const handleCopyLink = (contentId: number, type: ContentType) => {
+    const url = `${window.location.origin}/content?contentId=${contentId}&type=${type}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Link copied!");
+  };
 
   const cardRef = useRef<HTMLDivElement>(null);
   const startTimeRef = useRef<number | null>(null);
@@ -263,16 +271,24 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
               <MenuItem>
                 <button
                   onClick={() => setIsShowContent(true)}
-                  className="group flex w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10"
+                  className="group cursor-pointer flex w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10"
                 >
                   Show post
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button
+                  onClick={() => handleCopyLink(post.id, post.contentType)}
+                  className="group flex cursor-pointer w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10"
+                >
+                  Copy link
                 </button>
               </MenuItem>
               <div className="my-1 h-px bg-white/5" />
               <MenuItem>
                 <button
                   onClick={() => setIsShowReport(true)}
-                  className="group flex w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10"
+                  className="group cursor-pointer flex w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10"
                 >
                   Report
                 </button>

@@ -20,15 +20,16 @@ import {
   Transition,
 } from "@headlessui/react";
 import { useUser } from "../contexts/user.context";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import PostPopUp from "./PostPopUp";
 import ShortPopUp from "./ShortPopUp";
 import StoryPopUp from "./StoryPopUp";
 import SearchPopup from "../pages/SearchPopup";
 import NotificationPopUp from "../pages/NotificationPopUp";
+import { useNotification } from "../contexts/notification.context";
+import { useMessage } from "../contexts/message.context";
 
 const SideBar: React.FC = () => {
-  const [activeItem, setActiveItem] = useState("Home");
   const [isExpanded, setIsExpanded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [openShortPopUp, setOpenShortPopUp] = useState(false);
@@ -37,6 +38,32 @@ const SideBar: React.FC = () => {
   const [isOpenSearch, setIsOpenSearch] = useState(false);
   const [isOpenNotification, setIsOpenNotification] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  const location = useLocation();
+  const { unreadCount } = useNotification();
+  const { unreadConversationCount } = useMessage();
+  const { currentUser } = useUser();
+
+  const getActiveFromPath = (pathname: string) => {
+    if (pathname === "/") return "Home";
+    if (pathname.startsWith("/reels")) return "Shorts";
+    if (pathname.startsWith("/inbox")) return "Messages";
+    if (pathname.startsWith("/ad")) return "Boosted";
+    if (pathname.startsWith("/search")) return "Search";
+    if (currentUser && pathname.startsWith(`/${currentUser.username}`))
+      return "Profile";
+    return "Home";
+  };
+
+  const [activeItem, setActiveItem] = useState(() =>
+    getActiveFromPath(location.pathname),
+  );
+
+  useEffect(() => {
+    const active = getActiveFromPath(location.pathname);
+    if (active !== "Search" || !isOpenSearch) {
+      setActiveItem(active);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -44,7 +71,6 @@ const SideBar: React.FC = () => {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const { currentUser } = useUser();
   const navigate = useNavigate();
 
   const expanded = isExpanded || menuOpen;
@@ -59,8 +85,8 @@ const SideBar: React.FC = () => {
   ];
 
   const handleItemClick = (item: (typeof menuItems)[0]) => {
-    setActiveItem(item.id);
     if (item.link) {
+      setActiveItem(item.id);
       navigate(item.link);
     } else if (item.id === "Notifications") {
       setIsOpenNotification(true);
@@ -112,13 +138,23 @@ const SideBar: React.FC = () => {
                     ${isActive ? "bg-blue-500 shadow-lg shadow-blue-500/30" : "hover:bg-gray-700"}
                   `}
                 >
-                  <div className="w-6 flex justify-center shrink-0">
+                  <div className="w-6 flex justify-center shrink-0 relative">
                     <IconComponent
                       color="white"
                       fill={item.hasFill && isActive ? "white" : "none"}
                       className={`transition-transform duration-200 ${isActive ? "scale-110" : ""}`}
                       size={24}
                     />
+                    {item.id === "Notifications" && unreadCount > 0 && (
+                      <span className="absolute -top-1.5 -right-2 bg-red-500 px-1.5 py-0.5 rounded-full text-[10px]">
+                        {unreadCount}
+                      </span>
+                    )}
+                    {item.id === "Messages" && unreadConversationCount > 0 && (
+                      <span className="absolute -top-1.5 -right-2 bg-red-500 px-1.5 py-0.5 rounded-full text-[10px]">
+                        {unreadConversationCount}
+                      </span>
+                    )}
                   </div>
                   <span
                     className={`
@@ -177,7 +213,7 @@ const SideBar: React.FC = () => {
                       <MenuItems
                         portal
                         anchor={{ to: "right start", gap: 15 }}
-                        className="z-9999 w-56 rounded-xl bg-gray-800 p-1 text-sm text-white shadow-2xl ring-1 ring-white/10 focus:outline-none"
+                        className="z-9999 w-56 rounded-xl bg-zinc-900 p-1 text-sm text-white shadow-2xl ring-1 ring-white/10 focus:outline-none"
                       >
                         {[
                           {
@@ -224,9 +260,16 @@ const SideBar: React.FC = () => {
         {currentUser && (
           <div
             className="px-3 pb-4 shrink-0"
-            onClick={() => navigate(`/${currentUser.username}`)}
+            onClick={() => {
+              setActiveItem("Profile");
+              navigate(`/${currentUser.username}`);
+            }}
           >
-            <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-700 transition-colors cursor-pointer">
+            <div
+              className={`flex items-center gap-3 p-3 rounded-xl transition-colors cursor-pointer ${
+                activeItem === "Profile" ? "bg-blue-500" : "hover:bg-gray-700" // thêm active state
+              }`}
+            >
               <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0">
                 <img
                   src={currentUser.avatar || assets.profile}
@@ -303,7 +346,7 @@ const SideBar: React.FC = () => {
                   <MenuItems
                     portal
                     anchor={{ to: "top end", gap: 8 }}
-                    className="z-9999 w-52 rounded-xl bg-gray-800 p-1 text-sm text-white shadow-2xl ring-1 ring-white/10 focus:outline-none"
+                    className="z-9999 w-52 rounded-xl bg-zinc-900 p-1 text-sm text-white shadow-2xl ring-1 ring-white/10 focus:outline-none"
                   >
                     {[
                       {

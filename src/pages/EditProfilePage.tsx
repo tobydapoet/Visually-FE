@@ -1,17 +1,5 @@
 import React from "react";
 import {
-  Box,
-  Typography,
-  Avatar,
-  TextField,
-  Button,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  FormHelperText,
-} from "@mui/material";
-import {
   User,
   AtSign,
   Calendar,
@@ -34,9 +22,7 @@ import assets from "../assets";
 
 const EditProfilePage: React.FC = () => {
   const { currentUser, reloadUser } = useUser();
-  if (!currentUser) {
-    return;
-  }
+  if (!currentUser) return;
 
   const {
     register,
@@ -67,38 +53,41 @@ const EditProfilePage: React.FC = () => {
     formData.append("dob", data.dob);
     formData.append("gender", data.gender);
     formData.append("bio", data.bio);
-    if (data.file) {
-      formData.append("file", data.file);
-    }
-
+    if (data.file) formData.append("file", data.file);
     const res = await handleUpdateUser(formData);
     if (res.success) {
       toast.success("Update success!");
       reloadUser();
-    } else {
-      toast.error(res.message);
-    }
+    } else toast.error(res.message);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setValue("file", file);
-    }
+    if (file) setValue("file", file);
   };
 
+  const inputClass =
+    "w-full bg-neutral-800 border border-neutral-700 hover:border-neutral-500 focus:border-blue-500 focus:outline-none rounded-xl px-4 py-3 text-white text-sm placeholder-neutral-500 transition-colors";
+  const labelClass =
+    "text-xs font-medium text-neutral-400 mb-1.5 flex items-center gap-1.5";
+  const errorClass = "text-xs text-red-400 mt-1";
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="p-6 rounded-2xl mx-auto">
-      <div className="flex items-center justify-between mb-6 bg-neutral-800 rounded-2xl py-3 px-5">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="max-w-2xl space-y-5 pb-10"
+    >
+      {/* Avatar */}
+      <div className="flex items-center justify-between bg-neutral-800/60 border border-neutral-700 rounded-2xl py-4 px-5">
         <div className="flex items-center gap-4">
           <div className="relative group">
-            <Avatar
+            <img
               src={currentUser?.avatar || assets.profile}
               alt={currentUser.fullName}
-              sx={{ width: 80, height: 80, border: "2px solid #333" }}
+              className="w-16 h-16 rounded-full object-cover border-2 border-neutral-700"
             />
-            <label className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer">
-              <Camera size={28} className="text-white" />
+            <label className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+              <Camera size={20} className="text-white" />
               <input
                 type="file"
                 accept="image/*"
@@ -108,21 +97,16 @@ const EditProfilePage: React.FC = () => {
             </label>
           </div>
           <div>
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              sx={{ color: "#ffffff" }}
-            >
+            <p className="text-white font-semibold text-sm">
               {currentUser.username}
-            </Typography>
-            <Typography variant="body2" sx={{ color: "#999" }}>
+            </p>
+            <p className="text-neutral-400 text-xs mt-0.5">
               {currentUser.fullName}
-            </Typography>
+            </p>
           </div>
         </div>
-
-        <label className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-200">
-          <Camera size={16} />
+        <label className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white text-xs font-medium px-3 py-2 rounded-lg flex items-center gap-1.5 transition-colors">
+          <Camera size={14} />
           Change photo
           <input
             type="file"
@@ -133,240 +117,118 @@ const EditProfilePage: React.FC = () => {
         </label>
       </div>
 
-      <div className="space-y-4">
-        <TextField
-          fullWidth
-          label="Full Name"
-          margin="normal"
-          error={!!errors.fullName}
-          helperText={errors.fullName?.message}
+      {/* Full Name */}
+      <div>
+        <label className={labelClass}>
+          <User size={13} /> Full name
+        </label>
+        <input
           {...register("fullName")}
-          InputProps={{
-            startAdornment: (
-              <Box sx={{ mr: 1, display: "flex", alignItems: "center" }}>
-                <User size={20} color="#999" />
-              </Box>
-            ),
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              color: "#ffffff",
-              "& fieldset": { borderColor: "#333" },
-              "&:hover fieldset": { borderColor: "#555" },
-              "&.Mui-focused fieldset": { borderColor: "#666" },
-            },
-            "& .MuiInputLabel-root": { color: "#999" },
-            "& .MuiInputLabel-root.Mui-focused": { color: "#ccc" },
-            "& .MuiFormHelperText-root": {
-              color: "#f44336",
-              marginLeft: 0,
-            },
-          }}
+          placeholder="Your full name"
+          className={inputClass}
         />
+        {errors.fullName && (
+          <p className={errorClass}>{errors.fullName.message}</p>
+        )}
+      </div>
 
-        <TextField
-          fullWidth
-          label="Username"
-          margin="normal"
-          error={!!errors.username}
-          helperText={
-            errors.username?.message || "This will be your unique username"
-          }
+      {/* Username */}
+      <div>
+        <label className={labelClass}>
+          <AtSign size={13} /> Username
+        </label>
+        <input
           {...register("username")}
-          InputProps={{
-            startAdornment: (
-              <Box sx={{ mr: 1, display: "flex", alignItems: "center" }}>
-                <AtSign size={20} color="#999" />
-              </Box>
-            ),
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              color: "#ffffff",
-              "& fieldset": { borderColor: "#333" },
-              "&:hover fieldset": { borderColor: "#555" },
-              "&.Mui-focused fieldset": { borderColor: "#666" },
-            },
-            "& .MuiInputLabel-root": { color: "#999" },
-            "& .MuiInputLabel-root.Mui-focused": { color: "#ccc" },
-            "& .MuiFormHelperText-root": {
-              color: errors.username ? "#f44336" : "#777",
-              marginLeft: 0,
-            },
-          }}
+          placeholder="your_username"
+          className={inputClass}
         />
+        {errors.username ? (
+          <p className={errorClass}>{errors.username.message}</p>
+        ) : (
+          <p className="text-xs text-neutral-500 mt-1">
+            This will be your unique username
+          </p>
+        )}
+      </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <FormControl fullWidth margin="normal" error={!!errors.gender}>
-            <InputLabel id="gender-label" sx={{ color: "#999" }}>
-              Gender
-            </InputLabel>
-            <Select
-              labelId="gender-label"
-              label="Gender"
-              value={selectedGender || ""}
-              {...register("gender")}
-              startAdornment={
-                <Box sx={{ mr: 1, display: "flex", alignItems: "center" }}>
-                  <VenusAndMars size={20} color="#999" />
-                </Box>
-              }
-              sx={{
-                color: "#ffffff",
-                "& .MuiOutlinedInput-notchedOutline": { borderColor: "#333" },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "#555",
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "#666",
-                },
-                "& .MuiSelect-icon": { color: "#999" },
-              }}
-            >
-              <MenuItem value={Gender.MALE}>Male</MenuItem>
-              <MenuItem value={Gender.FEMALE}>Female</MenuItem>
-              <MenuItem value={Gender.OTHER}>Other</MenuItem>
-            </Select>
-            {errors.gender && (
-              <FormHelperText sx={{ color: "#f44336", marginLeft: 0 }}>
-                {errors.gender.message}
-              </FormHelperText>
-            )}
-          </FormControl>
+      {/* Gender + DOB */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>
+            <VenusAndMars size={13} /> Gender
+          </label>
+          <select
+            {...register("gender")}
+            value={selectedGender || ""}
+            className={`${inputClass} appearance-none`}
+          >
+            <option value="" disabled>
+              Select gender
+            </option>
+            <option value={Gender.MALE}>Male</option>
+            <option value={Gender.FEMALE}>Female</option>
+            <option value={Gender.OTHER}>Other</option>
+          </select>
+          {errors.gender && (
+            <p className={errorClass}>{errors.gender.message}</p>
+          )}
+        </div>
 
+        <div>
+          <label className={labelClass}>
+            <Calendar size={13} /> Date of birth
+          </label>
           <Controller
             name="dob"
             control={control}
             render={({ field }) => (
-              <TextField
+              <input
                 {...field}
-                fullWidth
-                label="Date of Birth"
                 type="date"
-                margin="normal"
-                error={!!errors.dob}
-                helperText={errors.dob?.message}
-                InputLabelProps={{ shrink: true }}
-                InputProps={{
-                  startAdornment: (
-                    <Box sx={{ mr: 1, display: "flex", alignItems: "center" }}>
-                      <Calendar size={20} color="#999" />
-                    </Box>
-                  ),
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    color: "#ffffff",
-                    "& fieldset": { borderColor: "#333" },
-                    "&:hover fieldset": { borderColor: "#555" },
-                    "&.Mui-focused fieldset": { borderColor: "#666" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#999" },
-                  "& .MuiInputLabel-root.Mui-focused": { color: "#ccc" },
-                  "& input[type='date']": { colorScheme: "dark" },
-                  "& .MuiFormHelperText-root": {
-                    color: "#f44336",
-                    marginLeft: 0,
-                  },
-                }}
+                className={`${inputClass} [color-scheme:dark]`}
               />
             )}
           />
+          {errors.dob && <p className={errorClass}>{errors.dob.message}</p>}
         </div>
+      </div>
 
-        <TextField
-          fullWidth
-          label="Bio"
-          multiline
+      {/* Bio */}
+      <div>
+        <label className={labelClass}>
+          <Info size={13} /> Bio
+        </label>
+        <textarea
           {...register("bio")}
-          margin="normal"
           rows={4}
           defaultValue={currentUser.bio || ""}
           placeholder="Tell us about yourself..."
-          InputProps={{
-            startAdornment: (
-              <Box
-                sx={{
-                  mr: 1,
-                  mt: 1.5,
-                  display: "flex",
-                  alignItems: "flex-start",
-                }}
-              >
-                <Info size={20} color="#999" />
-              </Box>
-            ),
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              color: "#ffffff",
-              "& fieldset": { borderColor: "#333" },
-              "&:hover fieldset": { borderColor: "#555" },
-              "&.Mui-focused fieldset": { borderColor: "#666" },
-            },
-            "& .MuiInputLabel-root": { color: "#999" },
-            "& .MuiInputLabel-root.Mui-focused": { color: "#ccc" },
-            "& textarea::placeholder": { color: "#555", opacity: 1 },
-          }}
+          className={`${inputClass} resize-none`}
         />
+      </div>
 
-        <div className="mt-4">
-          <Typography variant="subtitle2" sx={{ color: "#ccc", mb: 2 }}>
-            Account Information
-          </Typography>
-          <TextField
-            fullWidth
-            label="Email"
-            defaultValue={currentUser.email || "tng.nguyn.vit@gmail.com"}
-            disabled
-            InputProps={{
-              startAdornment: (
-                <Box sx={{ mr: 1, display: "flex", alignItems: "center" }}>
-                  <Mail size={20} color="#555" />
-                </Box>
-              ),
-            }}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                color: "#777",
-                backgroundColor: "#1a1a1a",
-                "& fieldset": { borderColor: "#333" },
-              },
-              "& .MuiInputLabel-root": { color: "#666" },
-              "& .Mui-disabled": {
-                "-webkit-text-fill-color": "#777 !important",
-              },
-            }}
-          />
-        </div>
+      {/* Email (disabled) */}
+      <div>
+        <label className={labelClass}>
+          <Mail size={13} /> Email
+        </label>
+        <input
+          value={currentUser.email || ""}
+          disabled
+          className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-500 text-sm cursor-not-allowed"
+        />
+      </div>
 
-        <div className="flex justify-end">
-          <Button
-            variant="contained"
-            size="large"
-            type="submit"
-            sx={{
-              py: 1.5,
-              width: "10rem",
-              height: "3rem",
-              borderRadius: "1rem",
-              backgroundColor: "#1565C0",
-              boxShadow: "0 3px 5px 2px rgba(21, 101, 192, 0.3)",
-              color: "white",
-              textTransform: "none",
-              fontWeight: 600,
-              "&:hover": {
-                backgroundColor: "#0D47A1",
-                boxShadow: "0 4px 8px 3px rgba(13, 71, 161, 0.4)",
-              },
-            }}
-          >
-            Submit
-          </Button>
-        </div>
+      {/* Submit */}
+      <div className="flex justify-end pt-2">
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-8 py-2.5 rounded-xl transition-colors"
+        >
+          Save changes
+        </button>
       </div>
     </form>
   );
 };
-
 export default EditProfilePage;

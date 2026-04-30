@@ -20,6 +20,7 @@ import {
 import { ParsedContent } from "../components/ParseContent";
 import Pagination from "../components/Pagination";
 import ConfirmDialog from "../components/ConfirmDialog";
+import assets from "../assets";
 
 const ShortManagePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -110,9 +111,11 @@ const ShortManagePage: React.FC = () => {
     }
   };
 
+  const isActive = status === "ACTIVE";
+
   return (
     <>
-      <div className="min-h-screen w-full bg-neutral-950 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="min-h-screen w-full bg-zinc-900 px-4 py-6 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-4">
           <div className="">
             <h1 className="text-xl sm:text-2xl font-bold text-white mb-4">
@@ -151,7 +154,7 @@ const ShortManagePage: React.FC = () => {
           </div>
 
           <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full min-w-150">
                 <thead className="bg-neutral-950 border-b border-neutral-800">
                   <tr>
@@ -208,7 +211,9 @@ const ShortManagePage: React.FC = () => {
                         key={short.id}
                         className="hover:bg-neutral-800/50 transition-colors cursor-pointer"
                         onClick={() => {
-                          navigate(`/content?contentId=${short.id}&type=SHORT`);
+                          navigate(
+                            `/manage/content?contentId=${short.id}&type=SHORT`,
+                          );
                         }}
                       >
                         <td className="px-4 py-3 text-sm text-neutral-400 font-medium whitespace-nowrap">
@@ -240,17 +245,12 @@ const ShortManagePage: React.FC = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            {short.avatarUrl ? (
-                              <img
-                                src={short.avatarUrl}
-                                alt={short.username}
-                                className="w-8 h-8 rounded-full object-cover shrink-0"
-                              />
-                            ) : (
-                              <div className="w-8 h-8 bg-neutral-800 rounded-full flex items-center justify-center shrink-0">
-                                <User className="w-4 h-4 text-neutral-600" />
-                              </div>
-                            )}
+                            <img
+                              src={short.avatarUrl || assets.profile}
+                              alt={short.username}
+                              className="w-8 h-8 rounded-full object-cover shrink-0"
+                            />
+
                             <p className="text-sm text-neutral-300 whitespace-nowrap">
                               {short.username}
                             </p>
@@ -285,6 +285,100 @@ const ShortManagePage: React.FC = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            <div className="sm:hidden divide-y divide-neutral-800">
+              {loading && shorts.length === 0 ? (
+                <div className="px-4 py-12 text-center">
+                  <Loader2 className="w-7 h-7 animate-spin text-neutral-500 mx-auto mb-2" />
+                  <p className="text-neutral-500 text-sm">Loading data...</p>
+                </div>
+              ) : shorts.length === 0 ? (
+                <div className="px-4 py-12 text-center flex flex-col items-center gap-2">
+                  <Filter className="w-10 h-10 text-neutral-700" />
+                  <p className="text-neutral-400 text-sm">No shorts found</p>
+                  <p className="text-xs text-neutral-600">
+                    Try changing the filter or search keyword
+                  </p>
+                </div>
+              ) : (
+                shorts.map((short) => (
+                  <div
+                    key={short.id}
+                    className="flex items-start gap-3 px-4 py-3 hover:bg-neutral-800/50 transition-colors cursor-pointer"
+                    onClick={() =>
+                      navigate(
+                        `/manage/content?contentId=${short.id}&type=SHORT`,
+                      )
+                    }
+                  >
+                    {/* Thumbnail - portrait ratio vì là short */}
+                    {short.thumbnailUrl ? (
+                      <img
+                        src={short.thumbnailUrl}
+                        alt="thumbnail"
+                        className="w-12 h-16 object-cover rounded-lg shrink-0"
+                      />
+                    ) : (
+                      <div className="w-12 h-16 bg-neutral-800 rounded-lg flex items-center justify-center shrink-0">
+                        <ImageOff className="w-5 h-5 text-neutral-600" />
+                      </div>
+                    )}
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-xs text-neutral-500 font-medium">
+                          #{short.id}
+                        </span>
+                        <span className="text-xs text-neutral-500">
+                          {new Date(short.createdAt).toLocaleDateString(
+                            "en-US",
+                          )}
+                        </span>
+                      </div>
+
+                      <div className="text-sm text-neutral-300 line-clamp-2 mb-2">
+                        {short.caption && (
+                          <ParsedContent
+                            caption={short.caption}
+                            classname="font-bold"
+                            mentions={short.mentions}
+                          />
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <img
+                            src={short.avatarUrl || assets.profile}
+                            alt={short.username}
+                            className="w-5 h-5 rounded-full object-cover"
+                          />
+                          <span className="text-xs text-neutral-400">
+                            @{short.username}
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedContentId(short.id);
+                            setIsOpenDialog(true);
+                          }}
+                          className="p-1 rounded-lg group"
+                        >
+                          {isActive ? (
+                            <Ban className="w-4 h-4 text-red-500 group-hover:text-red-400" />
+                          ) : (
+                            <CheckCircle className="w-4 h-4 text-emerald-500 group-hover:text-emerald-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             <div className="px-4 py-3 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-3">

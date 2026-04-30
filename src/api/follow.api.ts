@@ -1,5 +1,6 @@
 import type { FollowCreateStatus } from "../constants/follow.enum";
 import type { FollowPageResponse } from "../types/api/follow.type";
+import type { UserLastSeenPageResponse } from "../types/api/user.type";
 import axiosInstance from "../utils/axiosInstance";
 
 export const handleGetFollower = async (
@@ -20,6 +21,16 @@ export const handleGetFollowing = async (
 ): Promise<FollowPageResponse> => {
   const res = await axiosInstance.get<FollowPageResponse>(
     `${import.meta.env.VITE_API_URL}follows/follow/following?${search && `search=${search}`}&followerId=${userId}&page=${page}&size=20`,
+  );
+
+  return res.data;
+};
+
+export const handleGetFollowingWithStatus = async (
+  page: number,
+): Promise<UserLastSeenPageResponse> => {
+  const res = await axiosInstance.get<UserLastSeenPageResponse>(
+    `${import.meta.env.VITE_API_URL}follows/follow/following/online?page=${page}&size=20`,
   );
 
   return res.data;

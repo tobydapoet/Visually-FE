@@ -21,7 +21,7 @@ const StoryMedia: FC = () => {
           ref={videoRef}
           key={currentStory.id}
           src={currentStory.mediaUrl}
-          className="h-screen w-auto"
+          className="h-full w-full object-cover md:w-auto md:object-contain"
           muted
           playsInline
           autoPlay
@@ -38,7 +38,7 @@ const StoryMedia: FC = () => {
         <img
           key={currentStory?.id}
           src={currentStory?.mediaUrl}
-          className="h-full w-auto object-contain"
+          className="h-full w-full object-cover md:w-auto md:object-contain"
           onLoad={(e) => {
             setMediaWidth(e.currentTarget.getBoundingClientRect().width);
             setIsLoading(false);

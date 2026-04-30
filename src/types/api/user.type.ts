@@ -34,6 +34,7 @@ export type UserType = {
   shortCount: number;
   isBlocked: boolean;
   isFollowed: boolean;
+  hasNewStory?: boolean;
 };
 
 export interface UserSummaryType {
@@ -42,6 +43,10 @@ export interface UserSummaryType {
   fullName: string;
   avatar: string;
 }
+
+export type UserSummaryLastSeenType = UserSummaryType & {
+  lastSeen: Date | null;
+};
 
 export interface UserPageResponse {
   content: UserSummaryType[];
@@ -66,3 +71,13 @@ export type UserStatusPageResponse = {
   first: boolean;
   last: boolean;
 };
+
+export interface UserLastSeenPageResponse {
+  content: UserSummaryLastSeenType[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+}

@@ -9,7 +9,7 @@ export const CreateAdSchema = z
       .min(1000, "Daily budget must be at least 1,000")
       .max(1000000, "Daily budget cannot exceed 1,000,000"),
 
-    time: z
+    duration: z
       .number()
       .min(1, "Time duration must be at least 1 hour")
       .max(720, "Time duration cannot exceed 720 hours"),
@@ -20,7 +20,7 @@ export const CreateAdSchema = z
 
     gender: z.enum(GenderSelect, "Please select a valid gender option"),
 
-    type: z.enum(ContentType, "Please select a valid content type"),
+    contentType: z.enum(ContentType, "Please select a valid content type"),
 
     contentId: z.number(),
   })

@@ -9,7 +9,6 @@ import {
   ImageIcon,
   Loader2,
   MessageCircle,
-  MousePointerClick,
   PlayCircle,
   Repeat,
   Target,
@@ -165,15 +164,15 @@ const AdPopUp: React.FC = () => {
         <div className="fixed inset-0 flex items-center justify-center">
           <DialogPanel
             transition
-            className="w-fit max-w-5xl rounded-xl bg-zinc-900 p-0
-              text-white duration-300 ease-out
-              data-closed:scale-95 data-closed:opacity-0"
+            className="w-full max-w-5xl mx-4 rounded-xl bg-zinc-900 p-0
+          text-white duration-300 ease-out
+            data-closed:scale-95 data-closed:opacity-0"
           >
-            <DialogTitle className="flex items-center justify-between px-4 py-2 border-b border-zinc-800">
-              <div className="text-md font-semibold text-white">
+            <DialogTitle className="flex items-center justify-between px-3 sm:px-4 py-2 border-b border-zinc-800">
+              <div className="text-sm sm:text-md font-semibold text-white">
                 Campaign Details
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <div
                   className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(ad.status)}`}
                 >
@@ -238,23 +237,25 @@ const AdPopUp: React.FC = () => {
                 <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
               </div>
             ) : (
-              <div className="p-6">
-                <div className="flex flex-row gap-6">
-                  <div>
-                    <div className="rounded-xl h-full overflow-hidden bg-zinc-800">
-                      {mediaUrls.length > 0 ? (
+              <div className="p-4 sm:p-6 max-h-[80vh] overflow-y-auto">
+                {/* flex-col trên mobile, flex-row trên desktop */}
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                  {/* Media */}
+                  <div className="w-full sm:w-64 md:w-72 shrink-0">
+                    <div className="rounded-xl overflow-hidden bg-zinc-800">
+                      {mediaUrls.length > 0 || ad.content.thumbnailUrl ? (
                         isVideo ? (
                           <video
                             src={mediaUrls[0]}
                             controls
-                            className="w-70 h-full object-contain"
+                            className="w-full max-h-72 sm:max-h-full sm:h-full object-contain"
                             poster={thumbnailUrl || undefined}
                           />
                         ) : (
                           <img
-                            src={mediaUrls[0]}
+                            src={mediaUrls[0] || ad.content.thumbnailUrl}
                             alt={ad.content.caption}
-                            className="rounded-xl w-70 h-full object-contain"
+                            className="w-full max-h-72 sm:max-h-full object-contain rounded-xl"
                           />
                         )
                       ) : (
@@ -269,15 +270,16 @@ const AdPopUp: React.FC = () => {
                     </div>
                   </div>
 
-                  <div>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3">
                       <img
                         src={ad.content.avatarUrl || assets.profile}
-                        className="w-10 h-10 rounded-full object-cover"
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover"
                         alt="avatar"
                       />
                       <div>
-                        <p className="font-semibold text-white">
+                        <p className="font-semibold text-white text-sm sm:text-base">
                           {ad.content.username}
                         </p>
                         <p className="text-xs text-zinc-500">
@@ -286,7 +288,7 @@ const AdPopUp: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="text-white mt-2 max-w-md">
+                    <div className="text-white mt-2 text-sm sm:text-base">
                       <ParsedContent
                         caption={ad.content.caption}
                         mentions={ad.content.mentions}
@@ -309,111 +311,111 @@ const AdPopUp: React.FC = () => {
                         </div>
                       )}
 
-                    <div className="bg-zinc-800/30 rounded-xl p-4 mb-6 w-90 mt-4">
-                      <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-                        <Wallet className="w-4 h-4 text-emerald-400" />
-                        Budget Details
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-zinc-400">Daily Budget:</span>
-                          <span className="text-emerald-400 font-semibold">
-                            {formatCurrency(ad.dailyBudget)}
-                          </span>
+                    {/* Budget + Targeting: side by side trên desktop, stack trên mobile */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                      <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4">
+                        <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                          <Wallet className="w-4 h-4 text-emerald-400" />
+                          Budget Details
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs sm:text-sm">
+                            <span className="text-zinc-400">Daily Budget:</span>
+                            <span className="text-emerald-400 font-semibold">
+                              {formatCurrency(ad.dailyBudget)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs sm:text-sm">
+                            <span className="text-zinc-400">Total Spent:</span>
+                            <span className="text-yellow-400 font-semibold">
+                              {formatCurrency(ad.spentAmount)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs sm:text-sm">
+                            <span className="text-zinc-400">Remaining:</span>
+                            <span className="text-blue-400 font-semibold">
+                              {formatCurrency(
+                                ad.dailyBudget * 30 - ad.spentAmount,
+                              )}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs sm:text-sm pt-2 border-t border-zinc-700">
+                            <span className="text-zinc-400">
+                              Cost per View:
+                            </span>
+                            <span className="text-white">
+                              {calculateROI(ad.spentAmount, ad.views)} VND
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-zinc-400">Total Spent:</span>
-                          <span className="text-yellow-400 font-semibold">
-                            {formatCurrency(ad.spentAmount)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-zinc-400">Remaining:</span>
-                          <span className="text-blue-400 font-semibold">
-                            {formatCurrency(
-                              ad.dailyBudget * 30 - ad.spentAmount,
-                            )}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm pt-2 border-t border-zinc-700">
-                          <span className="text-zinc-400">Cost per View:</span>
-                          <span className="text-white">
-                            {calculateROI(ad.spentAmount, ad.views)} VND
-                          </span>
+                      </div>
+
+                      <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4">
+                        <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                          <Target className="w-4 h-4 text-purple-400" />
+                          Targeting Details
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-xs text-zinc-500 mb-1">
+                              Age Range
+                            </p>
+                            <p className="text-xs sm:text-sm text-white">
+                              {ad.ageMin} - {ad.ageMax} years
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-zinc-500 mb-1">Gender</p>
+                            <p className="text-xs sm:text-sm text-white">
+                              {ad.gender === "ALL"
+                                ? "All"
+                                : ad.gender === "MALE"
+                                  ? "Male"
+                                  : "Female"}
+                            </p>
+                          </div>
+                          <div className="col-span-2">
+                            <p className="text-xs text-zinc-500 mb-1">
+                              Campaign Period
+                            </p>
+                            <p className="text-xs sm:text-sm text-white">
+                              {formatDate(ad.startDate)} -{" "}
+                              {formatDate(ad.endDate)}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-zinc-800/30 rounded-xl p-4">
-                      <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-                        <Target className="w-4 h-4 text-purple-400" />
-                        Targeting Details
-                      </h4>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-xs text-zinc-500 mb-1">
-                            Age Range
-                          </p>
-                          <p className="text-sm text-white">
-                            {ad.ageMin} - {ad.ageMax} years
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-zinc-500 mb-1">Gender</p>
-                          <p className="text-sm text-white">
-                            {ad.gender === "ALL"
-                              ? "All"
-                              : ad.gender === "MALE"
-                                ? "Male"
-                                : "Female"}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-zinc-500 mb-1">
-                            Campaign Period
-                          </p>
-                          <p className="text-sm text-white">
-                            {formatDate(ad.startDate)} -{" "}
-                            {formatDate(ad.endDate)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-4 mt-4 ml-1">
+                    {/* Stats */}
+                    <div className="flex flex-wrap gap-3 sm:gap-4 mt-4">
                       <div className="flex items-center gap-1">
                         <Heart className="w-4 h-4" />
-                        <span className="text-sm text-zinc-300">
+                        <span className="text-xs sm:text-sm text-zinc-300">
                           {ad.content.likeCount}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <MessageCircle className="w-4 h-4" />
-                        <span className="text-sm text-zinc-300">
+                        <span className="text-xs sm:text-sm text-zinc-300">
                           {ad.content.commentCount}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Bookmark className="w-4 h-4" />
-                        <span className="text-sm text-zinc-300">
+                        <span className="text-xs sm:text-sm text-zinc-300">
                           {ad.content.saveCount}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Repeat className="w-4 h-4" />
-                        <span className="text-sm text-zinc-300">
+                        <span className="text-xs sm:text-sm text-zinc-300">
                           {ad.content.repostCount}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <MousePointerClick className="w-4 h-4" />
-                        <span className="text-sm text-zinc-300">
-                          {ad.clicks}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
                         <Eye className="w-4 h-4" />
-                        <span className="text-sm text-zinc-300">
+                        <span className="text-xs sm:text-sm text-zinc-300">
                           {ad.views}
                         </span>
                       </div>

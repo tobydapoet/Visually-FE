@@ -17,6 +17,7 @@ import {
 } from "../types/schemas/post.schema";
 import { handleCreatePost } from "../api/post.api";
 import { toast } from "sonner";
+import assets from "../assets";
 
 type Props = {
   open: boolean;
@@ -299,7 +300,7 @@ const PostPopUp: React.FC<Props> = ({ open, onClose }) => {
                   >
                     <div className="flex items-center gap-2">
                       <img
-                        src={currentUser?.avatar}
+                        src={currentUser?.avatar || assets.profile}
                         className="w-8 h-8 object-cover rounded-2xl"
                       />
                       <span className="text-[12px] font-semibold">

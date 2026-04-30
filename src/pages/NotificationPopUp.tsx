@@ -43,23 +43,29 @@ const NotificationPopUp: FC<Props> = ({ open, onClose }) => {
     if (notification.contentId) {
       switch (notification.contentType) {
         case NotificationContentType.POST:
-          navigate(`/post/${notification.contentId}`);
+          navigate(
+            `/content?contentId=${notification.contentId}&type=${notification.contentType}`,
+          );
           break;
         case NotificationContentType.SHORT:
-          navigate(`/short/${notification.contentId}`);
+          navigate(
+            `/content?contentId=${notification.contentId}&type=${notification.contentType}`,
+          );
           break;
         case NotificationContentType.STORY:
           navigate(`/`);
           break;
         case NotificationContentType.COMMENT:
-          navigate(`/post/${notification.contentId}`);
+          navigate(
+            `/content?contentId=${notification.contentId}&type=${notification.contentType}`,
+          );
           break;
         default:
           if (notification.type === NotificationActionType.FOLLOW)
-            navigate(`/${notification.content}`);
+            navigate(`/${notification.content.split(" ")[0]}`);
       }
     } else if (notification.type === NotificationActionType.FOLLOW) {
-      navigate(`/${notification.content}`);
+      navigate(`/${notification.content.split(" ")[0]}`);
     }
   };
 
@@ -208,8 +214,7 @@ const PanelContent: FC<PanelContentProps> = ({
   scrollAreaClass,
 }) => (
   <>
-    {/* Header */}
-    <div className="sticky top-0 bg-zinc-900 border-b border-gray-700 p-4 z-10">
+    <div className="sticky top-0 bg-zinc-900 border-b border-gray-700 p-3.5 z-10">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Bell className="w-5 h-5 text-white" />
@@ -240,7 +245,6 @@ const PanelContent: FC<PanelContentProps> = ({
       </div>
     </div>
 
-    {/* List */}
     <div className={scrollAreaClass} onScroll={handleScroll}>
       {isLoading ? (
         <div className="flex justify-center items-center py-20">

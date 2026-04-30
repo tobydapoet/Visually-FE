@@ -1,6 +1,6 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   X,
   ArrowRight,
@@ -8,7 +8,6 @@ import {
   Check,
   Users,
   CreditCard,
-  Wallet,
   Clock,
   Coins,
   UserCheck,
@@ -17,8 +16,10 @@ import {
 import { useForm } from "react-hook-form";
 import { CreateAdSchema, type CreateAdType } from "../types/schemas/ad.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { handleCreateAd } from "../api/ad.api";
+import { savePendingAd } from "../api/ad.api";
 import { toast } from "sonner";
+import { useUser } from "../contexts/user.context";
+import { useAdPayment } from "../hooks/useAdPayment";
 
 type Props = {
   open: boolean;
@@ -30,11 +31,11 @@ type Props = {
 const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
+  const [isPaid, setIsPaid] = useState(false);
 
   const {
     register,
-    formState: { errors, isSubmitting },
-    handleSubmit,
+    formState: { errors },
     setValue,
     watch,
     reset,
@@ -43,21 +44,57 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
     resolver: zodResolver(CreateAdSchema),
     mode: "onChange",
   });
-
+  const { currentUser } = useUser();
   const watchedValues = watch();
+  const formDataRef = useRef<CreateAdType | null>(null);
+
+  useEffect(() => {
+    formDataRef.current = watchedValues as CreateAdType;
+  }, [watchedValues]);
+
+  const handleGoToPayment = async () => {
+    const res = await savePendingAd({
+      ...watchedValues,
+      type: type,
+      contentId: contentId,
+    } as CreateAdType);
+    if (res.success) {
+      setCurrentStep(3);
+    } else {
+      toast.error(res.message);
+    }
+  };
+
+  useAdPayment({
+    userId: currentUser?.id?.toString() ?? null,
+    onSuccess: () => {
+      setIsPaid(true);
+      toast.success("Payment successful! Your post is being boosted");
+      setTimeout(() => {
+        onClose();
+        reset();
+      }, 2000);
+    },
+    onFailed: () => {
+      toast.error("Payment failed, please try again");
+    },
+  });
+
+  if (!currentUser) return;
 
   useEffect(() => {
     if (open) {
       reset({
         dailyBudget: 1000,
-        time: 24,
+        duration: 24,
         ageMin: 18,
         ageMax: 35,
         gender: "ALL",
-        type: type,
+        contentType: type,
         contentId: contentId,
       });
       setCurrentStep(1);
+      setIsPaid(false);
     }
   }, [open, reset]);
 
@@ -65,7 +102,7 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
     let fieldsToValidate: (keyof CreateAdType)[] = [];
 
     if (currentStep === 1) {
-      fieldsToValidate = ["dailyBudget", "time"];
+      fieldsToValidate = ["dailyBudget", "duration"];
     } else if (currentStep === 2) {
       fieldsToValidate = ["ageMin", "ageMax", "gender"];
     }
@@ -73,7 +110,11 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
     const isValid = await trigger(fieldsToValidate);
 
     if (isValid && currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+      if (currentStep === 2) {
+        handleGoToPayment();
+      } else {
+        setCurrentStep(currentStep + 1);
+      }
     }
   };
 
@@ -81,17 +122,19 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  const onSubmit = async (data: CreateAdType) => {
-    console.log("DATA: ", data);
-    const res = await handleCreateAd(data);
-    if (res.success) {
-      toast.success(res.message);
-      onClose();
-      reset();
-    } else {
-      toast.error(res.message);
-    }
-  };
+  // const onSubmit = async (data: CreateAdType) => {
+  //   console.log("DATA: ", data);
+  //   const res = await handleCreateAd(data);
+  //   if (res.success) {
+  //     toast.success(res.message);
+  //     onClose();
+  //     reset();
+  //   } else {
+  //     toast.error(res.message);
+  //   }
+  // };
+
+  const description = `USER ${currentUser.id} PAY FOR BOOSTED POST`;
 
   const formatVND = (amount: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -114,8 +157,8 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
   const getEstimatedReach = () => {
     const baseReach = 5000;
     const budgetFactor = watchedValues.dailyBudget / 10000;
-    const timeFactor = watchedValues.time / 24;
-    return Math.floor(baseReach * budgetFactor * timeFactor);
+    const durationFactor = watchedValues.duration / 24;
+    return Math.floor(baseReach * budgetFactor * durationFactor);
   };
 
   const StepIndicator = ({
@@ -206,14 +249,14 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
           <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <input
             type="number"
-            {...register("time", { valueAsNumber: true })}
+            {...register("duration", { valueAsNumber: true })}
             className={`w-full pl-12 pr-4 py-3 bg-zinc-800/50 border rounded-xl 
               text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all
-              ${errors.time ? "border-red-500" : "border-zinc-700"}`}
+              ${errors.duration ? "border-red-500" : "border-zinc-700"}`}
           />
         </div>
-        {errors.time && (
-          <p className="text-xs text-red-400 mt-2">{errors.time.message}</p>
+        {errors.duration && (
+          <p className="text-xs text-red-400 mt-2">{errors.duration.message}</p>
         )}
 
         <div className="flex gap-2 mt-3">
@@ -221,7 +264,9 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
             <button
               key={hours}
               type="button"
-              onClick={() => setValue("time", hours, { shouldValidate: true })}
+              onClick={() =>
+                setValue("duration", hours, { shouldValidate: true })
+              }
               className="px-3 py-1.5 text-xs rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-all"
             >
               {formatHours(hours)}
@@ -235,13 +280,14 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
           <span className="text-sm text-zinc-300">Total Budget</span>
           <span className="text-xl font-bold text-white">
             {formatVND(
-              watchedValues.dailyBudget * Math.ceil(watchedValues.time / 24),
+              watchedValues.dailyBudget *
+                Math.ceil(watchedValues.duration / 24),
             )}
           </span>
         </div>
         <div className="flex justify-between items-center text-xs text-zinc-400">
           <span>Daily: {formatVND(watchedValues.dailyBudget)}</span>
-          <span>Duration: {formatHours(watchedValues.time)}</span>
+          <span>Duration: {formatHours(watchedValues.duration)}</span>
         </div>
       </div>
     </div>
@@ -350,7 +396,7 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
 
   const renderStep3 = () => {
     const totalBudget =
-      watchedValues.dailyBudget * Math.ceil(watchedValues.time / 24);
+      watchedValues.dailyBudget * Math.ceil(watchedValues.duration / 24);
 
     return (
       <div className="space-y-5">
@@ -381,7 +427,7 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
             <div className="flex justify-between items-center">
               <span className="text-sm text-zinc-400">Duration</span>
               <span className="text-sm font-semibold text-white">
-                {formatHours(watchedValues.time)}
+                {formatHours(watchedValues.duration)}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -410,6 +456,16 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
             </div>
           </div>
         </div>
+        {isPaid ? (
+          <p className="text-center text-emerald-400 font-semibold">
+            Payment successful! Your post is being boosted
+          </p>
+        ) : (
+          <img
+            src={`https://qr.sepay.vn/img?acc=${import.meta.env.VITE_BANK_USER}&bank=${import.meta.env.VITE_BANK_NAME}&amount=${totalBudget}&des=${description}&template=TEMPLATE`}
+            className="w-50 mx-auto"
+          />
+        )}
       </div>
     );
   };
@@ -418,9 +474,9 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
     if (currentStep === 1) {
       return (
         !errors.dailyBudget &&
-        !errors.time &&
+        !errors.duration &&
         watchedValues.dailyBudget >= 1000 &&
-        watchedValues.time >= 1
+        watchedValues.duration >= 1
       );
     }
     if (currentStep === 2) {
@@ -489,7 +545,7 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
               Back
             </button>
 
-            {currentStep < totalSteps ? (
+            {currentStep < totalSteps && (
               <button
                 onClick={nextStep}
                 disabled={!isStepValid()}
@@ -504,24 +560,6 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
               >
                 Next
                 <ArrowRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                onClick={handleSubmit(onSubmit)}
-                disabled={isSubmitting || !isStepValid()}
-                className={`
-                  px-5 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2
-                  ${
-                    isStepValid() && !isSubmitting
-                      ? "bg-linear-to-r from-emerald-600 to-blue-600 hover:from-emerald-500 hover:to-blue-500 shadow-lg shadow-emerald-600/20"
-                      : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
-                  }
-                `}
-              >
-                <Wallet className="w-4 h-4" />
-                {isSubmitting
-                  ? "Processing..."
-                  : `Pay ${formatVND(watchedValues.dailyBudget * Math.ceil(watchedValues.time / 24))}`}
               </button>
             )}
           </div>

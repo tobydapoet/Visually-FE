@@ -18,8 +18,7 @@ type AdContextType = {
   selectedAd: AdResponse | null;
   isOpenAdPopUp: boolean;
   updatingStatusId: number | null;
-
-  fetchAds: (page?: number) => Promise<void>;
+  fetchAds: (page?: number, userId?: string) => Promise<void>;
   setCurrentPage: (page: number) => void;
   selectAd: (ad: AdResponse | null) => void;
   closePopUp: () => void;
@@ -50,13 +49,16 @@ export const AdProvider: React.FC<AdProviderProps> = ({
   const { currentUser } = useUser();
 
   const fetchAds = useCallback(
-    async (page?: number) => {
+    async (page?: number, userId?: string) => {
       const pageToFetch = page ?? currentPage;
+      const targetUserId = userId ?? currentUser?.id;
+
+      if (!targetUserId) return;
+
       setLoading(true);
       try {
-        if (!currentUser) return;
         const response = await handleGetAdByUser(
-          currentUser.id!,
+          targetUserId,
           pageToFetch - 1,
           pageSize,
         );
@@ -68,7 +70,7 @@ export const AdProvider: React.FC<AdProviderProps> = ({
         setLoading(false);
       }
     },
-    [currentUser, pageSize],
+    [currentUser, pageSize, currentPage],
   );
 
   const refreshAds = useCallback(async () => {
@@ -175,7 +177,6 @@ export const AdProvider: React.FC<AdProviderProps> = ({
         selectedAd,
         isOpenAdPopUp,
         updatingStatusId,
-
         fetchAds,
         setCurrentPage,
         selectAd,

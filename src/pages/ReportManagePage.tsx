@@ -150,7 +150,7 @@ const ReportManagePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 p-6 w-[calc(100vw-10rem)]">
+    <div className="min-h-screen bg-zinc-900 p-6 w-screen md:w-[calc(100vw-10rem)]">
       <div className="mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-white mb-2">
@@ -177,7 +177,7 @@ const ReportManagePage: React.FC = () => {
             {!isSelectionMode ? (
               <button
                 onClick={toggleSelectionMode}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium cursor-pointer transition-colors"
               >
                 <CheckSquare className="w-4 h-4" />
                 Select
@@ -186,7 +186,7 @@ const ReportManagePage: React.FC = () => {
               <>
                 <button
                   onClick={toggleSelectAll}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium cursor-pointer transition-colors"
                 >
                   {selectedIds.size === reports.length ? (
                     <>
@@ -213,7 +213,7 @@ const ReportManagePage: React.FC = () => {
 
                 <button
                   onClick={toggleSelectionMode}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium cursor-pointer transition-colors"
                 >
                   <X className="w-4 h-4" />
                   Cancel
@@ -267,7 +267,7 @@ const ReportManagePage: React.FC = () => {
                         toggleSelectReport(report.id);
                       } else {
                         navigate(
-                          `/content?contentId=${report.targetId}&type=${report.targetType}`,
+                          `/manage/content?contentId=${report.targetId}&type=${report.targetType}`,
                         );
                       }
                     }}

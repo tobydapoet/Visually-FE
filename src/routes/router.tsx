@@ -16,7 +16,6 @@ import { MusicProvider } from "../contexts/music.context";
 import StoragePage from "../pages/StoragePage";
 import StoryPage from "../pages/StoryPage";
 import MessagePage from "../pages/MessagePage";
-import { MessageProvider } from "../contexts/message.context";
 import BoostedPostPage from "../pages/BoostedPostPage";
 import ShortManangePage from "../pages/ShortMangePage";
 import { ShortProvider } from "../contexts/short.context";
@@ -31,6 +30,7 @@ import { StoryProvider } from "../contexts/story.context";
 import ReelsPage from "../pages/ReelsPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
+import BoostedPostMangePage from "../pages/AdvertisementManagePage";
 
 export const router = createBrowserRouter([
   // {
@@ -102,11 +102,7 @@ export const router = createBrowserRouter([
         path: routes.ad,
       },
       {
-        element: (
-          <MessageProvider>
-            <MessagePage />
-          </MessageProvider>
-        ),
+        element: <MessagePage />,
         path: routes.inbox,
       },
       {
@@ -114,11 +110,7 @@ export const router = createBrowserRouter([
         path: routes.search,
       },
       {
-        element: (
-          <MessageProvider>
-            <MessagePage />
-          </MessageProvider>
-        ),
+        element: <MessagePage />,
         path: routes.inboxDetail,
       },
       {
@@ -128,6 +120,16 @@ export const router = createBrowserRouter([
       {
         element: <ReelsPage />,
         path: routes.reels,
+      },
+      {
+        path: routes.content,
+        element: (
+          <ShortProvider>
+            <PostProvider>
+              <ContentPage />
+            </PostProvider>
+          </ShortProvider>
+        ),
       },
     ],
   },
@@ -167,18 +169,27 @@ export const router = createBrowserRouter([
         path: routes.report_manage,
         element: (
           <PostProvider>
-            <ReportManagePage />{" "}
+            <ReportManagePage />
           </PostProvider>
         ),
       },
       {
-        path: routes.content,
+        path: routes.content_manage,
         element: (
           <ShortProvider>
             <PostProvider>
               <ContentPage />
             </PostProvider>
           </ShortProvider>
+        ),
+      },
+
+      {
+        path: routes.ad_manage,
+        element: (
+          <AdProvider>
+            <BoostedPostMangePage />
+          </AdProvider>
         ),
       },
 

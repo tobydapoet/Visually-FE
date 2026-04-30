@@ -10,7 +10,6 @@ export const handleGetFeed = async (
   const res = await axiosInstance.get(
     `${import.meta.env.VITE_API_URL}contents/content/${type.toLowerCase()}/feed${cursor ? `?cursor=${cursor}` : ""}`,
   );
-  console.log("TEST: ", res.data);
   return res.data;
 };
 

@@ -3,23 +3,25 @@ import type {
   NotificationContentType,
 } from "../../constants/notification.enum";
 
-export class NotificationResponse {
-  id!: number;
+export type NotificationResponse = {
+  id: number;
 
   snapshotUrl?: string;
 
-  contentId!: number;
+  contentId: number;
 
-  contentType!: NotificationContentType;
+  contentType: NotificationContentType;
 
-  type!: NotificationActionType;
+  type: NotificationActionType;
 
-  content!: string;
+  content: string;
 
-  createdAt!: Date;
+  createdAt: Date;
 
-  isRead!: boolean;
-}
+  isRead: boolean;
+
+  senderId: string;
+};
 
 export type NotificationPageResponse = {
   page: number;

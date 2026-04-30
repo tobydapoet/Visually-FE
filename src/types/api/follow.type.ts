@@ -24,7 +24,3 @@ export type FollowPageResponse = {
   first: boolean;
   last: boolean;
 };
-
-// export type FollowCreateResponse = {
-//     status :
-// }

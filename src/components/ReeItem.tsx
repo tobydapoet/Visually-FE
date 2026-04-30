@@ -62,7 +62,7 @@ export function ReelItem({ url, isActive, isCurrent }: ReelItemProps) {
       <video
         ref={videoRef}
         src={url}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 md:w-full w-screen h-[calc(100vh-4rem)] md:h-full object-cover"
         loop
         muted={muted}
         playsInline
@@ -93,7 +93,7 @@ export function ReelItem({ url, isActive, isCurrent }: ReelItemProps) {
 
       <button
         onClick={toggleMute}
-        className="absolute bottom-2 cursor-pointer right-4 z-30 flex items-center justify-center rounded-full"
+        className="absolute md:bottom-7 bottom-12 cursor-pointer right-4 z-30 flex items-center justify-center rounded-full"
         style={{
           width: 32,
           height: 32,

@@ -47,7 +47,7 @@ export const UserComponent: React.FC<Props> = ({ data }) => {
   return (
     <>
       <div
-        className="relative h-90 w-68 group overflow-hidden cursor-pointer"
+        className="relative aspect-[3/4] w-full group overflow-hidden cursor-pointer"
         onClick={() => setIsOpenPopUp(true)}
       >
         {isVideoFile ? (

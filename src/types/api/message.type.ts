@@ -26,4 +26,6 @@ export type MemberType = {
   username: string;
   avatarUrl?: string;
   lastSeen: Date | null;
+  isMutedAt: Date | null;
+  mutedUntil: Date | null;
 };

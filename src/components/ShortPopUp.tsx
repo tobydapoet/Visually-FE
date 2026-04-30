@@ -20,6 +20,7 @@ import { handleCreateShort } from "../api/short.api";
 import { toast } from "sonner";
 import { useProgressBar } from "../hooks/useProgressBar";
 import { ProgressBar } from "./ProgressBar";
+import assets from "../assets";
 
 type Props = { open: boolean; onClose: () => void };
 
@@ -321,7 +322,7 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
                     <div>
                       <div className="flex items-center gap-2 mb-3">
                         <img
-                          src={currentUser?.avatar}
+                          src={currentUser?.avatar || assets.profile}
                           className="w-8 h-8 object-cover rounded-2xl"
                         />
                         <div className="text-[12px] font-semibold">

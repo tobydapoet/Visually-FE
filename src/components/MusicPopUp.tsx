@@ -170,7 +170,7 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
                   ${
                     errors.title
                       ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                      : "border-zinc-700 focus:ring-indigo-500 focus:border-indigo-500"
+                      : "border-zinc-700 focus:ring-blue-500 focus:border-blue-500"
                   }`}
               />
               {errors.title && (
@@ -192,7 +192,7 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
                   ${
                     errors.artist
                       ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                      : "border-zinc-700 focus:ring-indigo-500 focus:border-indigo-500"
+                      : "border-zinc-700 focus:ring-blue-500 focus:border-blue-500"
                   }`}
               />
               {errors.artist && (
@@ -209,7 +209,7 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
                 </label>
                 <div
                   onClick={() => imgInputRef.current?.click()}
-                  className="relative w-40 aspect-square rounded-lg border-2 border-dashed border-zinc-700 hover:border-indigo-500 transition-colors cursor-pointer overflow-hidden bg-zinc-800/50"
+                  className="relative w-40 aspect-square rounded-lg border-2 border-dashed border-zinc-700 hover:border-blue-500 transition-colors cursor-pointer overflow-hidden bg-zinc-800/50"
                 >
                   {imgPreview ? (
                     <img
@@ -244,7 +244,7 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
                 </label>
                 <div
                   onClick={() => audioInputRef.current?.click()}
-                  className="relative w-full h-40 aspect-square rounded-lg border-2 border-dashed border-zinc-700 hover:border-indigo-500 transition-colors cursor-pointer bg-zinc-800/50 flex flex-col items-center justify-center p-4"
+                  className="relative w-full h-40 aspect-square rounded-lg border-2 border-dashed border-zinc-700 hover:border-blue-500 transition-colors cursor-pointer bg-zinc-800/50 flex flex-col items-center justify-center p-4"
                 >
                   {audioPreview ? (
                     <div className="w-full space-y-3">
@@ -292,7 +292,7 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
                 {submitting ? (
                   <>

@@ -2,35 +2,48 @@ import { Outlet, useNavigate } from "react-router-dom";
 import SidebarManage from "../components/SideBarManage";
 import Cookies from "js-cookie";
 import parseJwt from "../utils/parseToken";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Menu } from "lucide-react";
 
 function ManageLayout() {
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const token = Cookies.get("access_token");
   const navigate = useNavigate();
 
   useEffect(() => {
     if (token) {
       const payload = parseJwt(token);
-      const isAdmin = payload?.role === "ADMIN";
-
-      if (!isAdmin) {
+      if (!payload || payload?.role !== "ADMIN")
         navigate("/unauthorized", { replace: true });
-      }
     } else {
       navigate("/unauthorized", { replace: true });
     }
-  }, [token, navigate]);
+  }, [token]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-neutral-950">
-      <div className="shrink-0 h-screen z-50 fixed border-r bg-neutral-950 border-zinc-800">
-        <SidebarManage />
+    <div className="flex h-screen overflow-hidden bg-zinc-900">
+      {/* Mobile header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center gap-3 px-4 py-3 bg-neutral-950 border-b border-zinc-800">
+        <button
+          onClick={() => setIsMobileOpen(true)}
+          className="p-2 rounded-lg hover:bg-zinc-800 transition-colors text-white"
+        >
+          <Menu size={20} />
+        </button>
+        <span className="text-white font-medium">Admin Panel</span>
       </div>
-      <div className="flex-1 ml-61 overflow-auto flex justify-center bg-neutral-950">
-        <Outlet />
+
+      <SidebarManage
+        isMobileOpen={isMobileOpen}
+        setIsMobileOpen={setIsMobileOpen}
+      />
+
+      <div className="flex-1 overflow-auto bg-neutral-950 pt-14 md:pt-0">
+        <div className="flex justify-center">
+          <Outlet />
+        </div>
       </div>
     </div>
   );
 }
-
 export default ManageLayout;

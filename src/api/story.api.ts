@@ -48,6 +48,7 @@ export const handleValidStoryByUser = async (
   const res = await axiosInstance.get(
     `${import.meta.env.VITE_API_URL}contents/story/user-valid/${username}`,
   );
+
   return res.data;
 };
 

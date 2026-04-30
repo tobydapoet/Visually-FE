@@ -18,6 +18,7 @@ export const routes = {
   inbox: "/inbox",
   inboxDetail: "/inbox/:id",
   ad: "/ad",
+  ad_manage: "/manage/ad",
   short_manage: "/content/short",
   post_manage: "/content/post",
   report_manage: "/report",
@@ -27,4 +28,5 @@ export const routes = {
   search: "/search",
   reel: "/reels",
   reels: "/reels/:feedId",
+  content_manage: "/manage/content",
 };

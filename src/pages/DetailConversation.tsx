@@ -1,7 +1,15 @@
 import type React from "react";
 import { useMessage } from "../contexts/message.context";
 import assets from "../assets";
-import { LogOut, SquarePen, Trash, UserPlus } from "lucide-react";
+import {
+  Bell,
+  BellOff,
+  LogOut,
+  ShieldBan,
+  SquarePen,
+  Trash,
+  UserPlus,
+} from "lucide-react";
 import { useState } from "react";
 import EditConversationPopUp from "./EditConverSationPopup";
 import type { MemberType } from "../types/api/message.type";
@@ -13,6 +21,8 @@ import { useUser } from "../contexts/user.context";
 import MemberInvitePopUp from "../components/MemberInvitePopUp";
 import { toast } from "sonner";
 import { timeAgo } from "../utils/timeAgot";
+import MutePopUp from "../components/MutePopUp";
+import { handleBlock, handleUnblock } from "../api/follow.api";
 
 interface DetailConversationProps {
   open: boolean;
@@ -34,9 +44,17 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
   const [isRemoving, setIsRemoving] = useState(false);
   const [isOpenInvite, setIsOpenInvite] = useState(false);
   const [isOpenLeave, setIsOpenLeave] = useState(false);
+  const [isOpenMutePopUp, setIsOpenMutePopUp] = useState(false);
+  const [isOpenBlockDialog, setIsOpenBlockDialog] = useState(false);
   const navigate = useNavigate();
 
   if (!selectedConversation) return null;
+
+  const currentMember = memberList.find(
+    (member) => member.userId === currentUser?.id,
+  );
+
+  const otherMember = memberList.find((m) => m.userId !== currentUser?.id);
 
   const handleRemoveMember = async () => {
     if (!selectedMember) return;
@@ -226,24 +244,62 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
                 </span>
               </button>
             </div>
+          </div>
+        )}
+        <div className="flex flex-col absolute bottom-0 items-center w-full">
+          <button
+            className="flex items-center gap-3 px-4 py-3 w-full 
+          bg-zinc-800 hover:bg-zinc-700
+            border-t border-zinc-700
+            transition-all duration-300 cursor-pointer group"
+            onClick={() => setIsOpenMutePopUp(true)}
+          >
+            <div className="p-1 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+              {currentMember?.isMutedAt ? (
+                <Bell size={18} color="#a1a1aa" />
+              ) : (
+                <BellOff size={18} color="#a1a1aa" />
+              )}
+            </div>
+            <span className="text-sm font-medium text-zinc-400 tracking-wide">
+              {currentMember?.isMutedAt
+                ? "Turn on notifications"
+                : "Turn off notifications"}
+            </span>
+          </button>
+          {selectedConversation.type === "PRIVATE" && (
             <button
-              className="flex absolute bottom-0 items-center gap-3 px-4 py-3 w-full bg-red-500 hover:from-red-600 hover:to-red-700 border border-red-400/30 transition-all duration-300 cursor-pointer group shadow-lg hover:shadow-red-500/20"
+              className="flex items-center gap-3 px-4 py-3 w-full 
+      bg-zinc-800 hover:bg-zinc-700
+      border-t border-zinc-700
+      transition-all duration-300 cursor-pointer group"
+              onClick={() => setIsOpenBlockDialog(true)}
+            >
+              <div className="p-1 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                <ShieldBan size={18} color="#f87171" />
+              </div>
+              <span className="text-sm font-medium text-red-400 tracking-wide">
+                {selectedConversation.isBlocked ? "Unblock user" : "Block user"}
+              </span>
+            </button>
+          )}
+          {selectedConversation.type === "GROUP" && (
+            <button
+              className="flex items-center gap-3 px-4 py-3 w-full 
+            bg-zinc-800 hover:bg-zinc-700
+              border-t border-zinc-700
+              transition-all duration-300 cursor-pointer group"
               onClick={() => setIsOpenLeave(true)}
             >
               <div className="p-1 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-                <LogOut size={18} color="#ffffff" />
+                <LogOut size={18} color="#f87171" />
               </div>
-
-              <span className="text-sm font-semibold text-white tracking-wide group-hover:tracking-wider transition-all duration-300">
+              <span className="text-sm font-medium text-red-400 tracking-wide">
                 Leave group
               </span>
-
-              <div className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full" />
-              </div>
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <EditConversationPopUp
@@ -280,6 +336,37 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
         open={isOpenInvite}
         onClose={() => setIsOpenInvite(false)}
       />
+
+      {currentMember && (
+        <MutePopUp
+          open={isOpenMutePopUp}
+          onClose={() => setIsOpenMutePopUp(false)}
+          converstationId={selectedConversation.id}
+          isMuted={!!currentMember.isMutedAt}
+        />
+      )}
+
+      {memberList.length === 2 && otherMember && (
+        <ConfirmDialog
+          open={isOpenBlockDialog}
+          onClose={() => setIsOpenBlockDialog(false)}
+          onConfirm={async () => {
+            if (!otherMember?.userId) return;
+            if (selectedConversation.isBlocked) {
+              await handleUnblock(otherMember.userId);
+            } else {
+              await handleBlock(otherMember.userId);
+            }
+            window.location.reload();
+          }}
+          message={
+            selectedConversation.isBlocked
+              ? "Do you want to unblock this user?"
+              : "Do you want to block this user?"
+          }
+          title={selectedConversation.isBlocked ? "Unblock user" : "Block user"}
+        />
+      )}
     </>
   );
 };

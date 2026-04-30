@@ -28,20 +28,21 @@ type MenuItem = {
   children?: ChildMenuItem[];
 };
 
-const SidebarManage: React.FC = () => {
+type Props = {
+  isMobileOpen: boolean;
+  setIsMobileOpen: (v: boolean) => void;
+};
+
+const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({
     content: true,
   });
-
   const { currentUser, loading } = useUser();
   const navigate = useNavigate();
-
   const isContentActive = useMatch("/content/*");
 
   useEffect(() => {
-    if (!loading && currentUser === null) {
-      navigate("/login");
-    }
+    if (!loading && currentUser === null) navigate("/login");
   }, [currentUser, loading]);
 
   const menuItems: MenuItem[] = [
@@ -70,17 +71,12 @@ const SidebarManage: React.FC = () => {
       icon: <BarChart3 size={20} />,
       path: "/report",
     },
-    {
-      id: "user",
-      label: "User",
-      icon: <Users size={20} />,
-      path: "/user",
-    },
+    { id: "user", label: "User", icon: <Users size={20} />, path: "/user" },
     {
       id: "advertisement",
       label: "Advertisement",
       icon: <Megaphone size={20} />,
-      path: "/advertisement",
+      path: "/manage/ad",
     },
     {
       id: "music",
@@ -94,15 +90,21 @@ const SidebarManage: React.FC = () => {
     setOpenMenus((prev) => ({ ...prev, [menuId]: !prev[menuId] }));
   };
 
-  return (
-    <div className="w-64 h-screen bg-neutral-950 text-white flex flex-col">
-      <div className="p-4 border-b border-zinc-800">
+  const SidebarContent = () => (
+    <div className="w-64 h-screen bg-zinc-900 text-white flex flex-col">
+      <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
             <span className="font-bold text-lg">A</span>
           </div>
           <span className="font-semibold text-lg">Admin Panel</span>
         </div>
+        <button
+          className="md:hidden p-1 rounded-lg hover:bg-zinc-800 transition-colors"
+          onClick={() => setIsMobileOpen(false)}
+        >
+          <ChevronDown size={18} className="rotate-90" />
+        </button>
       </div>
 
       <nav className="flex-1 p-2 overflow-y-auto">
@@ -156,6 +158,7 @@ const SidebarManage: React.FC = () => {
                         >
                           <NavLink
                             to={child.path}
+                            onClick={() => setIsMobileOpen(false)}
                             className={({ isActive }) =>
                               `w-full flex items-center px-3 py-2 rounded-lg transition-all duration-200 ${
                                 isActive
@@ -175,6 +178,7 @@ const SidebarManage: React.FC = () => {
               ) : (
                 <NavLink
                   to={item.path!}
+                  onClick={() => setIsMobileOpen(false)}
                   className={({ isActive }) =>
                     `w-full flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 ${
                       isActive
@@ -214,6 +218,36 @@ const SidebarManage: React.FC = () => {
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      <button
+        className="md:hidden fixed cursor-pointer top-4 left-4 z-50 p-2 bg-zinc-800 rounded-lg text-white shadow-lg"
+        onClick={() => setIsMobileOpen(true)}
+      >
+        <LayoutDashboard size={20} />
+      </button>
+
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 md:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      <div
+        className={`fixed top-0 left-0 h-full z-50 transition-transform duration-300 md:hidden ${
+          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <SidebarContent />
+      </div>
+
+      <div className="hidden md:block">
+        <SidebarContent />
+      </div>
+    </>
   );
 };
 

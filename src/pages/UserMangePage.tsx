@@ -152,7 +152,7 @@ const UserManagePage: FC = () => {
         toast.error(result.message || "Update failed");
       } else {
         toast.success(successMessage);
-        await fetchUsers(); // Refresh the list
+        await fetchUsers();
       }
     } catch (error) {
       console.error("Error updating user status:", error);
@@ -259,7 +259,6 @@ const UserManagePage: FC = () => {
     }
   };
 
-  // Get available actions based on current user status
   const getAvailableActions = (userStatus: string) => {
     switch (userStatus) {
       case "ACTIVE":
@@ -320,7 +319,7 @@ const UserManagePage: FC = () => {
           },
         ];
       case "DELETED":
-        return []; // No actions for deleted users
+        return [];
       default:
         return [
           {
@@ -354,25 +353,32 @@ const UserManagePage: FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-neutral-950 p-6 w-[calc(100vw-10rem)]">
-        <div className="mx-auto">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-white mb-2">
+      {/* 
+        Responsive wrapper:
+        - Mobile: full width, padding nhỏ hơn
+        - Có sidebar: dùng w-full thay vì w-[calc(100vw-10rem)] cứng
+      */}
+      <div className="min-h-screen bg-zinc-900 p-3 sm:p-4 md:p-6 w-full">
+        <div className="mx-auto max-w-screen-xl">
+          {/* Header */}
+          <div className="mb-4 sm:mb-6">
+            <h1 className="text-xl sm:text-2xl font-bold text-white mb-1">
               User Management
             </h1>
-            <p className="text-neutral-400 text-sm">
+            <p className="text-neutral-400 text-xs sm:text-sm">
               Manage moderators and client users
             </p>
           </div>
 
-          <div className="flex gap-2 mb-6 border-b border-neutral-800">
+          {/* Tabs */}
+          <div className="flex gap-0 mb-4 sm:mb-6 border-b border-neutral-800">
             {tabs.map((tab) => (
               <button
                 key={tab.role}
                 onClick={() => handleTabChange(tab.role)}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-200 border-b-2 ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 cursor-pointer text-xs sm:text-sm font-medium transition-all duration-200 border-b-2 ${
                   activeTab === tab.role
-                    ? "text-indigo-400 border-indigo-400"
+                    ? "text-blue-500 border-blue-500"
                     : "text-neutral-400 border-transparent hover:text-neutral-300"
                 }`}
               >
@@ -382,32 +388,35 @@ const UserManagePage: FC = () => {
             ))}
           </div>
 
-          <div className="relative mb-6">
+          {/* Search */}
+          <div className="relative mb-4 sm:mb-6">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
             <input
               type="text"
               placeholder={`Search ${activeTab === UserRole.MODERATOR ? "moderator" : "client"} by username, full name...`}
               value={searchInput}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-neutral-900 border border-neutral-800 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-white placeholder-neutral-500 text-sm"
+              className="w-full pl-9 pr-4 py-2 bg-neutral-900 border border-neutral-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-neutral-500 text-sm"
             />
           </div>
 
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-neutral-500">
+          {/* Total count */}
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <p className="text-xs sm:text-sm text-neutral-500">
               Total{" "}
               {activeTab === UserRole.MODERATOR ? "moderators" : "clients"}:{" "}
               <span className="text-white font-medium">{totalElements}</span>
             </p>
           </div>
 
+          {/* Content */}
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-neutral-500" />
+            <div className="flex items-center justify-center py-16 sm:py-20">
+              <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin text-neutral-500" />
             </div>
           ) : users.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-2">
-              <Users className="w-12 h-12 text-neutral-700" />
+            <div className="flex flex-col items-center justify-center py-16 sm:py-20 gap-2">
+              <Users className="w-10 h-10 sm:w-12 sm:h-12 text-neutral-700" />
               <p className="text-neutral-500 text-sm">No users found</p>
               <p className="text-xs text-neutral-600">
                 Try changing your search keyword
@@ -415,7 +424,14 @@ const UserManagePage: FC = () => {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {/*
+                Grid responsive:
+                - Mobile (< sm): 1 cột
+                - sm (≥ 640px): 2 cột
+                - lg (≥ 1024px): 3 cột
+                - xl (≥ 1280px): 4 cột
+              */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                 {users.map((user) => {
                   const availableActions = getAvailableActions(user.status);
                   const newRole =
@@ -428,14 +444,14 @@ const UserManagePage: FC = () => {
                   return (
                     <div
                       key={user.id}
-                      className="bg-neutral-900 cursor-pointer border border-neutral-800 rounded-xl p-4 hover:border-neutral-700 transition-all duration-200 hover:shadow-lg"
+                      className="bg-neutral-900 cursor-pointer border border-neutral-800 rounded-xl p-3 sm:p-4 hover:border-neutral-700 transition-all duration-200 hover:shadow-lg"
                       onClick={() => navigate(`/user/${user.username}`)}
                     >
-                      <div className="flex items-center gap-3 mb-3">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-3">
                         <img
                           src={user.avatar || assets.profile}
                           alt={user.username}
-                          className="w-12 h-12 rounded-full object-cover"
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-white truncate">
@@ -457,7 +473,10 @@ const UserManagePage: FC = () => {
                         {getStatusBadge(user.status)}
 
                         <Menu as="div" className="relative">
-                          <MenuButton className="p-1.5 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors">
+                          <MenuButton
+                            className="p-1.5 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             <MoreVertical
                               size={14}
                               className="text-neutral-400"
@@ -466,12 +485,15 @@ const UserManagePage: FC = () => {
                           <MenuItems
                             transition
                             anchor="bottom end"
-                            className="w-40 bg-neutral-900 origin-top-right rounded-xl border border-neutral-800 shadow-lg p-1 z-50 focus:outline-none"
+                            className="w-44 bg-neutral-900 origin-top-right rounded-xl border border-neutral-800 shadow-lg p-1 z-50 focus:outline-none"
                           >
                             <MenuItem>
                               {({ focus }) => (
                                 <button
-                                  onClick={() => openRoleDialog(user)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openRoleDialog(user);
+                                  }}
                                   className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
                                     focus
                                       ? "bg-neutral-800 text-white"
@@ -492,9 +514,10 @@ const UserManagePage: FC = () => {
                               <MenuItem key={action.action}>
                                 {({ focus }) => (
                                   <button
-                                    onClick={() =>
-                                      openConfirmDialog(user, action.action)
-                                    }
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      openConfirmDialog(user, action.action);
+                                    }}
                                     className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
                                       action.className
                                     } ${focus ? "bg-opacity-20" : ""}`}
@@ -512,7 +535,8 @@ const UserManagePage: FC = () => {
                   );
                 })}
               </div>
-              <div className="flex justify-center mt-4">
+
+              <div className="flex justify-center mt-4 sm:mt-6">
                 <Pagination
                   currentPage={currentPage}
                   onPageChange={handlePageChange}
