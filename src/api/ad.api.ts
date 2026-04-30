@@ -1,6 +1,6 @@
 import type { AdStatus } from "../constants/adStatus.enum";
 import type { AdResponsePage } from "../types/api/ad.type";
-import type { UserPageResponse, UserSummaryType } from "../types/api/user.type";
+import type { UserPageResponse } from "../types/api/user.type";
 import type { CreateAdType } from "../types/schemas/ad.schema";
 import axiosInstance from "../utils/axiosInstance";
 

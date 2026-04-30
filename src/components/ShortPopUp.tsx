@@ -52,10 +52,8 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
     setValue,
     reset,
     control,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<CreateShortType>({ resolver: zodResolver(CreateShortSchema) });
-  const tags = watch("tagsName") ?? [];
 
   const video = useFileUpload({
     accept: "video/*",
