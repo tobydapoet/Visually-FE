@@ -196,9 +196,12 @@ const LoginPage: React.FC = () => {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={() =>
-                  (window.location.href = `${import.meta.env.VITE_OAUTH_URL}`)
-                }
+                onClick={() => {
+                  const redirectUri = encodeURIComponent(
+                    window.location.origin + "/",
+                  );
+                  window.location.href = `${import.meta.env.VITE_OAUTH_URL}?redirectUri=${redirectUri}`;
+                }}
                 size="large"
                 startIcon={
                   <img src={assets.google} alt="google" className="w-5 h-5" />
