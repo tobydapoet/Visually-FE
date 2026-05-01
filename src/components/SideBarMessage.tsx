@@ -1,6 +1,6 @@
 import type React from "react";
 import { useUser } from "../contexts/user.context";
-import { Plus, Search } from "lucide-react";
+import { BotMessageSquare, Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { UserSummaryType } from "../types/api/user.type";
 import useDebounce from "../hooks/useDebounce";
@@ -22,6 +22,7 @@ const SideBarMessage: React.FC = () => {
     isFetchingNextPage,
     isLoadingConversations,
     handleSelectConversation,
+    getBotConversation,
   } = useMessage();
 
   const [searchResults, setSearchResult] = useState<UserSummaryType[]>([]);
@@ -65,12 +66,20 @@ const SideBarMessage: React.FC = () => {
       <div className="w-full md:w-85 px-5 pt-5 border-r border-gray-600 h-screen flex flex-col">
         <div className="flex justify-between">
           <div className="font-bold text-2xl">{currentUser?.username}</div>
-          <button
-            className="cursor-pointer"
-            onClick={() => setIsOpenCreateBox(true)}
-          >
-            <Plus />
-          </button>
+          <div className="flex gap-2">
+            <button
+              className="cursor-pointer"
+              onClick={() => getBotConversation()}
+            >
+              <BotMessageSquare />
+            </button>
+            <button
+              className="cursor-pointer"
+              onClick={() => setIsOpenCreateBox(true)}
+            >
+              <Plus />
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-2 bg-zinc-800 rounded-full px-3 py-3 mt-2">
           <Search size={16} className="text-zinc-400" />
@@ -183,7 +192,7 @@ const SideBarMessage: React.FC = () => {
                               conversation.otherUsers[0].username}
                           </div>
                         </div>
-                        <div className="text-xs text-gray-400 truncate">
+                        <div className="text-xs text-gray-400 truncate max-w-50">
                           {typeof conversation.lastMessage === "object"
                             ? (conversation.lastMessage as any)?.content ||
                               "No messages yet"

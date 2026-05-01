@@ -50,6 +50,7 @@ export type MessageInputRef = {
   setText: (text: string, mentions?: MentionItem[], isEdit?: boolean) => void;
   clearText: () => void;
   setReplyingTo: (username: string | null) => void;
+  getText: () => string;
 };
 
 const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
@@ -137,6 +138,7 @@ const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
         textareaRef.current.style.height = "auto";
       }
     },
+    getText: () => messageValue,
   }));
 
   const handleSend = async () => {

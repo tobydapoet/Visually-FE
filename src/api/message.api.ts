@@ -43,7 +43,6 @@ export const handleGetConversationWithId = async (
   const res = await axiosInstance.get(
     `${import.meta.env.VITE_API_URL}messages/conversation/${id}`,
   );
-  console.log("RESDATA: ", res.data);
 
   return res.data;
 };
@@ -218,4 +217,32 @@ export const handleUnMuteConversation = async (id: number): Promise<number> => {
     `${import.meta.env.VITE_API_URL}messages/conversation-member/${id}/unmute`,
   );
   return res.data;
+};
+
+export const handleAskBot = async (conversationId: number, content: string) => {
+  try {
+    const res = await axiosInstance.post(
+      `${import.meta.env.VITE_API_URL}messages/message/conversation/${conversationId}/ask-bot`,
+      { content },
+    );
+    console.log("REQ: ", { conversationId, content });
+
+    console.log("RES: ", res);
+    return res.data;
+  } catch (err: any) {
+    console.log(err);
+    throw err;
+  }
+};
+
+export const handleGetBotConversation = async () => {
+  try {
+    const res = await axiosInstance.post(
+      `${import.meta.env.VITE_API_URL}messages/conversation/bot`,
+    );
+    return res.data;
+  } catch (err: any) {
+    console.log(err);
+    throw err;
+  }
 };

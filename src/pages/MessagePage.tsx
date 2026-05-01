@@ -15,6 +15,7 @@ import {
   Reply,
   X,
   ChevronLeft,
+  BotMessageSquare,
 } from "lucide-react";
 import DetailConversation from "./DetailConversation";
 import type { Message } from "../types/api/message.type";
@@ -36,6 +37,7 @@ const MessagePage: React.FC = () => {
     loadingMoreMessages,
     updateMessage,
     deleteMessage,
+    askBot,
   } = useMessage();
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -49,6 +51,9 @@ const MessagePage: React.FC = () => {
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
   const [showSidebar, setShowSidebar] = useState(!id);
+  const [isAskingBot, setIsAskingBot] = useState(false);
+
+  console.log("SELECTED: ", selectedConversation);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -473,21 +478,62 @@ const MessagePage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <MessageInput
-                  ref={messageInputRef}
-                  key={inputResetKey}
-                  mode="MESSAGE"
-                  conversationId={selectedConversation.id}
-                  onSend={async (message, files, mentions) => {
-                    if (editingId) {
-                      await updateMessage(editingId, message, mentions);
-                      setEditingId(null);
-                    } else {
-                      await sendMessage(message, files, replyTo?.id, mentions);
-                      setReplyTo(null);
-                    }
-                  }}
-                />
+                <div className="relative">
+                  <div className="flex items-center pt-2">
+                    <div className="flex-1 -px-2">
+                      <MessageInput
+                        ref={messageInputRef}
+                        key={inputResetKey}
+                        mode="MESSAGE"
+                        conversationId={selectedConversation.id}
+                        onSend={async (message, files, mentions) => {
+                          if (editingId) {
+                            await updateMessage(editingId, message, mentions);
+                            setEditingId(null);
+                          } else if (selectedConversation.type === "BOT") {
+                            await askBot(message);
+                            setReplyTo(null);
+                          } else {
+                            await sendMessage(
+                              message,
+                              files,
+                              replyTo?.id,
+                              mentions,
+                            );
+                            setReplyTo(null);
+                          }
+                        }}
+                      />
+                    </div>
+                    {selectedConversation.type !== "BOT" && (
+                      <button
+                        onClick={async () => {
+                          const content = messageInputRef.current?.getText();
+                          if (content) {
+                            setIsAskingBot(true);
+                            messageInputRef.current?.clearText();
+                            try {
+                              await askBot(content);
+                            } finally {
+                              setIsAskingBot(false);
+                            }
+                          }
+                        }}
+                        disabled={isAskingBot}
+                        className="flex items-center cursor-pointer px-4 mr-2 py-2 rounded-md bg-zinc-900 border-gray-600 hover:bg-zinc-700 border transition-all text-sm text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isAskingBot ? (
+                          <CircularProgress
+                            size={18}
+                            sx={{ color: "#a1a1aa" }}
+                          />
+                        ) : (
+                          <BotMessageSquare />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
 

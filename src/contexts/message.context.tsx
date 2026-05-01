@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import type { ConversationType } from "../types/api/conversation.type";
 import type { MemberType, Message } from "../types/api/message.type";
 import {
+  handleAskBot,
   handledeleteMessage,
+  handleGetBotConversation,
   handleGetConversationMembers,
   handleGetConversationMessages,
   handleGetConversationWithId,
@@ -48,6 +50,7 @@ type MessageContextType = {
   loadingMoreMessages: boolean;
   loadMoreMessages: () => Promise<void>;
   refetchConversations: () => void;
+  getBotConversation: () => Promise<void>;
   fetchMember: () => Promise<void>;
   setNullForConversation: () => void;
   updateMessage: (
@@ -61,6 +64,7 @@ type MessageContextType = {
     option: "15m" | "1h" | "8h" | "24h" | "forever",
   ) => Promise<void>;
   unmuteConversation: (memberId: number) => Promise<void>;
+  askBot: (content: string) => Promise<void>;
 };
 
 const MessageContext = createContext<MessageContextType | null>(null);
@@ -229,6 +233,32 @@ export const MessageProvider = ({
       socket.off("message_deleted");
     };
   }, [currentUser?.id]);
+
+  const askBot = async (content: string) => {
+    if (!selectedConversation || !content.trim()) return;
+    try {
+      await handleAskBot(selectedConversation.id, content);
+    } catch (err) {
+      console.error("Failed to ask bot:", err);
+    }
+  };
+
+  const getBotConversation = async () => {
+    try {
+      const res = await handleGetBotConversation();
+      setSelectedConversation(res);
+      navigate(`/inbox/${res.id}`);
+      setMessages([]);
+      setInputResetKey((k) => k + 1);
+      joinConversationRoom(res.id);
+      setMessagePage(1);
+      setHasMoreMessages(false);
+      await loadMessages(res.id);
+      refetchConversations();
+    } catch (err) {
+      console.error("Failed to create bot conversation:", err);
+    }
+  };
 
   const setNullForConversation = () => {
     setSelectedConversation(null);
@@ -446,6 +476,8 @@ export const MessageProvider = ({
         deleteMessage,
         muteConversation,
         unmuteConversation,
+        askBot,
+        getBotConversation,
       }}
     >
       {children}

@@ -166,13 +166,11 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
             startTimeRef.current = null;
 
             hasSeen.current = true;
-            if (Math.floor(accumulatedTimeRef.current / 1000) !== 0) {
-              handleView(
-                post.id,
-                post.contentType,
-                Math.floor(accumulatedTimeRef.current / 1000),
-              );
-            }
+            handleView(
+              post.id,
+              post.contentType,
+              Math.floor(accumulatedTimeRef.current / 1000),
+            );
 
             observer.disconnect();
           }
