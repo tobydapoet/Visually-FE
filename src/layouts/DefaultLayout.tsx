@@ -24,7 +24,7 @@ function DefaultLayout() {
   useEffect(() => {
     if (token) {
       const payload = parseJwt(token);
-      const isAdmin = payload?.role === "ADMIN";
+      const isAdmin = payload?.role !== "CLIENT";
 
       if (isAdmin) {
         navigate("/unauthorized", { replace: true });

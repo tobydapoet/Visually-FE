@@ -13,7 +13,7 @@ function ManageLayout() {
   useEffect(() => {
     if (token) {
       const payload = parseJwt(token);
-      if (!payload || payload?.role !== "ADMIN")
+      if (!payload || payload?.role === "CLIENT")
         navigate("/unauthorized", { replace: true });
     } else {
       navigate("/unauthorized", { replace: true });
@@ -22,7 +22,6 @@ function ManageLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-zinc-900">
-      {/* Mobile header */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center gap-3 px-4 py-3 bg-neutral-950 border-b border-zinc-800">
         <button
           onClick={() => setIsMobileOpen(true)}

@@ -19,7 +19,7 @@ function OauthSuccessPage() {
       Cookies.set("refresh_token", refreshToken, { expires: 7 });
 
     const payload = parseJwt(accessToken);
-    if (payload?.role === "ADMIN") {
+    if (payload?.role !== "CLIENT") {
       navigate("/music_library", { replace: true });
     } else {
       navigate("/", { replace: true });

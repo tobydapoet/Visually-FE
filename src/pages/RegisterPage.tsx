@@ -48,7 +48,7 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-800 min-h-screen">
+    <div className="flex items-center justify-center bg-zinc-900 min-h-screen">
       <div className="flex items-center justify-center py-8">
         <div className="w-screen max-w-lg px-10 md:px-0">
           <div className="mb-8 flex items-center">

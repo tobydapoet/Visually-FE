@@ -128,7 +128,7 @@ const ForgotPasswordPage: FC = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#0f0f1a",
+        bgcolor: "#18181B",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -139,7 +139,7 @@ const ForgotPasswordPage: FC = () => {
         sx={{
           maxWidth: 420,
           width: "100%",
-          bgcolor: "#1a1a2e",
+          bgcolor: "#18181B",
           borderRadius: 3,
           p: 4,
           border: "1px solid #2d2d44",
@@ -159,7 +159,6 @@ const ForgotPasswordPage: FC = () => {
           Back to Login
         </Button>
 
-        {/* Header */}
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <Box
             sx={{
@@ -215,7 +214,6 @@ const ForgotPasswordPage: FC = () => {
           </Alert>
         )}
 
-        {/* Step: Email */}
         {step === "email" ? (
           <Box
             component="form"

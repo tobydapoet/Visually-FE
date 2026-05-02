@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import assets from "../assets";
 
 const LoadingSpinner = () => {
@@ -10,7 +10,7 @@ const LoadingSpinner = () => {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #1F2937 0%, #111827 100%)",
+        background: "#18181B",
         position: "fixed",
         top: 0,
         left: 0,
@@ -39,19 +39,6 @@ const LoadingSpinner = () => {
           }}
         />
       </Box>
-
-      <Typography
-        variant="h3"
-        sx={{
-          color: "#60A5FA",
-          fontWeight: 700,
-          mt: 3,
-          textShadow: "2px 2px 4px rgba(0,0,0,0.2)",
-          letterSpacing: "2px",
-        }}
-      >
-        Visually
-      </Typography>
 
       <Box sx={{ display: "flex", gap: 1, mt: 4 }}>
         {[0, 1, 2].map((dot) => (

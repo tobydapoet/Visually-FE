@@ -266,8 +266,8 @@ const SideBar: React.FC = () => {
             }}
           >
             <div
-              className={`flex items-center gap-3 p-3 rounded-xl transition-colors cursor-pointer ${
-                activeItem === "Profile" ? "bg-blue-500" : "hover:bg-gray-700" // thêm active state
+              className={`flex items-center gap-3 py-3 pl-2 rounded-xl transition-colors cursor-pointer ${
+                activeItem === "Profile" ? "bg-blue-500" : "hover:bg-gray-700"
               }`}
             >
               <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0">

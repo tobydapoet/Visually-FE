@@ -3,9 +3,9 @@ import assets from "../assets";
 
 export default function AuthLayout() {
   return (
-    <div className="flex w-full min-h-screen items-center justify-center ">
-      <div className="flex w-full max-w-6xl h-screen md:h-auto overflow-hidden rounded-2xl bg-white shadow-xl">
-        <div className="bg-gray-800 flex w-full md:w-1/2 items-center justify-center p-8">
+    <div className="flex w-full min-h-screen items-center justify-center bg-zinc-900">
+      <div className="flex w-full max-w-6xl h-screen md:h-auto overflow-hidden border border-gray-800 md:rounded-2xl shadow-xl">
+        <div className="bg-zinc-900 flex w-full md:w-1/2 items-center justify-center p-8">
           <div className="w-full max-w-md">
             <Outlet />
           </div>

@@ -21,11 +21,7 @@ function SettingLayout() {
   const menuGroups = [
     {
       title: "General",
-      items: [
-        { id: "Profile", icon: User, label: "Profile" },
-        { id: "Account", icon: Settings, label: "Account" },
-        { id: "Notifications", icon: Bell, label: "Notifications" },
-      ],
+      items: [{ id: "Profile", icon: User, label: "Profile" }],
     },
     {
       title: "Support",
