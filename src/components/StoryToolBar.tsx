@@ -1,4 +1,4 @@
-import { Type, Music, Trash2 } from "lucide-react";
+import { Music, Trash2 } from "lucide-react";
 
 type Props = {
   onText: () => void;
