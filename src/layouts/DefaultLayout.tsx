@@ -14,6 +14,8 @@ function DefaultLayout() {
     return t;
   });
 
+  // console.log("ACCESS: ", token);
+
   useEffect(() => {
     setToken(Cookies.get("access_token"));
   }, [location.pathname]);

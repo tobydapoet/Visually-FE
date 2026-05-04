@@ -6,16 +6,9 @@ type Props = {
   onRemove: () => void;
 };
 
-export function StoryToolbar({ onText, onMusic, onRemove }: Props) {
+export function StoryToolbar({ onMusic, onRemove }: Props) {
   return (
     <div className="absolute top-3 right-3 flex flex-col gap-3 z-10">
-      <button
-        type="button"
-        onClick={onText}
-        className="p-2 rounded-full bg-white hover:bg-blue-500 transition-colors"
-      >
-        <Type size={20} color="black" />
-      </button>
       <button
         type="button"
         onClick={onMusic}

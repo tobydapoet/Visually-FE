@@ -151,7 +151,6 @@ export const MessageProvider = ({
       socket.on("connected", handleConnected);
 
       socket.on("new_message", (event) => {
-        console.log("SOCKET EFFECT RUN:", currentUser?.id);
         const isOwnMessage = event.senderId === currentUser?.id;
         const isCurrentConversation =
           selectedConversationRef.current?.id === event.conversationId;
@@ -432,7 +431,6 @@ export const MessageProvider = ({
     mentions?: MentionItem[],
   ) => {
     if (!message.trim() && files.length === 0) return;
-    console.log("mentions: ", mentions);
     const formData = new FormData();
     formData.append("conversationId", String(selectedConversation!.id));
     formData.append("senderId", currentUser!.id);

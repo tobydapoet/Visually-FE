@@ -15,8 +15,8 @@ import EditConversationPopUp from "./EditConverSationPopup";
 import type { MemberType } from "../types/api/message.type";
 import { handleGetConversationMembers } from "../api/message.api";
 import { useNavigate } from "react-router-dom";
-import ConfirmDialog from "../components/ConfirmDialog"; // import dialog
-import { handleRemoveMemberFromConversation } from "../api/message.api"; // import API xóa
+import ConfirmDialog from "../components/ConfirmDialog";
+import { handleRemoveMemberFromConversation } from "../api/message.api";
 import { useUser } from "../contexts/user.context";
 import MemberInvitePopUp from "../components/MemberInvitePopUp";
 import { toast } from "sonner";

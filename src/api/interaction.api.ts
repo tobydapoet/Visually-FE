@@ -53,7 +53,7 @@ export const handleComment = async (data: CommentReqType) => {
     );
     return {
       success: true,
-      data: res.data,
+      data: res.data.content,
     };
   } catch (err: any) {
     console.error("ERROR:", err);

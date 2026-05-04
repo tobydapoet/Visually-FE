@@ -217,7 +217,7 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
                       <p className="text-base font-medium">
                         Upload photo or video
                       </p>
-                      <p className="text-sm text-zinc-400">
+                      <p className="text-sm text-zinc-400 px-2">
                         Drag and drop or click to browse
                       </p>
                     </div>

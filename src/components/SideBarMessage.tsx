@@ -155,7 +155,7 @@ const SideBarMessage: React.FC = () => {
                               .map((user, index) => (
                                 <img
                                   key={user.userId}
-                                  src={user.avatarUrl || assets.profile}
+                                  src={user?.avatarUrl || assets.profile}
                                   alt={conversation.name || user.username}
                                   className="w-8 h-8 rounded-full object-cover border-2 border-white"
                                   style={{
@@ -170,7 +170,7 @@ const SideBarMessage: React.FC = () => {
                         <div className="relative">
                           <img
                             src={
-                              conversation.otherUsers[0].avatarUrl ||
+                              conversation.otherUsers[0]?.avatarUrl ||
                               assets.profile
                             }
                             alt={
