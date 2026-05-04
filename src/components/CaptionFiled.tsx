@@ -1,4 +1,3 @@
-// CaptionField.tsx
 import {
   Popper,
   Paper,
@@ -78,9 +77,9 @@ export const CaptionField: React.FC<Props> = ({
   };
 
   const { handleSelectUser } = useMentionSelection(
-    handleInput, // onMentionSelected
-    () => setOpen(false), // onClose
-    clearMentionState, // onClearKeyword
+    handleInput,
+    () => setOpen(false),
+    clearMentionState,
   );
 
   const { handleKeyDown } = useMentionKeyboard({

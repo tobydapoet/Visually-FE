@@ -5,6 +5,7 @@ import type { UserSummaryLastSeenType } from "../types/api/user.type";
 import assets from "../assets";
 import { handleGetFollowingWithStatus } from "../api/follow.api";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/user.context";
 
 const getOnlineStatus = (lastSeen: Date | null) => {
   if (lastSeen === null) return { label: "Online", color: "bg-emerald-500" };
@@ -24,6 +25,8 @@ const UserFollowSideBar: React.FC = () => {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
+
+  const { currentUser, loading } = useUser();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
@@ -49,6 +52,8 @@ const UserFollowSideBar: React.FC = () => {
 
   const users: UserSummaryLastSeenType[] =
     data?.pages.flatMap((page) => page.content) || [];
+
+  if (loading || !currentUser) return null;
 
   return (
     <div

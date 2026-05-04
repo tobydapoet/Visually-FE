@@ -20,7 +20,7 @@ function OauthSuccessPage() {
 
     const payload = parseJwt(accessToken);
     if (payload?.role !== "CLIENT") {
-      navigate("/music_library", { replace: true });
+      navigate("/content/post", { replace: true });
     } else {
       navigate("/", { replace: true });
     }

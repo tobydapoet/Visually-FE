@@ -25,10 +25,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   >();
   const [loading, setLoading] = useState(false);
 
-  console.log("CURRENT_USER: ", currentUser);
-  console.log("ACCESS: ", Cookies.get("access_token"));
-  console.log("REFRESH: ", Cookies.get("refresh_token"));
-
   const onLogout = async (onSuccess?: () => void) => {
     const res = await handleLogout();
     if (res.success) {
@@ -70,6 +66,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     if (Cookies.get("refresh_token")) {
       reloadUser();
     }
+  }, []);
+
+  useEffect(() => {
+    const handleTokenChange = () => {
+      if (Cookies.get("refresh_token")) {
+        reloadUser();
+      }
+    };
+
+    window.addEventListener("tokenChanged", handleTokenChange);
+    return () => window.removeEventListener("tokenChanged", handleTokenChange);
   }, []);
 
   return (

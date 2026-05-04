@@ -158,8 +158,8 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
               <X className="w-6 h-6" />
             </button>
 
-            <div className="flex flex-col md:flex-row max-h-[90vh]">
-              <div className="relative flex-1 bg-black md:min-w-100">
+            <div className="flex flex-col md:flex-row h-[90vh]">
+              <div className="relative flex flex-1 bg-black md:min-w-100">
                 {isPost ? (
                   <div className="relative h-full flex items-center justify-center">
                     {mediaItems.length > 0 && (

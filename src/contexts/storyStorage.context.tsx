@@ -70,7 +70,6 @@ export const StoryStorageProvider: FC<StoryStorageProviderProps> = ({
   const isVideo = (url?: string) =>
     url?.includes(".mp4") || url?.includes("/video/");
 
-  // Sync refs
   useEffect(() => {
     currentIndexRef.current = currentIndex;
   }, [currentIndex]);
@@ -78,7 +77,6 @@ export const StoryStorageProvider: FC<StoryStorageProviderProps> = ({
     storyListRef.current = storyList;
   }, [storyList]);
 
-  // Fetch data
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -101,7 +99,6 @@ export const StoryStorageProvider: FC<StoryStorageProviderProps> = ({
     fetch();
   }, []);
 
-  // Audio
   useEffect(() => {
     if (!currentStory || !audioRef.current) return;
     let isActive = true;
@@ -146,7 +143,6 @@ export const StoryStorageProvider: FC<StoryStorageProviderProps> = ({
     }
   }, [isMuted]);
 
-  // Progress
   useEffect(() => {
     setProgress(0);
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
@@ -172,7 +168,6 @@ export const StoryStorageProvider: FC<StoryStorageProviderProps> = ({
     };
   }, [currentStory]);
 
-  // Video progress
   useEffect(() => {
     if (!videoRef.current || !isVideo(currentStory?.mediaUrl)) return;
     const video = videoRef.current;

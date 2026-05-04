@@ -23,6 +23,7 @@ export const handleLogin = async (req: LoginType) => {
       Cookies.set("access_token", access_token);
       Cookies.set("refresh_token", refresh_token);
     }
+    window.dispatchEvent(new Event("tokenChanged"));
     return {
       success: true,
       access_token,

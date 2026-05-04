@@ -7,6 +7,7 @@ import { Menu } from "lucide-react";
 
 function ManageLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
   const token = Cookies.get("access_token");
   const navigate = useNavigate();
 
@@ -15,6 +16,9 @@ function ManageLayout() {
       const payload = parseJwt(token);
       if (!payload || payload?.role === "CLIENT")
         navigate("/unauthorized", { replace: true });
+      else {
+        setRole(payload.role);
+      }
     } else {
       navigate("/unauthorized", { replace: true });
     }
@@ -39,7 +43,7 @@ function ManageLayout() {
 
       <div className="flex-1 overflow-auto bg-neutral-950 pt-14 md:pt-0">
         <div className="flex justify-center">
-          <Outlet />
+          <Outlet context={{ role }} />
         </div>
       </div>
     </div>

@@ -41,7 +41,7 @@ const SideBar: React.FC = () => {
   const location = useLocation();
   const { unreadCount } = useNotification();
   const { unreadConversationCount } = useMessage();
-  const { currentUser } = useUser();
+  const { currentUser, loading } = useUser();
 
   const getActiveFromPath = (pathname: string) => {
     if (pathname === "/") return "Home";
@@ -104,6 +104,8 @@ const SideBar: React.FC = () => {
     { id: "Messages", icon: MessageCircle, label: "Tin nhắn", link: "/inbox" },
   ];
 
+  if (loading || !currentUser) return null;
+
   return (
     <>
       <div
@@ -114,12 +116,17 @@ const SideBar: React.FC = () => {
         className={`hidden md:flex h-screen bg-zinc-900 transition-all duration-300 ease-in-out overflow-hidden shadow-xl flex-col
           ${expanded ? "w-64" : "w-18"}`}
       >
-        <div className="p-4 border-b border-gray-700 shrink-0">
-          <img
-            src={assets.white_logo}
-            alt="Logo"
-            className="h-8 w-auto object-contain"
-          />
+        <div className="p-3 w-fit shrink-0 ">
+          <div
+            className="hover:bg-gray-700 rounded-lg p-1 cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            <img
+              src={assets.white_logo}
+              alt="Logo"
+              className="w-10 h-10 object-contain"
+            />
+          </div>
         </div>
 
         <div className="flex-1 py-4">

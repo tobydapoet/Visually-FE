@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import type { ConversationType } from "../types/api/conversation.type";
 import type { MemberType, Message } from "../types/api/message.type";
 import {
@@ -89,6 +89,14 @@ export const MessageProvider = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const selectedConversationRef = useRef<ConversationType | null>(null);
   const [unreadConversationCount, setUnreadConversationCount] = useState(0);
+  const location = useLocation();
+  const isMessagePage = location.pathname.startsWith("/inbox");
+
+  useEffect(() => {
+    if (!isMessagePage) {
+      setSelectedConversation(null);
+    }
+  }, [isMessagePage]);
 
   useEffect(() => {
     selectedConversationRef.current = selectedConversation;
@@ -121,113 +129,130 @@ export const MessageProvider = ({
 
   useEffect(() => {
     if (!currentUser?.id) return;
+
     const socket = getSocket(currentUser.id);
 
-    const handleConnected = () => {
-      if (selectedConversationRef.current?.id) {
-        joinConversationRoom(selectedConversationRef.current.id);
+    const registerListeners = () => {
+      socket.off("new_message");
+      socket.off("message_updated");
+      socket.off("message_deleted");
+
+      const handleConnected = () => {
+        if (selectedConversationRef.current?.id) {
+          joinConversationRoom(selectedConversationRef.current.id);
+        }
+      };
+
+      if (socket.connected) {
+        handleConnected();
       }
+
+      socket.on("connect", handleConnected);
+      socket.on("connected", handleConnected);
+
+      socket.on("new_message", (event) => {
+        console.log("SOCKET EFFECT RUN:", currentUser?.id);
+        const isOwnMessage = event.senderId === currentUser?.id;
+        const isCurrentConversation =
+          selectedConversationRef.current?.id === event.conversationId;
+        const isMuted = event.mutedUserIds?.includes(currentUser?.id);
+
+        if (!isOwnMessage && !isCurrentConversation && !isMuted) {
+          toast.custom(
+            (t) => (
+              <div
+                className="flex items-center gap-3 bg-white shadow-lg rounded-xl p-4 w-80 cursor-pointer"
+                onClick={() => {
+                  window.location.href = `/inbox/${event.conversationId}`;
+                  toast.dismiss(t);
+                }}
+              >
+                <img
+                  src={event.senderAvatar || assets.profile}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-800">
+                    {event.senderUsername}
+                  </p>
+                  <p className="text-sm text-gray-600 truncate">
+                    {event.content}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">Just now</p>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toast.dismiss(t);
+                  }}
+                  className="ml-auto text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+            ),
+            { duration: 4000, position: "bottom-right" },
+          );
+        }
+
+        fetchUnreadCount();
+        refetchConversations();
+
+        if (selectedConversationRef.current?.id !== event.conversationId) {
+          return;
+        }
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === event.id)) return prev;
+
+          const newMessage = {
+            id: event.id,
+            content: event.content,
+            files: [],
+            filePreviews: event.mediaUrls?.map((m: any) => m.url) ?? [],
+            createdAt: new Date(event.createdAt),
+            isOwn: event.senderId === currentUser.id,
+            senderUsername: event.senderUsername,
+            senderAvatar: event.senderAvatar,
+            replyTo: event.replyToId ?? null,
+            mentions: event.mentions,
+          };
+
+          const updated = [...prev, newMessage];
+
+          return updated;
+        });
+
+        if (selectedConversationRef.current?.id === event.conversationId) {
+          handleUpdateLastSeen(event.conversationId);
+        }
+      });
+
+      socket.on("message_updated", (event) => {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === event.id
+              ? { ...m, content: event.content, mentions: event.mentions ?? [] }
+              : m,
+          ),
+        );
+      });
+      socket.on("message_deleted", (event) => {
+        setMessages((prev) => prev.filter((m) => m.id !== event.messageId));
+      });
     };
 
     if (socket.connected) {
-      handleConnected();
+      registerListeners();
+    } else {
+      socket.once("connect", () => {
+        registerListeners();
+      });
+      socket.connect();
+      socket.connect();
     }
 
-    socket.on("connect", handleConnected);
-    socket.on("connected", handleConnected);
-
-    socket.on("new_message", (event) => {
-      const isOwnMessage = event.senderId === currentUser?.id;
-      const isCurrentConversation =
-        selectedConversationRef.current?.id === event.conversationId;
-      const isMuted = event.mutedUserIds?.includes(currentUser?.id);
-
-      if (!isOwnMessage && !isCurrentConversation && !isMuted) {
-        toast.custom(
-          (t) => (
-            <div
-              className="flex items-center gap-3 bg-white shadow-lg rounded-xl p-4 w-80 cursor-pointer"
-              onClick={() => {
-                window.location.href = `/inbox/${event.conversationId}`;
-                toast.dismiss(t);
-              }}
-            >
-              <img
-                src={event.senderAvatar || assets.profile}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-800">
-                  {event.senderUsername}
-                </p>
-                <p className="text-sm text-gray-600 truncate">
-                  {event.content}
-                </p>
-                <p className="text-xs text-gray-400 mt-0.5">Just now</p>
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toast.dismiss(t);
-                }}
-                className="ml-auto text-gray-400 hover:text-gray-600"
-              >
-                ✕
-              </button>
-            </div>
-          ),
-          { duration: 4000, position: "bottom-right" },
-        );
-      }
-
-      fetchUnreadCount();
-      refetchConversations();
-
-      if (selectedConversationRef.current?.id !== event.conversationId) {
-        return;
-      }
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === event.id)) return prev;
-
-        const newMessage = {
-          id: event.id,
-          content: event.content,
-          files: [],
-          filePreviews: event.mediaUrls?.map((m: any) => m.url) ?? [],
-          createdAt: new Date(event.createdAt),
-          isOwn: event.senderId === currentUser.id,
-          senderUsername: event.senderUsername,
-          senderAvatar: event.senderAvatar,
-          replyTo: event.replyToId ?? null,
-          mentions: event.mentions,
-        };
-
-        const updated = [...prev, newMessage];
-
-        return updated;
-      });
-
-      if (selectedConversationRef.current?.id === event.conversationId) {
-        handleUpdateLastSeen(event.conversationId);
-      }
-    });
-
-    socket.on("message_updated", (event) => {
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === event.id
-            ? { ...m, content: event.content, mentions: event.mentions ?? [] }
-            : m,
-        ),
-      );
-    });
-    socket.on("message_deleted", (event) => {
-      setMessages((prev) => prev.filter((m) => m.id !== event.messageId));
-    });
-
     return () => {
-      socket.off("connect", handleConnected);
-      socket.off("connected", handleConnected);
+      socket.off("connect", registerListeners);
       socket.off("new_message");
       socket.off("message_updated");
       socket.off("message_deleted");
@@ -384,6 +409,7 @@ export const MessageProvider = ({
     refetch: refetchConversations,
   } = useInfiniteQuery({
     queryKey: ["userConversations"],
+    enabled: isMessagePage,
     queryFn: async ({ pageParam = 1 }) => {
       const res = await handleGetUserConverstaion(pageParam, 10);
       return {

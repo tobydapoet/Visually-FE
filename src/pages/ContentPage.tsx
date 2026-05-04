@@ -227,8 +227,7 @@ const ContentPage: React.FC = () => {
                 </>
               )}
             </>
-          ) : // SHORT
-          isVideo(currentContent.mediaUrl) ? (
+          ) : isVideo(currentContent.mediaUrl) ? (
             <>
               <video
                 src={currentContent.mediaUrl}

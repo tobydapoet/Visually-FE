@@ -122,18 +122,6 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  // const onSubmit = async (data: CreateAdType) => {
-  //   console.log("DATA: ", data);
-  //   const res = await handleCreateAd(data);
-  //   if (res.success) {
-  //     toast.success(res.message);
-  //     onClose();
-  //     reset();
-  //   } else {
-  //     toast.error(res.message);
-  //   }
-  // };
-
   const description = `USER ${currentUser.id} PAY FOR BOOSTED POST`;
 
   const formatVND = (amount: number) => {

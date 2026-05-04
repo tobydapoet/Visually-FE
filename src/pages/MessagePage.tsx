@@ -53,8 +53,6 @@ const MessagePage: React.FC = () => {
   const [showSidebar, setShowSidebar] = useState(!id);
   const [isAskingBot, setIsAskingBot] = useState(false);
 
-  console.log("SELECTED: ", selectedConversation);
-
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
@@ -74,7 +72,6 @@ const MessagePage: React.FC = () => {
         if (isMobile) setShowSidebar(false);
       });
     } else {
-      // No id → show sidebar on mobile
       if (isMobile) setShowSidebar(true);
     }
   }, [id, currentUser, isMobile]);

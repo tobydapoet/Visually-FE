@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -24,6 +24,13 @@ const LoginPage: React.FC = () => {
     resolver: zodResolver(LoginSchema),
     mode: "onBlur",
   });
+
+  useEffect(() => {
+    const refresh_token = Cookies.get("refresh_token");
+    if (refresh_token) {
+      navigate("/unauthorized");
+    }
+  }, []);
 
   const onSubmit = async (data: LoginType) => {
     const res = await handleLogin(data);

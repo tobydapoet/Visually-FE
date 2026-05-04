@@ -26,6 +26,7 @@ type MenuItem = {
   icon: React.ReactNode;
   path?: string;
   children?: ChildMenuItem[];
+  adminOnly?: boolean;
 };
 
 type Props = {
@@ -38,6 +39,7 @@ const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
     content: true,
   });
   const { currentUser, loading } = useUser();
+  const isAdmin = currentUser?.role === "ADMIN";
   const navigate = useNavigate();
   const isContentActive = useMatch("/content/*");
 
@@ -71,7 +73,13 @@ const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
       icon: <BarChart3 size={20} />,
       path: "/report",
     },
-    { id: "user", label: "User", icon: <Users size={20} />, path: "/user" },
+    {
+      id: "user",
+      label: "User",
+      icon: <Users size={20} />,
+      path: "/user",
+      adminOnly: true,
+    },
     {
       id: "advertisement",
       label: "Advertisement",
@@ -83,8 +91,9 @@ const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
       label: "Music Library",
       icon: <Music size={20} />,
       path: "/music_library",
+      adminOnly: true,
     },
-  ];
+  ].filter((item) => !item.adminOnly || isAdmin);
 
   const toggleMenu = (menuId: string) => {
     setOpenMenus((prev) => ({ ...prev, [menuId]: !prev[menuId] }));

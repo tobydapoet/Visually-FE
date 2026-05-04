@@ -312,7 +312,6 @@ const ShortManagePage: React.FC = () => {
                       )
                     }
                   >
-                    {/* Thumbnail - portrait ratio vì là short */}
                     {short.thumbnailUrl ? (
                       <img
                         src={short.thumbnailUrl}
@@ -325,7 +324,6 @@ const ShortManagePage: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <span className="text-xs text-neutral-500 font-medium">

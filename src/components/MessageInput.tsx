@@ -340,7 +340,7 @@ const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
 
       <div className="relative">
         {mentionResults.length > 0 && mentionQuery !== null && (
-          <div className="absolute bottom-full mb-2 left-0 w-64 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50 overflow-hidden">
+          <div className="absolute bottom-full mb-2 left-0 w-64 bg-zinc-900 border border-gray-800 rounded-lg shadow-lg z-50 overflow-hidden">
             {mentionResults.map((user, index) => (
               <button
                 key={user.userId}

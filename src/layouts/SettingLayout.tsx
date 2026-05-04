@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Settings,
-  User,
-  Bell,
-  HelpCircle,
-  LogOut,
-  ChevronRight,
-} from "lucide-react";
+import { Settings, User, HelpCircle, LogOut, ChevronRight } from "lucide-react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/user.context";
 import ConfirmDialog from "../components/ConfirmDialog";

@@ -184,7 +184,6 @@ const PostPopUp: React.FC<Props> = ({ open, onClose }) => {
               >
                 <div className="flex flex-col gap-3">
                   {entries.length === 0 ? (
-                    // Drop zone
                     <div
                       onDragOver={handleDragOver}
                       onDrop={handleDrop}

@@ -31,12 +31,9 @@ import ReelsPage from "../pages/ReelsPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import BoostedPostMangePage from "../pages/AdvertisementManagePage";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 export const router = createBrowserRouter([
-  // {
-  //   path: routes.root,
-  //   element: <RootPage />,
-  // },
   {
     path: routes.forgot,
     element: <ForgotPasswordPage />,
@@ -139,9 +136,11 @@ export const router = createBrowserRouter([
       {
         path: routes.music_library,
         element: (
-          <MusicProvider>
-            <MusicLibraryPage />
-          </MusicProvider>
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <MusicProvider>
+              <MusicLibraryPage />
+            </MusicProvider>
+          </ProtectedRoute>
         ),
       },
       {
@@ -195,7 +194,11 @@ export const router = createBrowserRouter([
 
       {
         path: routes.user_manage,
-        element: <UserMangePage />,
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <UserMangePage />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

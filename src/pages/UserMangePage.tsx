@@ -353,14 +353,8 @@ const UserManagePage: FC = () => {
 
   return (
     <>
-      {/* 
-        Responsive wrapper:
-        - Mobile: full width, padding nhỏ hơn
-        - Có sidebar: dùng w-full thay vì w-[calc(100vw-10rem)] cứng
-      */}
       <div className="min-h-screen bg-zinc-900 p-3 sm:p-4 md:p-6 w-full">
-        <div className="mx-auto max-w-screen-xl">
-          {/* Header */}
+        <div className="mx-auto max-w-7xl">
           <div className="mb-4 sm:mb-6">
             <h1 className="text-xl sm:text-2xl font-bold text-white mb-1">
               User Management
@@ -370,7 +364,6 @@ const UserManagePage: FC = () => {
             </p>
           </div>
 
-          {/* Tabs */}
           <div className="flex gap-0 mb-4 sm:mb-6 border-b border-neutral-800">
             {tabs.map((tab) => (
               <button
@@ -409,7 +402,6 @@ const UserManagePage: FC = () => {
             </p>
           </div>
 
-          {/* Content */}
           {loading ? (
             <div className="flex items-center justify-center py-16 sm:py-20">
               <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin text-neutral-500" />
@@ -424,13 +416,6 @@ const UserManagePage: FC = () => {
             </div>
           ) : (
             <>
-              {/*
-                Grid responsive:
-                - Mobile (< sm): 1 cột
-                - sm (≥ 640px): 2 cột
-                - lg (≥ 1024px): 3 cột
-                - xl (≥ 1280px): 4 cột
-              */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                 {users.map((user) => {
                   const availableActions = getAvailableActions(user.status);
@@ -451,7 +436,7 @@ const UserManagePage: FC = () => {
                         <img
                           src={user.avatar || assets.profile}
                           alt={user.username}
-                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0"
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-white truncate">

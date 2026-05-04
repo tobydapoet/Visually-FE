@@ -48,7 +48,7 @@ const MemberInvitePopUp: React.FC<Props> = ({ open, onClose }) => {
     };
 
     if (open) fetchFollow();
-  }, [open, debouncedSearch, memberList]); // Thêm memberList vào dependency
+  }, [open, debouncedSearch, memberList]);
 
   const toggleUser = (memberId: string) => {
     const current = memberIds ?? [];

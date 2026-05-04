@@ -34,7 +34,6 @@ const ReportManagePage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
 
-  // Selection states
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -70,7 +69,6 @@ const ReportManagePage: React.FC = () => {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     updateURLParams(newPage, debouncedSearch);
-    // Clear selection when changing page
     setSelectedIds(new Set());
     setIsSelectionMode(false);
   };
@@ -79,20 +77,17 @@ const ReportManagePage: React.FC = () => {
     setSearchInput(value);
     setCurrentPage(1);
     updateURLParams(1, value);
-    // Clear selection when searching
     setSelectedIds(new Set());
     setIsSelectionMode(false);
   };
 
-  // Toggle selection mode
   const toggleSelectionMode = () => {
     setIsSelectionMode(!isSelectionMode);
     if (isSelectionMode) {
-      setSelectedIds(new Set()); // Clear selection when exiting selection mode
+      setSelectedIds(new Set());
     }
   };
 
-  // Toggle single report selection
   const toggleSelectReport = (id: number) => {
     const newSelected = new Set(selectedIds);
     if (newSelected.has(id)) {
@@ -103,7 +98,6 @@ const ReportManagePage: React.FC = () => {
     setSelectedIds(newSelected);
   };
 
-  // Toggle select all on current page
   const toggleSelectAll = () => {
     if (selectedIds.size === reports.length) {
       setSelectedIds(new Set());
@@ -113,13 +107,10 @@ const ReportManagePage: React.FC = () => {
     }
   };
 
-  // Handle delete many
   const handleDeleteManyReports = async () => {
     try {
       await handleDeleteMany(Array.from(selectedIds));
-      // Refresh data
       await fetchReports(currentPage, debouncedSearch);
-      // Clear selection
       setSelectedIds(new Set());
       setIsSelectionMode(false);
       setIsDeleteDialogOpen(false);

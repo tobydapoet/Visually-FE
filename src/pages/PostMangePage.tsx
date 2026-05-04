@@ -62,6 +62,9 @@ const PostManagePage: React.FC = () => {
     }
   };
 
+  const isVideo = (url?: string) =>
+    url?.includes(".mp4") || url?.includes("/video/");
+
   const updateURLParams = (
     newPage: number,
     newSearch: string,
@@ -222,11 +225,18 @@ const PostManagePage: React.FC = () => {
                         </td>
                         <td className="px-4 py-3">
                           {post.thumbnailUrl ? (
-                            <img
-                              src={post.thumbnailUrl}
-                              alt="thumbnail"
-                              className="w-14 h-14 object-cover rounded-lg"
-                            />
+                            isVideo(post.thumbnailUrl) ? (
+                              <video
+                                src={post.thumbnailUrl}
+                                className="w-14 h-14 object-cover rounded-lg"
+                              />
+                            ) : (
+                              <img
+                                src={post.thumbnailUrl}
+                                alt="thumbnail"
+                                className="w-14 h-14 object-cover rounded-lg"
+                              />
+                            )
                           ) : (
                             <div className="w-14 h-14 bg-neutral-800 rounded-lg flex items-center justify-center">
                               <ImageOff className="w-5 h-5 text-neutral-600" />
@@ -313,7 +323,6 @@ const PostManagePage: React.FC = () => {
                       navigate(`/manage/content?contentId=${post.id}&type=POST`)
                     }
                   >
-                    {/* Thumbnail */}
                     {post.thumbnailUrl ? (
                       <img
                         src={post.thumbnailUrl}
@@ -326,7 +335,6 @@ const PostManagePage: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <span className="text-xs text-neutral-500 font-medium">

@@ -16,7 +16,6 @@ export const UserProfileHeader: React.FC<Props> = ({
   onFollowerClick,
   onFollowingClick,
 }) => {
-  console.log("USER: ", user);
   const [isNavigating, setIsNavigating] = useState(false);
   const navigate = useNavigate();
   return (
@@ -24,11 +23,11 @@ export const UserProfileHeader: React.FC<Props> = ({
       <div className="relative group">
         <div
           className={`w-32 h-32 md:w-40 md:h-40 rounded-full bg-linear-to-r 
-    p-0.75
-    ${user.hasNewStory && "from-blue-400 to-blue-500"}`}
+          p-0.75
+          ${user.hasNewStory && "from-blue-400 to-blue-500"}`}
         >
           <div
-            className="w-full h-full rounded-full bg-black p-0.5 cursor-pointer relative"
+            className={`w-full h-full rounded-full bg-black p-0.5 relative ${user.hasNewStory && "cursor-pointer"}`}
             onClick={async () => {
               if (user.hasNewStory && !isNavigating) {
                 setIsNavigating(true);
@@ -59,7 +58,7 @@ export const UserProfileHeader: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="flex-1 space-y-4">
+      <div className="flex-1">
         <div className="flex flex-wrap items-center gap-3">
           <h2 className="text-2xl font-bold text-white">{user.fullName}</h2>
           {user.followersCount > 10000 && (
@@ -79,12 +78,13 @@ export const UserProfileHeader: React.FC<Props> = ({
             </div>
           )}
         </div>
+        <div className="text-gray-500">@{user.username}</div>
 
-        <p className="text-gray-300 max-w-2xl leading-relaxed">
+        <p className="text-gray-300 max-w-2xl leading-relaxed mt-4">
           {user.bio || "No bio yet"}
         </p>
 
-        <div className="grid grid-cols-4 cursor-pointer md:gap-3 gap-1 max-w-lg">
+        <div className="grid grid-cols-4 mt-4 cursor-pointer md:gap-3 gap-1 max-w-lg">
           <div
             onClick={() => {
               navigate(`/${user.username}?tab=posts`);

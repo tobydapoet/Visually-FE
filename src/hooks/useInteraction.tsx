@@ -82,7 +82,6 @@ export const useContentInteraction = (
     parentId?: number,
   ): Promise<CommentResponse | null> => {
     if (!content) return null;
-    console.log("metions: ", mentions);
     const newComment = await handleComment({
       targetId: content.id,
       targetType: type as CommentTargetType,
@@ -147,10 +146,8 @@ export const useContentInteraction = (
     try {
       if (prevReposted) {
         await handleDeleteRepost(content.id, type as RepostTargetType);
-        console.log("LOST");
       } else {
         await handleRepost(content.id, type as RepostTargetType);
-        console.log("POST");
       }
     } catch {
       setIsReposted(prevReposted);

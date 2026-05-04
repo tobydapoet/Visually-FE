@@ -72,7 +72,7 @@ export const handleSave = async (data: SaveReqType) => {
       data,
     );
   } catch (err: any) {
-    console.log("ERR: ", err.response.data);
+    console.log("err: ", err.response.data);
 
     return {
       success: false,
@@ -217,5 +217,4 @@ export const handleView = async (
     targetType,
     watchTime,
   });
-  console.log("ACTION23: ", watchTime);
 };

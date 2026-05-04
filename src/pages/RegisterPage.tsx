@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import assets from "../assets";
@@ -14,6 +14,7 @@ import {
   RadioGroup,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
+import Cookies from "js-cookie";
 
 import { Venus, Mars, Transgender, ChevronLeft } from "lucide-react";
 import {
@@ -36,6 +37,13 @@ const RegisterPage: React.FC = () => {
     resolver: zodResolver(RegisterSchema),
     mode: "onBlur",
   });
+
+  useEffect(() => {
+    const refresh_token = Cookies.get("refresh_token");
+    if (refresh_token) {
+      navigate("/unauthorized");
+    }
+  }, []);
 
   const onSubmit = async (data: RegisterType) => {
     const res = await handleRegister(data);
@@ -245,10 +253,6 @@ const RegisterPage: React.FC = () => {
                 error={!!errors.phone}
                 helperText={errors.phone?.message}
                 variant="outlined"
-                // onChange={(e) => {
-                //   const value = e.target.value.replace(/\D/g, "");
-                //   e.target.value = value;
-                // }}
                 size="medium"
                 sx={{
                   "& .MuiInputLabel-root": { color: "white" },

@@ -147,7 +147,6 @@ export const handleGetConversationMembers = async (
   const res = await axiosInstance.get(
     `${import.meta.env.VITE_API_URL}messages/conversation-member/conversation/${conversationId}`,
   );
-  console.log("RES: ", res.data);
   return res.data;
 };
 
@@ -225,9 +224,7 @@ export const handleAskBot = async (conversationId: number, content: string) => {
       `${import.meta.env.VITE_API_URL}messages/message/conversation/${conversationId}/ask-bot`,
       { content },
     );
-    console.log("REQ: ", { conversationId, content });
 
-    console.log("RES: ", res);
     return res.data;
   } catch (err: any) {
     console.log(err);

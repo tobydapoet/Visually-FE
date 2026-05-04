@@ -20,7 +20,6 @@ export const useAdPayment = ({ userId, onSuccess, onFailed }: Props) => {
     const socket = getSocket(userId);
 
     const handler = (event: AdPaymentEvent) => {
-      console.log("FE received ad_register:", JSON.stringify(event));
       if (event.success) {
         onSuccess?.(event);
       } else {

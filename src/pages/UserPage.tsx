@@ -57,7 +57,6 @@ const UserPage: React.FC = () => {
       : "posts";
   })();
 
-  // Đổi setActiveTab thành
   const setActiveTab = (tab: TabUserType) => {
     setSearchParams({ tab }, { replace: true });
   };
@@ -154,7 +153,7 @@ const UserPage: React.FC = () => {
             {currentUser &&
               currentUser.role === "CLIENT" &&
               (isOwner ? (
-                <div className="flex flex-wrap gap-3 mt-8 w-full max-w-[580px] mx-auto">
+                <div className="flex flex-wrap gap-3 mt-8 w-full max-w-145 mx-auto">
                   <button
                     className="flex-1 min-w-30 bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-600 transition-all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
                     onClick={() => navigate("/account/edit")}
@@ -172,10 +171,10 @@ const UserPage: React.FC = () => {
               ) : (
                 <div>
                   {!user.isFollowed ? (
-                    <div className="flex flex-wrap gap-3 w-full max-w-[580px] mx-auto mt-8">
+                    <div className="flex flex-wrap gap-3 w-full max-w-145 mx-auto mt-8">
                       <button
                         onClick={() => onFollow()}
-                        className="cursor-pointer flex-1 w-full max-w-[580px] min-w-30 bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-600 transition-all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
+                        className="cursor-pointer flex-1 w-full max-w-145 min-w-30 bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-600 transition-all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
                       >
                         <UserPlus className="w-4 h-4" /> Follow
                       </button>
@@ -187,7 +186,7 @@ const UserPage: React.FC = () => {
                       </button>
                     </div>
                   ) : (
-                    <div className="flex flex-wrap gap-3 w-full max-w-[580px] mx-auto mt-8">
+                    <div className="flex flex-wrap gap-3 w-full max-w-145 mx-auto mt-8">
                       <button
                         onClick={() => onUnfollow()}
                         className="cursor-pointer flex-1 min-w-30 bg-blue-500/10 text-blue-400 font-semibold py-3 px-6 rounded-xl hover:bg-blue-500/20 transition-all transform hover:scale-105 flex items-center justify-center gap-2 border border-blue-500/30"
@@ -216,7 +215,7 @@ const UserPage: React.FC = () => {
                 </div>
               ))}
 
-            <div className="w-full max-w-[580px] mx-auto mt-5 flex gap-3">
+            <div className="w-full max-w-145 mx-auto mt-5 flex gap-3">
               {storageList.map((storage) => (
                 <div key={storage.id}>
                   <div
