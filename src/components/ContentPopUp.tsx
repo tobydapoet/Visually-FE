@@ -16,6 +16,7 @@ import {
   VolumeOff,
   Flag,
   Repeat2,
+  Wrench,
 } from "lucide-react";
 import MessageInput, { type MessageInputRef } from "./MessageInput";
 import { useContentInteraction } from "../hooks/useInteraction";
@@ -29,6 +30,7 @@ import { useUser } from "../contexts/user.context";
 import LikeListPopUp from "./LikeListPopUp";
 import CreateAdPopUp from "./CreateAdPopUp";
 import assets from "../assets";
+import EditContentPopUp from "./EditContentPopUp";
 
 type Props = {
   open: boolean;
@@ -45,6 +47,7 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isOpenReport, setIsOpenReport] = useState(false);
   const [isOpenLikeList, setIsOpenLikeList] = useState(false);
+  const [isOpenEditContent, setIsOpenEditContent] = useState(false);
   const [replyingToId, setReplyingToId] = useState<number | null>(null);
   const [muted, setMuted] = useState(true);
   const {
@@ -70,22 +73,22 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
     setCurrentMediaIndex(0);
   };
 
+  const fetchContent = async () => {
+    if (!open) {
+      setCurrentContent(null);
+      return;
+    }
+    let res: PostDetailResponse | ShortDetailResponse | null = null;
+
+    if (type === "POST") {
+      res = await handleGetPost(contentId);
+    } else if (type === "SHORT") {
+      res = await handleGetShort(contentId);
+    }
+    setCurrentContent(res);
+  };
+
   useEffect(() => {
-    const fetchContent = async () => {
-      if (!open) {
-        setCurrentContent(null);
-        return;
-      }
-      let res: PostDetailResponse | ShortDetailResponse | null = null;
-
-      if (type === "POST") {
-        res = await handleGetPost(contentId);
-      } else if (type === "SHORT") {
-        res = await handleGetShort(contentId);
-      }
-      setCurrentContent(res);
-    };
-
     fetchContent();
   }, [open, contentId, type]);
 
@@ -413,16 +416,30 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
                           )}
                       </div>
 
-                      <button
-                        className="flex flex-col items-center gap-1 group"
-                        onClick={() => setIsOpenReport(true)}
-                      >
-                        <div
-                          className={`p-2 rounded-full cursor-pointer transition-colors text-white hover:text-red-500`}
+                      {currentUser &&
+                      currentUser.id !== currentContent.userId ? (
+                        <button
+                          className="flex flex-col items-center gap-1 group"
+                          onClick={() => setIsOpenReport(true)}
                         >
-                          <Flag className={`w-6 h-6`} />
-                        </div>
-                      </button>
+                          <div
+                            className={`p-2 rounded-full cursor-pointer transition-colors text-white hover:text-red-500`}
+                          >
+                            <Flag className={`w-6 h-6`} />
+                          </div>
+                        </button>
+                      ) : (
+                        <button
+                          className="flex flex-col items-center gap-1 group"
+                          onClick={() => setIsOpenEditContent(true)}
+                        >
+                          <div
+                            className={`p-2 rounded-full cursor-pointer transition-colors text-white hover:text-blue-500`}
+                          >
+                            <Wrench className={`w-6 h-6`} />
+                          </div>
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -482,6 +499,14 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
         onClose={() => setIsOpenAd(false)}
         contentId={contentId}
         type={type}
+      />
+
+      <EditContentPopUp
+        open={isOpenEditContent}
+        onClose={() => setIsOpenEditContent(false)}
+        contentId={contentId}
+        type={type}
+        onSuccess={fetchContent}
       />
     </>
   );

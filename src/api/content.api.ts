@@ -1,5 +1,7 @@
+import type { ContentType } from "../constants/contentType.enum";
 import type { ContentSearchResponse } from "../types/api/content.type";
 import type { TagPageResponse } from "../types/api/tag.type";
+import type { UpdateContentType } from "../types/schemas/content.schema";
 import axiosInstance from "../utils/axiosInstance";
 
 export const handleContentSearch = async (
@@ -37,4 +39,32 @@ export const handleTagSearch = async (
     `${import.meta.env.VITE_API_URL}contents/tag?keyword=${keyword}&page=${page}&size=${size}`,
   );
   return res.data;
+};
+
+export const handleUpdateContent = async (
+  data: UpdateContentType,
+  id: number,
+  type: ContentType,
+) => {
+  try {
+    const endpoint =
+      type === "POST"
+        ? `contents/post/${id}`
+        : type === "SHORT"
+          ? `contents/short/${id}`
+          : null;
+
+    if (!endpoint) {
+      return { success: false, message: "Invalid content type" };
+    }
+
+    const res = await axiosInstance.put(
+      `${import.meta.env.VITE_API_URL}${endpoint}`,
+      data,
+    );
+
+    return { success: true, message: res.data.message };
+  } catch (err: any) {
+    return { success: false, message: err?.response?.data };
+  }
 };

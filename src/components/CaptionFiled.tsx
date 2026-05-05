@@ -27,12 +27,16 @@ type Props = {
   onChange: (value: string) => void;
   onMentionsExtracted?: (mentions: MentionItem[]) => void;
   captionRef?: React.MutableRefObject<HTMLDivElement | null>;
+  initialValue?: string;
+  initialMentions?: { userId: string; username: string }[];
 };
 
 export const CaptionField: React.FC<Props> = ({
   onChange,
   onMentionsExtracted,
   captionRef,
+  initialValue,
+  initialMentions,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [searchResults, setSearchResults] = useState<UserSummaryType[]>([]);
@@ -69,6 +73,28 @@ export const CaptionField: React.FC<Props> = ({
       setSearchResults([]);
     }
   };
+
+  useEffect(() => {
+    if (!editorRef.current || !initialValue) return;
+
+    if (initialMentions && initialMentions.length > 0) {
+      let html = initialValue;
+      initialMentions.forEach((m) => {
+        const mentionChip = `<span 
+        contenteditable="false"
+        data-id="${m.userId}"
+        data-username="${m.username}"
+        style="color:#60a5fa;font-weight:500;cursor:pointer;"
+      >@${m.username}</span>`;
+        html = html.replace(`@${m.username}`, mentionChip);
+      });
+      editorRef.current.innerHTML = html + " ";
+    } else {
+      editorRef.current.innerText = initialValue;
+    }
+
+    setCharCount(initialValue.length);
+  }, []);
 
   const clearMentionState = () => {
     setOpen(false);
