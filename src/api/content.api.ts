@@ -68,3 +68,24 @@ export const handleUpdateContent = async (
     return { success: false, message: err?.response?.data };
   }
 };
+
+export const handleDeleteContent = async (id: number, type: ContentType) => {
+  try {
+    const endpoint =
+      type === "POST"
+        ? `contents/post/${id}`
+        : type === "SHORT"
+          ? `contents/short/${id}`
+          : null;
+
+    if (!endpoint) {
+      return { success: false, message: "Invalid content type" };
+    }
+
+    await axiosInstance.delete(`${import.meta.env.VITE_API_URL}${endpoint}`);
+
+    return { success: true, message: "Delete content sucess!" };
+  } catch (err: any) {
+    return { success: false, message: err?.response?.data };
+  }
+};

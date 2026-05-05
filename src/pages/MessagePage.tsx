@@ -21,6 +21,7 @@ import DetailConversation from "./DetailConversation";
 import type { Message } from "../types/api/message.type";
 import { ParsedContent } from "../components/ParseContent";
 import { timeAgo } from "../utils/timeAgot";
+import MediaViewerModal from "../components/MediaViewerModal";
 
 const MessagePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,6 +53,10 @@ const MessagePage: React.FC = () => {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
   const [showSidebar, setShowSidebar] = useState(!id);
   const [isAskingBot, setIsAskingBot] = useState(false);
+  const [mediaViewer, setMediaViewer] = useState<{
+    open: boolean;
+    mediaId?: number;
+  }>({ open: false });
 
   useEffect(() => {
     const checkMobile = () => {
@@ -66,9 +71,15 @@ const MessagePage: React.FC = () => {
   useEffect(() => {
     if (id && currentUser) {
       loadConversationById(Number(id)).then(() => {
-        setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
-        }, 0);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const container = messagesContainerRef.current;
+            if (container) {
+              container.scrollTop = container.scrollHeight;
+            }
+          });
+        });
+
         if (isMobile) setShowSidebar(false);
       });
     } else {
@@ -97,6 +108,10 @@ const MessagePage: React.FC = () => {
       isLoadingMore.current = true;
       loadMoreMessages();
     }
+  };
+
+  Element.prototype.scrollIntoView = function () {
+    console.log("SCROLL TRIGGERED", this);
   };
 
   const handleBackToSidebar = () => {
@@ -382,7 +397,13 @@ const MessagePage: React.FC = () => {
                                       key={index}
                                       src={preview}
                                       alt={`media-${index}`}
-                                      className="max-w-40 max-h-40 rounded-lg object-cover"
+                                      onClick={() =>
+                                        setMediaViewer({
+                                          open: true,
+                                          mediaId: msg.id,
+                                        })
+                                      }
+                                      className="max-w-40 max-h-40 rounded-lg object-cover cursor-pointer"
                                     />
                                   ))}
                                 </div>
@@ -547,6 +568,14 @@ const MessagePage: React.FC = () => {
           )
         )}
       </div>
+      {selectedConversation && (
+        <MediaViewerModal
+          open={mediaViewer.open}
+          onClose={() => setMediaViewer({ open: false })}
+          conversationId={selectedConversation.id}
+          initialMediaId={mediaViewer.mediaId}
+        />
+      )}
     </div>
   );
 };

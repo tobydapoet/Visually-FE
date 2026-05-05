@@ -1,11 +1,9 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { X, ImagePlus } from "lucide-react";
 import type React from "react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Stage, Layer, Transformer, Image as KonvaImage } from "react-konva";
-import Konva from "konva";
 
 import { StoryMusicCard } from "./StoryMusicCard";
 import { toast } from "sonner";
@@ -34,11 +32,7 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [openMusicDialog, setOpenMusicDialog] = useState(false);
   const [selectedMusic, setSelectedMusic] = useState<MusicResponse>();
-  const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
   const [musicStartTime, setMusicStartTime] = useState(0);
-
-  const stageRef = useRef<Konva.Stage>(null);
-  const transformerRef = useRef<Konva.Transformer>(null);
 
   const {
     progress,
@@ -46,6 +40,7 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
     done,
     reset: resetProgress,
   } = useProgressBar({ estimatedMs: 5000 });
+
   const {
     handleSubmit,
     setValue,
@@ -59,8 +54,29 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
 
   const file = useFileUpload({
     accept: "image/*,video/*",
-    onChange: (f) =>
-      setValue("file", f ?? (undefined as any), { shouldValidate: !!f }),
+    onChange: (f) => {
+      if (f && f.type.startsWith("video/")) {
+        const url = URL.createObjectURL(f);
+        const tempVideo = document.createElement("video");
+        tempVideo.preload = "metadata";
+        tempVideo.src = url;
+
+        tempVideo.onloadedmetadata = () => {
+          URL.revokeObjectURL(url);
+
+          if (tempVideo.duration > 60) {
+            toast.error("Video must be under 1 minute");
+            setValue("file", undefined as any, { shouldValidate: true });
+            setTimeout(() => file.handleRemove(), 0);
+            return;
+          }
+
+          setValue("file", f, { shouldValidate: true });
+        };
+      } else {
+        setValue("file", f ?? (undefined as any), { shouldValidate: !!f });
+      }
+    },
   });
 
   useEffect(() => {
@@ -76,21 +92,10 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
   }, [file.file]);
 
   useEffect(() => {
-    if (!file.preview || !file.file?.type.startsWith("image/")) {
-      setBgImage(null);
-      return;
-    }
-    const img = new window.Image();
-    img.src = file.preview;
-    img.onload = () => setBgImage(img);
-  }, [file.preview]);
-
-  useEffect(() => {
     if (!open) {
       reset();
       file.handleRemove();
       mention.reset();
-      setBgImage(null);
       setActivePanel(null);
       setSelectedMusic(undefined);
       setOpenMusicDialog(false);
@@ -104,7 +109,6 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
     reset();
     file.handleRemove();
     mention.reset();
-    setBgImage(null);
     setActivePanel(null);
     setSelectedMusic(undefined);
     resetProgress();
@@ -113,7 +117,6 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
 
   const handleRemoveFile = () => {
     file.handleRemove();
-    setBgImage(null);
     setActivePanel(null);
     setSelectedMusic(undefined);
     setOpenMusicDialog(false);
@@ -137,12 +140,10 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
     setIsUploading(false);
     if (res.success) {
       toast.success(res.message);
-      setIsUploading(false);
       onClose();
       reset();
     } else {
       console.log(res.message);
-      setIsUploading(false);
       onClose();
       reset();
     }
@@ -221,11 +222,6 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
                         Drag and drop or click to browse
                       </p>
                     </div>
-                    {errors.file && (
-                      <p className="text-red-400 text-sm">
-                        {errors.file.message}
-                      </p>
-                    )}
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3 w-full items-center animate-fade-in">
@@ -233,7 +229,7 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
                       className="relative rounded-xl overflow-hidden bg-black"
                       style={{ width: STAGE_W, height: STAGE_H }}
                     >
-                      {file.file?.type.startsWith("video/") && (
+                      {file.file?.type.startsWith("video/") ? (
                         <video
                           src={file.preview}
                           autoPlay
@@ -241,27 +237,13 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
                           loop
                           className="absolute inset-0 w-full h-full object-cover"
                         />
+                      ) : (
+                        <img
+                          src={file.preview}
+                          alt="preview"
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
                       )}
-
-                      <Stage ref={stageRef} width={STAGE_W} height={STAGE_H}>
-                        <Layer>
-                          {bgImage && (
-                            <KonvaImage
-                              image={bgImage}
-                              width={STAGE_W}
-                              height={STAGE_H}
-                              listening={false}
-                            />
-                          )}
-
-                          <Transformer
-                            ref={transformerRef}
-                            boundBoxFunc={(old, nb) =>
-                              nb.width < 20 ? old : nb
-                            }
-                          />
-                        </Layer>
-                      </Stage>
 
                       <StoryToolbar
                         onText={() => setActivePanel("text")}

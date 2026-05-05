@@ -17,6 +17,7 @@ import {
   Flag,
   Repeat2,
   Wrench,
+  Trash,
 } from "lucide-react";
 import MessageInput, { type MessageInputRef } from "./MessageInput";
 import { useContentInteraction } from "../hooks/useInteraction";
@@ -31,6 +32,9 @@ import LikeListPopUp from "./LikeListPopUp";
 import CreateAdPopUp from "./CreateAdPopUp";
 import assets from "../assets";
 import EditContentPopUp from "./EditContentPopUp";
+import ConfirmDialog from "./ConfirmDialog";
+import { handleDeleteContent } from "../api/content.api";
+import { toast } from "sonner";
 
 type Props = {
   open: boolean;
@@ -49,6 +53,7 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
   const [isOpenLikeList, setIsOpenLikeList] = useState(false);
   const [isOpenEditContent, setIsOpenEditContent] = useState(false);
   const [replyingToId, setReplyingToId] = useState<number | null>(null);
+  const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
   const [muted, setMuted] = useState(true);
   const {
     isLiked,
@@ -130,6 +135,18 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
       }
       setReplyingToId(null);
       messageInputRef.current?.clearText();
+    }
+  };
+
+  const handleDelete = async () => {
+    const res = await handleDeleteContent(contentId, type);
+    if (res.success) {
+      toast.success(res.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } else {
+      toast.error("Something wrong please try again!");
     }
   };
 
@@ -309,7 +326,7 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
                   </div>
                 )}
 
-                <div className="flex-1 overflow-y-auto p-4 border-zinc-800">
+                <div className="flex-1 overflow-y-auto border-zinc-800">
                   <CommentComponent
                     ref={commentRef}
                     targetId={contentId}
@@ -429,16 +446,28 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
                           </div>
                         </button>
                       ) : (
-                        <button
-                          className="flex flex-col items-center gap-1 group"
-                          onClick={() => setIsOpenEditContent(true)}
-                        >
-                          <div
-                            className={`p-2 rounded-full cursor-pointer transition-colors text-white hover:text-blue-500`}
+                        <div className="flex">
+                          <button
+                            className="flex flex-col items-center gap-1 group"
+                            onClick={() => setIsOpenEditContent(true)}
                           >
-                            <Wrench className={`w-6 h-6`} />
-                          </div>
-                        </button>
+                            <div
+                              className={`p-2 rounded-full cursor-pointer transition-colors text-white hover:text-blue-500`}
+                            >
+                              <Wrench className={`w-6 h-6`} />
+                            </div>
+                          </button>
+                          <button
+                            className="flex flex-col items-center gap-1 group"
+                            onClick={() => setIsOpenConfirmDelete(true)}
+                          >
+                            <div
+                              className={`p-2 rounded-full cursor-pointer transition-colors text-white hover:text-red-500`}
+                            >
+                              <Trash className={`w-6 h-6`} />
+                            </div>
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -507,6 +536,14 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
         contentId={contentId}
         type={type}
         onSuccess={fetchContent}
+      />
+
+      <ConfirmDialog
+        message={`Do you want to delete this ${type.toLowerCase()} ?`}
+        onClose={() => setIsOpenConfirmDelete(false)}
+        onConfirm={handleDelete}
+        open={isOpenConfirmDelete}
+        title="Delete content"
       />
     </>
   );

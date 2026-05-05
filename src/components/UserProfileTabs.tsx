@@ -16,6 +16,7 @@ type Props = {
   shortsQuery: UseInfiniteQueryResult<any>;
   repostedQuery: UseInfiniteQueryResult<any>;
   isOwner: boolean;
+  onDeleteSuccess?: () => void;
 };
 
 export const UserProfileTabs: React.FC<Props> = ({
@@ -29,6 +30,7 @@ export const UserProfileTabs: React.FC<Props> = ({
   shortsQuery,
   repostedQuery,
   isOwner,
+  onDeleteSuccess,
 }) => {
   const postsEndRef = useRef<HTMLDivElement>(null);
   const shortsEndRef = useRef<HTMLDivElement>(null);
@@ -91,7 +93,7 @@ export const UserProfileTabs: React.FC<Props> = ({
   return (
     <>
       <div className="mt-10 w-full border-b border-gray-700">
-        <div className="flex border-b border-blue-500/20 w-full max-w-[580px]  mx-auto">
+        <div className="flex border-b border-blue-500/20 w-full max-w-145  mx-auto">
           {visibleTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;

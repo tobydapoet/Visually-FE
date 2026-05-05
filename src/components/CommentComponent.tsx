@@ -187,7 +187,7 @@ const CommentComponent = forwardRef<CommentComponentRef, Props>(
     const allComments = data?.pages.flatMap((page) => page.content) || [];
 
     return (
-      <div className="space-y-4">
+      <div>
         <div className="font-semibold text-lg p-2">
           Comments ({commentCount})
         </div>
@@ -212,12 +212,6 @@ const CommentComponent = forwardRef<CommentComponentRef, Props>(
         )}
 
         {hasNextPage && <div ref={loadMoreRef} className="h-4" />}
-
-        {!hasNextPage && allComments.length > 0 && (
-          <div className="text-center text-gray-500 text-sm py-4">
-            No more comments
-          </div>
-        )}
 
         {allComments.length === 0 && (
           <div className="text-center text-sm text-gray-500 py-8">

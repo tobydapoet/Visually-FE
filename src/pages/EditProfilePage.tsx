@@ -20,10 +20,12 @@ import { handleUpdateUser } from "../api/user.api";
 import { toast } from "sonner";
 import assets from "../assets";
 import { manualRefreshToken } from "../api/auth.api";
+import { useNavigate } from "react-router-dom";
 
 const EditProfilePage: React.FC = () => {
   const { currentUser, reloadUser } = useUser();
   if (!currentUser) return;
+  const navigate = useNavigate();
 
   const {
     register,
@@ -61,6 +63,8 @@ const EditProfilePage: React.FC = () => {
       toast.success("Update success!");
       await manualRefreshToken();
       reloadUser();
+      navigate(`/${data.username}`, { replace: true });
+      navigate(`/account/edit`);
     } else {
       toast.error(res.message);
     }
@@ -186,7 +190,7 @@ const EditProfilePage: React.FC = () => {
               <input
                 {...field}
                 type="date"
-                className={`${inputClass} [color-scheme:dark]`}
+                className={`${inputClass} scheme-dark`}
               />
             )}
           />

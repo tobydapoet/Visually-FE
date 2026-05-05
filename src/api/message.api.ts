@@ -1,5 +1,6 @@
 import type { ConversationType } from "../types/api/conversation.type";
 import type { MentionItem } from "../types/api/mention.type";
+import type { MessagePageResponse } from "../types/api/message-media.type";
 import type { MemberType } from "../types/api/message.type";
 import type { CreateConversationType } from "../types/schemas/converstation.schema";
 import axiosInstance from "../utils/axiosInstance";
@@ -237,6 +238,23 @@ export const handleGetBotConversation = async () => {
     const res = await axiosInstance.post(
       `${import.meta.env.VITE_API_URL}messages/conversation/bot`,
     );
+    return res.data;
+  } catch (err: any) {
+    console.log(err);
+    throw err;
+  }
+};
+
+export const handleGetMediaConversation = async (
+  conversationId: number,
+  page?: number,
+  size?: number,
+): Promise<MessagePageResponse> => {
+  try {
+    const res = await axiosInstance.get(
+      `${import.meta.env.VITE_API_URL}messages/message-media/conversation/${conversationId}/media?page=${page}&size=${size}`,
+    );
+    console.log("RES: ", res.data.data);
     return res.data;
   } catch (err: any) {
     console.log(err);
