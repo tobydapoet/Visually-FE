@@ -100,7 +100,6 @@ const StoryPage: React.FC = () => {
         >
           <audio ref={audioRef} loop />
           <div className="relative w-full">
-            {/* Progress bar */}
             <div className="absolute top-2 left-0 right-0 z-10 px-2">
               <div className="flex gap-1">
                 {Array.from({ length: total }).map((_, i) => (
@@ -124,7 +123,6 @@ const StoryPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Header: avatar + mute */}
             <div className="absolute top-5 left-0 right-0 z-10 flex items-center justify-between px-3">
               <div className="flex items-center gap-2">
                 <img
@@ -155,7 +153,6 @@ const StoryPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Media */}
             <div
               className="relative h-[calc(100vh-4rem)] md:h-screen"
               onMouseDown={handleLongPress}
@@ -167,10 +164,8 @@ const StoryPage: React.FC = () => {
               <StoryMedia />
             </div>
 
-            {/* Bottom bar */}
-            <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+            <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-linear-to-t from-black/80 via-black/40 to-transparent">
               <div className="flex items-center justify-between">
-                {/* Bookmark - trái */}
                 {currentUser && currentUser.id === currentStory?.userId ? (
                   currentStory?.storageId ? (
                     <button
@@ -203,7 +198,6 @@ const StoryPage: React.FC = () => {
                   <div />
                 )}
 
-                {/* Like - phải */}
                 <div className="flex items-center gap-1">
                   <button
                     onClick={toggleLike}

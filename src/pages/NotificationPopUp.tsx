@@ -113,15 +113,8 @@ const NotificationPopUp: FC<Props> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
-      {/* Backdrop — chỉ hiện trên mobile */}
       <div className="md:hidden fixed inset-0 bg-black/50" aria-hidden="true" />
 
-      {/* 
-        Desktop: panel trượt từ trái cạnh sidebar (left-18)
-        Mobile:  bottom sheet trượt từ dưới lên, full width
-      */}
-
-      {/* Desktop panel */}
       <div className="hidden md:flex fixed inset-y-0 left-18">
         <DialogPanel
           transition

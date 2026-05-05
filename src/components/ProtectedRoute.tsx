@@ -1,14 +1,22 @@
-import { Navigate, useOutletContext } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import parseJwt from "../utils/parseToken";
 
 interface Props {
   children: React.ReactNode;
-  allowedRoles: string[];
+  allowedRoles?: string[];
 }
 
 const ProtectedRoute: React.FC<Props> = ({ children, allowedRoles }) => {
-  const { role } = useOutletContext<{ role: string | null }>();
+  const token = Cookies.get("access_token");
 
-  if (!role || !allowedRoles.includes(role)) {
+  if (!token) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  const payload = parseJwt(token);
+
+  if (allowedRoles && !allowedRoles.includes(payload?.role)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

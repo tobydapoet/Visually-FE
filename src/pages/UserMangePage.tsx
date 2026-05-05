@@ -381,7 +381,6 @@ const UserManagePage: FC = () => {
             ))}
           </div>
 
-          {/* Search */}
           <div className="relative mb-4 sm:mb-6">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
             <input
@@ -393,7 +392,6 @@ const UserManagePage: FC = () => {
             />
           </div>
 
-          {/* Total count */}
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <p className="text-xs sm:text-sm text-neutral-500">
               Total{" "}

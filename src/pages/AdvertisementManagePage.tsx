@@ -168,7 +168,6 @@ const BoostedPostManagePage = () => {
           )}
         </div>
 
-        {/* Right panel unchanged */}
         <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
           {!selectedUser ? (
             <div className="flex items-center justify-center h-full min-h-50 text-zinc-500 text-sm">

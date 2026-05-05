@@ -51,6 +51,7 @@ export const handleComment = async (data: CommentReqType) => {
       `${import.meta.env.VITE_API_URL}interactions/comment`,
       data,
     );
+
     return {
       success: true,
       data: res.data.content,

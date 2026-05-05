@@ -69,7 +69,6 @@ const LikeListPopUp: React.FC<Props> = ({
             </button>
           </DialogTitle>
 
-          {/* ✅ List */}
           <div className="max-h-96 overflow-y-auto">
             {isLoading ? (
               <div className="flex justify-center py-8">

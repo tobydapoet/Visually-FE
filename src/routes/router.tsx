@@ -99,7 +99,11 @@ export const router = createBrowserRouter([
         path: routes.ad,
       },
       {
-        element: <MessagePage />,
+        element: (
+          <ProtectedRoute>
+            <MessagePage />
+          </ProtectedRoute>
+        ),
         path: routes.inbox,
       },
       {
@@ -107,7 +111,11 @@ export const router = createBrowserRouter([
         path: routes.search,
       },
       {
-        element: <MessagePage />,
+        element: (
+          <ProtectedRoute>
+            <MessagePage />
+          </ProtectedRoute>
+        ),
         path: routes.inboxDetail,
       },
       {

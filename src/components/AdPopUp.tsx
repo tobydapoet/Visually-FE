@@ -238,9 +238,7 @@ const AdPopUp: React.FC = () => {
               </div>
             ) : (
               <div className="p-4 sm:p-6 max-h-[80vh] overflow-y-auto">
-                {/* flex-col trên mobile, flex-row trên desktop */}
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                  {/* Media */}
                   <div className="w-full sm:w-64 md:w-72 shrink-0">
                     <div className="rounded-xl overflow-hidden bg-zinc-800">
                       {mediaUrls.length > 0 || ad.content.thumbnailUrl ? (
@@ -270,7 +268,6 @@ const AdPopUp: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3">
                       <img
@@ -311,7 +308,6 @@ const AdPopUp: React.FC = () => {
                         </div>
                       )}
 
-                    {/* Budget + Targeting: side by side trên desktop, stack trên mobile */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                       <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4">
                         <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
@@ -387,7 +383,6 @@ const AdPopUp: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Stats */}
                     <div className="flex flex-wrap gap-3 sm:gap-4 mt-4">
                       <div className="flex items-center gap-1">
                         <Heart className="w-4 h-4" />

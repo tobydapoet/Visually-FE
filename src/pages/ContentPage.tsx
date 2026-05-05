@@ -147,7 +147,7 @@ const ContentPage: React.FC = () => {
             <img
               src={currentContent.avatarUrl || assets.profile}
               alt={currentContent.username}
-              className="w-9 h-9 rounded-full object-contain ring-2 ring-white/30"
+              className="w-9 h-9 rounded-full object-cover ring-2 ring-white/30"
             />
             <div>
               <span className="text-white font-bold text-sm block">

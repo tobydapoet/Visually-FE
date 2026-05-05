@@ -19,6 +19,7 @@ import {
 import { handleUpdateUser } from "../api/user.api";
 import { toast } from "sonner";
 import assets from "../assets";
+import { manualRefreshToken } from "../api/auth.api";
 
 const EditProfilePage: React.FC = () => {
   const { currentUser, reloadUser } = useUser();
@@ -54,11 +55,15 @@ const EditProfilePage: React.FC = () => {
     formData.append("gender", data.gender);
     formData.append("bio", data.bio);
     if (data.file) formData.append("file", data.file);
+
     const res = await handleUpdateUser(formData);
     if (res.success) {
       toast.success("Update success!");
+      await manualRefreshToken();
       reloadUser();
-    } else toast.error(res.message);
+    } else {
+      toast.error(res.message);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +82,6 @@ const EditProfilePage: React.FC = () => {
       onSubmit={handleSubmit(onSubmit)}
       className="max-w-2xl space-y-5 pb-10"
     >
-      {/* Avatar */}
       <div className="flex items-center justify-between bg-neutral-800/60 border border-neutral-700 rounded-2xl py-4 px-5">
         <div className="flex items-center gap-4">
           <div className="relative group">
@@ -117,7 +121,6 @@ const EditProfilePage: React.FC = () => {
         </label>
       </div>
 
-      {/* Full Name */}
       <div>
         <label className={labelClass}>
           <User size={13} /> Full name
@@ -132,7 +135,6 @@ const EditProfilePage: React.FC = () => {
         )}
       </div>
 
-      {/* Username */}
       <div>
         <label className={labelClass}>
           <AtSign size={13} /> Username
@@ -151,7 +153,6 @@ const EditProfilePage: React.FC = () => {
         )}
       </div>
 
-      {/* Gender + DOB */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>
@@ -193,7 +194,6 @@ const EditProfilePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Bio */}
       <div>
         <label className={labelClass}>
           <Info size={13} /> Bio
@@ -207,7 +207,6 @@ const EditProfilePage: React.FC = () => {
         />
       </div>
 
-      {/* Email (disabled) */}
       <div>
         <label className={labelClass}>
           <Mail size={13} /> Email
@@ -219,11 +218,10 @@ const EditProfilePage: React.FC = () => {
         />
       </div>
 
-      {/* Submit */}
       <div className="flex justify-end pt-2">
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-8 py-2.5 rounded-xl transition-colors"
+          className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white text-sm font-semibold px-8 py-2.5 rounded-xl transition-colors"
         >
           Save changes
         </button>

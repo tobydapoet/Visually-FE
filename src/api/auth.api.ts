@@ -135,3 +135,21 @@ export const handleSendOtp = async (data: ResendOtpType) => {
     };
   }
 };
+
+export const manualRefreshToken = async () => {
+  const refreshToken = Cookies.get("refresh_token");
+
+  const res = await axios.post(
+    `${import.meta.env.VITE_API_URL}users/auth/refresh`,
+    {},
+    {
+      headers: { Authorization: `Bearer ${refreshToken}` },
+    },
+  );
+
+  const newAccessToken = res.data.accessToken;
+  Cookies.set("access_token", newAccessToken);
+  window.dispatchEvent(new Event("tokenChanged"));
+
+  return newAccessToken;
+};
