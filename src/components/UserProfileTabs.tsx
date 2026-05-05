@@ -30,7 +30,6 @@ export const UserProfileTabs: React.FC<Props> = ({
   shortsQuery,
   repostedQuery,
   isOwner,
-  onDeleteSuccess,
 }) => {
   const postsEndRef = useRef<HTMLDivElement>(null);
   const shortsEndRef = useRef<HTMLDivElement>(null);
