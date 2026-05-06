@@ -333,6 +333,7 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
                     targetType={type}
                     commentCount={commentCount}
                     toggleCommentLike={toggleCommentLike}
+                    contentUserId={currentContent.userId}
                     onEditComment={(comment) => {
                       setReplyingToId(null);
                       setEditingCommentId(comment.id);

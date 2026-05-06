@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import assets from "../assets";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema, type LoginType } from "../types/schemas/login.schema";
@@ -15,6 +15,8 @@ import Cookies from "js-cookie";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const toastShown = useRef(false);
   const {
     register,
     handleSubmit,
@@ -29,6 +31,14 @@ const LoginPage: React.FC = () => {
     const refresh_token = Cookies.get("refresh_token");
     if (refresh_token) {
       navigate("/unauthorized");
+    }
+
+    const error = searchParams.get("error");
+    const message = searchParams.get("message");
+    if (error === "true" && !toastShown.current) {
+      toastShown.current = true;
+      toast.error(message || "Google login failed. Please try again!");
+      setSearchParams({});
     }
   }, []);
 

@@ -110,10 +110,6 @@ const MessagePage: React.FC = () => {
     }
   };
 
-  Element.prototype.scrollIntoView = function () {
-    console.log("SCROLL TRIGGERED", this);
-  };
-
   const handleBackToSidebar = () => {
     setShowSidebar(true);
     navigate("/inbox");

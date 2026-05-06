@@ -147,6 +147,9 @@ const EditProfilePage: React.FC = () => {
           {...register("username")}
           placeholder="your_username"
           className={inputClass}
+          onKeyDown={(e) => {
+            if (e.key === " ") e.preventDefault();
+          }}
         />
         {errors.username ? (
           <p className={errorClass}>{errors.username.message}</p>

@@ -18,6 +18,8 @@ function DefaultLayout() {
     setToken(Cookies.get("access_token"));
   }, [location.pathname]);
 
+  // console.log("TOKEN: ", token);
+
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();

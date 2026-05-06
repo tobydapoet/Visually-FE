@@ -18,7 +18,6 @@ type Props = {
 
 export const UserComponent: React.FC<Props> = ({ data }) => {
   const [isOpenPopUp, setIsOpenPopUp] = useState(false);
-
   const isShort = (
     data:
       | PostResponse
@@ -26,6 +25,8 @@ export const UserComponent: React.FC<Props> = ({ data }) => {
       | ContentDefaultResponse
       | ContentSearchResponse,
   ): data is ShortResponse => {
+    if ("originalType" in data) return data.originalType === "SHORT";
+    if ("type" in data) return data.type === "SHORT";
     return "thumbnailUrl" in data;
   };
 

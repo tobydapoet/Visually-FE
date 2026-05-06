@@ -189,11 +189,26 @@ const ContentPage: React.FC = () => {
 
           {"medias" in currentContent ? (
             <>
-              <img
-                src={currentContent.medias[currentMediaIndex]?.url}
-                alt={`Media ${currentMediaIndex + 1}`}
-                className="w-full h-full object-contain"
-              />
+              {isVideo(currentContent.medias[currentMediaIndex]?.url) ? (
+                <video
+                  src={currentContent.medias[currentMediaIndex]?.url}
+                  className="w-full h-full object-contain"
+                  autoPlay
+                  loop
+                  playsInline
+                  muted={muted}
+                  onClick={(e) => {
+                    const v = e.currentTarget;
+                    v.paused ? v.play() : v.pause();
+                  }}
+                />
+              ) : (
+                <img
+                  src={currentContent.medias[currentMediaIndex]?.url}
+                  alt={`Media ${currentMediaIndex + 1}`}
+                  className="w-full h-full object-contain"
+                />
+              )}
               {currentContent.medias.length > 1 && (
                 <>
                   {currentMediaIndex > 0 && (
@@ -342,6 +357,7 @@ const ContentPage: React.FC = () => {
                     targetType={type}
                     commentCount={commentCount}
                     toggleCommentLike={toggleCommentLike}
+                    contentUserId={currentContent.userId}
                     onEditComment={(comment) => {
                       setReplyingToId(null);
                       setEditingCommentId(comment.id);
@@ -586,6 +602,7 @@ const ContentPage: React.FC = () => {
                     targetType={type}
                     commentCount={commentCount}
                     toggleCommentLike={toggleCommentLike}
+                    contentUserId={currentContent.userId}
                     onEditComment={(comment) => {
                       setReplyingToId(null);
                       setEditingCommentId(comment.id);

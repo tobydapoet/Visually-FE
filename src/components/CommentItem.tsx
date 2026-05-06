@@ -12,6 +12,7 @@ import LikeListPopUp from "./LikeListPopUp";
 import ConfirmDialog from "./ConfirmDialog";
 
 const CommentItem: React.FC<{
+  contentUserId?: string;
   comment: CommentResponse;
   onEdit?: (comment: CommentResponse) => void;
   onReply?: (comment: CommentResponse) => void;
@@ -25,6 +26,7 @@ const CommentItem: React.FC<{
   onDelete,
   isReply = false,
   toggleCommentLike,
+  contentUserId,
 }) => {
   const { currentUser } = useUser();
   const [showReplies, setShowReplies] = useState(false);
@@ -157,7 +159,8 @@ const CommentItem: React.FC<{
                   )}
 
                 {currentUser &&
-                  currentUser.id === comment.userId &&
+                  (currentUser.id === comment.userId ||
+                    currentUser.id === contentUserId) &&
                   onDelete && (
                     <button
                       onClick={() => setShowConfirm(true)}
@@ -222,6 +225,7 @@ const CommentItem: React.FC<{
               onDelete={(commentId) => {
                 setReplies((prev) => prev.filter((r) => r.id !== commentId));
               }}
+              contentUserId={contentUserId}
             />
           ))}
 

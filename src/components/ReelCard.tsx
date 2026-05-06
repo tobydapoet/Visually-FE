@@ -254,6 +254,7 @@ export function ReelCard({ reel, isActive }: ReelCardProps) {
                     targetType={reel.contentType}
                     commentCount={commentCount}
                     toggleCommentLike={toggleCommentLike}
+                    contentUserId={reel.userId}
                     onEditComment={(comment) => {
                       setReplyingToId(null);
                       setEditingCommentId(comment.id);
@@ -450,6 +451,7 @@ export function ReelCard({ reel, isActive }: ReelCardProps) {
                     targetType={reel.contentType}
                     commentCount={commentCount}
                     toggleCommentLike={toggleCommentLike}
+                    contentUserId={reel.userId}
                     onEditComment={(comment) => {
                       setReplyingToId(null);
                       setEditingCommentId(comment.id);

@@ -29,7 +29,7 @@ export type ContentDefaultResponse = {
   isSaved: boolean;
   isReposted: boolean;
 
-  originalType: "POST" | "SHORT";
+  originalType: ContentType;
 };
 
 export type ContentDefaultPageResponse = {

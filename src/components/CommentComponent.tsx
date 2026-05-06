@@ -14,6 +14,7 @@ type Props = {
   onReplyComment?: (comment: CommentResponse) => void;
   toggleCommentLike?: (commentId: number, isLiked: boolean) => Promise<boolean>;
   onDeleteComment?: (commentId: number) => void;
+  contentUserId?: string;
 };
 
 export type CommentComponentRef = {
@@ -37,6 +38,7 @@ const CommentComponent = forwardRef<CommentComponentRef, Props>(
       onReplyComment,
       toggleCommentLike,
       onDeleteComment,
+      contentUserId,
     },
     ref,
   ) => {
@@ -201,6 +203,7 @@ const CommentComponent = forwardRef<CommentComponentRef, Props>(
               onReply={onReplyComment}
               toggleCommentLike={toggleCommentLike}
               onDelete={onDeleteComment}
+              contentUserId={contentUserId}
             />
           ))}
         </div>
