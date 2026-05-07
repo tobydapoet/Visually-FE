@@ -10,7 +10,6 @@ import {
   CheckCircle,
   MoreVertical,
   Trash2,
-  PauseCircle,
   RefreshCw,
 } from "lucide-react";
 import {
@@ -27,6 +26,14 @@ import Pagination from "../components/Pagination";
 import ConfirmDialog from "../components/ConfirmDialog";
 import assets from "../assets";
 import { UserStatus } from "../constants/userStatus";
+
+const BAN_DURATIONS = [
+  { label: "7 days", days: 7 },
+  { label: "30 days", days: 30 },
+  { label: "90 days", days: 90 },
+  { label: "180 days", days: 180 },
+  { label: "Forever", days: null },
+];
 
 const UserManagePage: FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,11 +52,13 @@ const UserManagePage: FC = () => {
 
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
+  const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] =
     useState<UserStatusSummaryType | null>(null);
-  const [pendingAction, setPendingAction] = useState<
-    "BAN" | "ACTIVATE" | "DELETE" | "SUSPEND"
-  >("BAN");
+  const [pendingAction, setPendingAction] = useState<"ACTIVATE" | "DELETE">(
+    "ACTIVATE",
+  );
+  const [selectedBanDays, setSelectedBanDays] = useState<number | null>(7);
 
   const debouncedSearch = useDebounce(searchInput, 500);
   const pageSize = 12;
@@ -105,11 +114,17 @@ const UserManagePage: FC = () => {
 
   const openConfirmDialog = (
     user: UserStatusSummaryType,
-    action: "BAN" | "ACTIVATE" | "DELETE" | "SUSPEND",
+    action: "ACTIVATE" | "DELETE",
   ) => {
     setSelectedUser(user);
     setPendingAction(action);
     setIsConfirmDialogOpen(true);
+  };
+
+  const openBanDialog = (user: UserStatusSummaryType) => {
+    setSelectedUser(user);
+    setSelectedBanDays(7);
+    setIsBanDialogOpen(true);
   };
 
   const openRoleDialog = (user: UserStatusSummaryType) => {
@@ -117,25 +132,46 @@ const UserManagePage: FC = () => {
     setIsRoleDialogOpen(true);
   };
 
+  const handleBanUser = async () => {
+    if (!selectedUser) return;
+    try {
+      const bannedUntil = selectedBanDays
+        ? new Date(Date.now() + selectedBanDays * 86400000)
+            .toISOString()
+            .split("T")[0]
+        : undefined;
+
+      const result = await handleUpdateUserStatus(
+        selectedUser.id,
+        UserStatus.BANNED,
+        bannedUntil,
+      );
+
+      if (result?.success === false) {
+        toast.error(result.message || "Ban failed");
+      } else {
+        const label = selectedBanDays ? `${selectedBanDays} days` : "Forever";
+        toast.success(`Banned ${selectedUser.username} for ${label}`);
+        await fetchUsers();
+      }
+    } catch (error) {
+      toast.error("Failed to ban user");
+    } finally {
+      setIsBanDialogOpen(false);
+      setSelectedUser(null);
+    }
+  };
+
   const handleUpdateStatus = async () => {
     if (!selectedUser) return;
-
     try {
       let newStatus: UserStatus;
       let successMessage: string;
 
       switch (pendingAction) {
-        case "BAN":
-          newStatus = UserStatus.BANNED;
-          successMessage = `User ${selectedUser.username} has been banned`;
-          break;
         case "ACTIVATE":
           newStatus = UserStatus.ACTIVE;
           successMessage = `User ${selectedUser.username} has been activated`;
-          break;
-        case "SUSPEND":
-          newStatus = UserStatus.SUSPENDED;
-          successMessage = `User ${selectedUser.username} has been suspended`;
           break;
         case "DELETE":
           newStatus = UserStatus.DELETED;
@@ -155,7 +191,6 @@ const UserManagePage: FC = () => {
         await fetchUsers();
       }
     } catch (error) {
-      console.error("Error updating user status:", error);
       toast.error("Failed to update user status");
     } finally {
       setIsConfirmDialogOpen(false);
@@ -165,7 +200,6 @@ const UserManagePage: FC = () => {
 
   const handleUpdateRole = async (role: UserRole) => {
     if (!selectedUser || !role) return;
-
     try {
       const result = await handleUpdateUserRole(selectedUser.id, role);
       if (result?.success === false) {
@@ -175,12 +209,9 @@ const UserManagePage: FC = () => {
           role === UserRole.MODERATOR ? "Moderator" : "Client";
         toast.success(`${selectedUser.username} is now a ${newRoleLabel}`);
         await fetchUsers();
-        if (role !== activeTab) {
-          handleTabChange(role);
-        }
+        if (role !== activeTab) handleTabChange(role);
       }
     } catch (error) {
-      console.error("Error updating user role:", error);
       toast.error("Failed to update user role");
     } finally {
       setIsRoleDialogOpen(false);
@@ -190,14 +221,9 @@ const UserManagePage: FC = () => {
 
   const getConfirmDialogMessage = () => {
     if (!selectedUser) return "";
-
     switch (pendingAction) {
-      case "BAN":
-        return `Are you sure you want to ban "${selectedUser.fullName || selectedUser.username}"? This user will not be able to access the platform.`;
       case "ACTIVATE":
-        return `Are you sure you want to activate "${selectedUser.fullName || selectedUser.username}"? This user will regain access to the platform.`;
-      case "SUSPEND":
-        return `Are you sure you want to suspend "${selectedUser.fullName || selectedUser.username}"? This user will temporarily lose access.`;
+        return `Are you sure you want to activate "${selectedUser.fullName || selectedUser.username}"?`;
       case "DELETE":
         return `Are you sure you want to delete "${selectedUser.fullName || selectedUser.username}"? This action cannot be undone.`;
       default:
@@ -207,12 +233,8 @@ const UserManagePage: FC = () => {
 
   const getConfirmDialogTitle = () => {
     switch (pendingAction) {
-      case "BAN":
-        return "Ban User";
       case "ACTIVATE":
         return "Activate User";
-      case "SUSPEND":
-        return "Suspend User";
       case "DELETE":
         return "Delete User";
       default:
@@ -225,29 +247,19 @@ const UserManagePage: FC = () => {
       case "ACTIVE":
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <CheckCircle className="w-3 h-3" />
-            Active
+            <CheckCircle className="w-3 h-3" /> Active
           </span>
         );
       case "BANNED":
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-red-500/10 text-red-400 border border-red-500/20">
-            <Ban className="w-3 h-3" />
-            Banned
-          </span>
-        );
-      case "SUSPENDED":
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20">
-            <PauseCircle className="w-3 h-3" />
-            Suspended
+            <Ban className="w-3 h-3" /> Banned
           </span>
         );
       case "DELETED":
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-neutral-500/10 text-neutral-400 border border-neutral-500/20">
-            <Trash2 className="w-3 h-3" />
-            Deleted
+            <Trash2 className="w-3 h-3" /> Deleted
           </span>
         );
       default:
@@ -263,33 +275,6 @@ const UserManagePage: FC = () => {
     switch (userStatus) {
       case "ACTIVE":
         return [
-          {
-            action: "SUSPEND" as const,
-            label: "Suspend",
-            icon: <PauseCircle size={14} />,
-            className: "text-amber-400 hover:bg-amber-500/10",
-          },
-          {
-            action: "BAN" as const,
-            label: "Ban",
-            icon: <Ban size={14} />,
-            className: "text-red-400 hover:bg-red-500/10",
-          },
-          {
-            action: "DELETE" as const,
-            label: "Delete",
-            icon: <Trash2 size={14} />,
-            className: "text-red-400 hover:bg-red-500/10",
-          },
-        ];
-      case "SUSPENDED":
-        return [
-          {
-            action: "ACTIVATE" as const,
-            label: "Activate",
-            icon: <CheckCircle size={14} />,
-            className: "text-emerald-400 hover:bg-emerald-500/10",
-          },
           {
             action: "BAN" as const,
             label: "Ban",
@@ -457,7 +442,7 @@ const UserManagePage: FC = () => {
 
                         <Menu as="div" className="relative">
                           <MenuButton
-                            className="p-1.5 bg-neutral-800 rounded-lg hover:bg-neutral-700 transition-colors"
+                            className="p-1.5 bg-neutral-800 cursor-pointer rounded-lg hover:bg-neutral-700 transition-colors"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <MoreVertical
@@ -499,11 +484,13 @@ const UserManagePage: FC = () => {
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      openConfirmDialog(user, action.action);
+                                      if (action.action === "BAN") {
+                                        openBanDialog(user);
+                                      } else {
+                                        openConfirmDialog(user, action.action);
+                                      }
                                     }}
-                                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
-                                      action.className
-                                    } ${focus ? "bg-opacity-20" : ""}`}
+                                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${action.className} ${focus ? "bg-opacity-20" : ""}`}
                                   >
                                     {action.icon}
                                     <span>{action.label}</span>
@@ -530,6 +517,56 @@ const UserManagePage: FC = () => {
           )}
         </div>
       </div>
+
+      {isBanDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <h2 className="text-white font-semibold text-base mb-1">
+              Ban User
+            </h2>
+            <p className="text-neutral-400 text-sm mb-4">
+              Select ban duration for{" "}
+              <span className="text-white font-medium">
+                {selectedUser?.fullName || selectedUser?.username}
+              </span>
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 mb-6">
+              {BAN_DURATIONS.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => setSelectedBanDays(item.days)}
+                  className={`py-2 px-3 rounded-lg text-sm font-medium cursor-pointer border transition-all ${
+                    selectedBanDays === item.days
+                      ? "bg-red-500/20 border-red-500 text-red-400"
+                      : "bg-neutral-800 border-neutral-700 text-neutral-300 hover:border-neutral-600"
+                  } ${item.days === null ? "col-span-2" : ""}`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setIsBanDialogOpen(false);
+                  setSelectedUser(null);
+                }}
+                className="flex-1 py-2 cursor-pointer rounded-lg border border-neutral-700 text-neutral-300 text-sm hover:bg-neutral-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBanUser}
+                className="flex-1 py-2 cursor-pointer rounded-lg bg-red-500/20 border border-red-500 text-red-400 text-sm hover:bg-red-500/30 transition-colors font-medium"
+              >
+                Ban confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfirmDialog
         open={isConfirmDialogOpen}

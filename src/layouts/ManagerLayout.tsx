@@ -9,6 +9,8 @@ function ManageLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [role, setRole] = useState<string | null>(null);
   const token = Cookies.get("access_token");
+  // console.log("TOKEN: ", token);
+
   const navigate = useNavigate();
 
   useEffect(() => {

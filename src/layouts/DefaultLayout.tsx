@@ -4,6 +4,7 @@ import parseJwt from "../utils/parseToken";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { MessageProvider } from "../contexts/message.context";
+import { routes } from "../routes/routes.config";
 
 function DefaultLayout() {
   const navigate = useNavigate();
@@ -30,8 +31,10 @@ function DefaultLayout() {
   useEffect(() => {
     if (token) {
       const payload = parseJwt(token);
-      if (payload?.role !== "CLIENT") {
-        navigate("/unauthorized", { replace: true });
+      if (payload?.role === "ADMIN") {
+        navigate(routes.user_manage, { replace: true });
+      } else if (payload?.role === "MODERATOR") {
+        navigate(routes.report_manage, { replace: true });
       }
     }
   }, [token, navigate]);

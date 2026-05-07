@@ -1,5 +1,5 @@
 import type { UserRole } from "../constants/userRole.enum";
-import type { UserStatus } from "../constants/userStatus";
+import { UserStatus } from "../constants/userStatus";
 import type {
   CurrentUserType,
   UserPageResponse,
@@ -62,11 +62,19 @@ export const handleUpdateUser = async (data: FormData) => {
 export const handleUpdateUserStatus = async (
   id: string,
   status: UserStatus,
+  bannedUntil?: string,
 ) => {
   try {
+    const params = new URLSearchParams({ status });
+    if (status === UserStatus.BANNED && bannedUntil) {
+      params.append("bannedUntil", bannedUntil);
+    }
+
     await axiosInstance.put(
-      `${import.meta.env.VITE_API_URL}users/account/${id}/status?status=${status}`,
+      `${import.meta.env.VITE_API_URL}users/account/${id}/status?${params}`,
     );
+
+    return { success: true };
   } catch (err: any) {
     return {
       success: false,
