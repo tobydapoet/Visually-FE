@@ -254,7 +254,6 @@ export const handleGetMediaConversation = async (
     const res = await axiosInstance.get(
       `${import.meta.env.VITE_API_URL}messages/message-media/conversation/${conversationId}/media?page=${page}&size=${size}`,
     );
-    console.log("RES: ", res.data.data);
     return res.data;
   } catch (err: any) {
     console.log(err);

@@ -97,7 +97,7 @@ const MusicLibraryPage: React.FC = () => {
             </div>
             <button
               onClick={() => setOpenDialog(true)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-500 transition-colors"
+              className="flex items-center gap-2 cursor-pointer px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 active:scale-95 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30"
             >
               <Plus size={16} />
               <span>Add</span>

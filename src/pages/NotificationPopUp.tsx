@@ -2,7 +2,6 @@ import { Dialog, DialogPanel } from "@headlessui/react";
 import {
   Bell,
   X,
-  CheckCheck,
   Loader2,
   Heart,
   MessageCircle,
@@ -11,7 +10,7 @@ import {
   Image,
   Video,
 } from "lucide-react";
-import type { FC } from "react";
+import { useEffect, type FC } from "react";
 import { useNotification } from "../contexts/notification.context";
 import { useNavigate } from "react-router-dom";
 import type { NotificationResponse } from "../types/api/notification.type";
@@ -35,6 +34,12 @@ const NotificationPopUp: FC<Props> = ({ open, onClose }) => {
     isLoading,
     markAllAsRead,
   } = useNotification();
+
+  useEffect(() => {
+    if (open && unreadCount > 0) {
+      markAllAsRead();
+    }
+  }, [open]);
 
   const navigate = useNavigate();
 
@@ -195,7 +200,6 @@ type PanelContentProps = {
 
 const PanelContent: FC<PanelContentProps> = ({
   unreadCount,
-  markAllAsRead,
   onClose,
   isLoading,
   notifications,
@@ -219,15 +223,6 @@ const PanelContent: FC<PanelContentProps> = ({
           )}
         </div>
         <div className="flex items-center gap-2">
-          {unreadCount > 0 && (
-            <button
-              onClick={markAllAsRead}
-              className="p-2 rounded-lg hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
-              title="Mark all as read"
-            >
-              <CheckCheck className="w-5 h-5" />
-            </button>
-          )}
           <button
             onClick={onClose}
             className="w-9 h-9 flex items-center cursor-pointer justify-center rounded-full hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
