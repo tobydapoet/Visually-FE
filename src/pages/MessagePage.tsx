@@ -530,6 +530,7 @@ const MessagePage: React.FC = () => {
                               await askBot(content);
                             } finally {
                               setIsAskingBot(false);
+                              messageInputRef.current?.focus();
                             }
                           }
                         }}

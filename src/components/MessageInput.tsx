@@ -51,6 +51,7 @@ export type MessageInputRef = {
   clearText: () => void;
   setReplyingTo: (username: string | null) => void;
   getText: () => string;
+  focus: () => void;
 };
 
 const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
@@ -125,6 +126,9 @@ const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
         }
       }, 0);
     },
+    focus: () => {
+      textareaRef.current?.focus();
+    },
 
     setReplyingTo: (username: string | null) => {
       setReplyingToUsername(username);
@@ -171,6 +175,9 @@ const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
       if (textareaRef.current) textareaRef.current.style.height = "auto";
     } finally {
       setIsSending(false);
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 0);
     }
   };
 

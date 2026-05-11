@@ -86,6 +86,7 @@ const RegisterPage: React.FC = () => {
           <form
             className="flex flex-col gap-8"
             onSubmit={handleSubmit(onSubmit)}
+            autoComplete="off"
           >
             <div className="space-y-4">
               <div className="border-b border-gray-700 pb-2">
