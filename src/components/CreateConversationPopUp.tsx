@@ -202,7 +202,7 @@ const CreateConversationPopup: React.FC<Props> = ({ open, onClose }) => {
 
             <button
               type="submit"
-              disabled={(memberIds && memberIds.length <= 0) || isSubmitting}
+              disabled={(memberIds && memberIds.length <= 1) || isSubmitting}
               className="flex-1 px-4 py-2 w-full mt-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
