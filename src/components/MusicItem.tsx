@@ -14,6 +14,7 @@ import { useMusic } from "../contexts/music.context";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { MusicStatus } from "../constants/music.enum";
 import MusicPopUp from "./MusicPopUp";
+import ConfirmDialog from "./ConfirmDialog";
 import { handleUpdateStatusMusic } from "../api/media.api";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
@@ -94,6 +95,7 @@ const MusicItem: React.FC<MusicItemProps> = ({
   const isPlaying = currentPlayingId === music.id;
   const actions = statusActions[music.status as MusicStatus] ?? [];
   const [open, setOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleTogglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -112,6 +114,14 @@ const MusicItem: React.FC<MusicItemProps> = ({
       await getMusicList(currentPage, 20, statusFilter, currentSearch);
     } else {
       console.log(res.message);
+    }
+  };
+
+  const handleActionClick = (status: MusicStatus) => {
+    if (status === MusicStatus.DELETED) {
+      setConfirmDelete(true);
+    } else {
+      handleUpdateStatus(status);
     }
   };
 
@@ -199,7 +209,7 @@ const MusicItem: React.FC<MusicItemProps> = ({
                 <MenuItem key={action.status}>
                   {({ focus }) => (
                     <button
-                      onClick={() => handleUpdateStatus(action.status)}
+                      onClick={() => handleActionClick(action.status)}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
                         action.className
                       } ${focus ? "bg-neutral-800" : ""}`}
@@ -214,7 +224,18 @@ const MusicItem: React.FC<MusicItemProps> = ({
           </Menu>
         </div>
       </div>
+
       <MusicPopUp open={open} onClose={() => setOpen(false)} music={music} />
+
+      <ConfirmDialog
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => handleUpdateStatus(MusicStatus.DELETED)}
+        title="Delete Music"
+        message={`Are you sure you want to delete "${music.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </>
   );
 };

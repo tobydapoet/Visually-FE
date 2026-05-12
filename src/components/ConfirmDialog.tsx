@@ -1,5 +1,10 @@
 import React from "react";
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -24,10 +29,20 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 }) => {
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
+      <DialogBackdrop
+        transition
+        className="fixed inset-0 bg-black/80
+          transition-opacity duration-300 ease-out
+          data-[closed]:opacity-0"
+      />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-md rounded-xl bg-zinc-900 p-6 text-white">
+        <DialogPanel
+          transition
+          className="w-full max-w-md rounded-xl bg-zinc-900 p-6 text-white
+            transition-all duration-300 ease-out
+            data-[closed]:opacity-0 data-[closed]:scale-95 data-[closed]:translate-y-2"
+        >
           <DialogTitle className="text-lg font-semibold mb-2">
             {title}
           </DialogTitle>
