@@ -33,7 +33,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         transition
         className="fixed inset-0 bg-black/80
           transition-opacity duration-300 ease-out
-          data-[closed]:opacity-0"
+          data-closed:opacity-0"
       />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
@@ -41,7 +41,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           transition
           className="w-full max-w-md rounded-xl bg-zinc-900 p-6 text-white
             transition-all duration-300 ease-out
-            data-[closed]:opacity-0 data-[closed]:scale-95 data-[closed]:translate-y-2"
+            data-closed:opacity-0 data-closed:scale-95 data-closed:translate-y-2"
         >
           <DialogTitle className="text-lg font-semibold mb-2">
             {title}
