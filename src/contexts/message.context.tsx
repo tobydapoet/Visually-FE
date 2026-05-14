@@ -65,6 +65,7 @@ type MessageContextType = {
   ) => Promise<void>;
   unmuteConversation: (memberId: number) => Promise<void>;
   askBot: (content: string) => Promise<void>;
+  typingUsers: Record<string, string[]>;
 };
 
 const MessageContext = createContext<MessageContextType | null>(null);
@@ -77,6 +78,7 @@ export const MessageProvider = ({
   const navigate = useNavigate();
   const { currentUser } = useUser();
 
+  const [typingUsers, setTypingUsers] = useState<Record<string, string[]>>({});
   const [selectedConversation, setSelectedConversation] =
     useState<ConversationType | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -250,8 +252,27 @@ export const MessageProvider = ({
       socket.connect();
     }
 
+    socket.on("typing", ({ userId, conversationId }) => {
+      const key = String(conversationId);
+      setTypingUsers((prev) => {
+        const current = prev[key] ?? [];
+        if (current.includes(userId)) return prev;
+        return { ...prev, [key]: [...current, userId] };
+      });
+    });
+
+    socket.on("stop_typing", ({ userId, conversationId }) => {
+      const key = String(conversationId);
+      setTypingUsers((prev) => {
+        const current = prev[key] ?? [];
+        return { ...prev, [key]: current.filter((id) => id !== userId) };
+      });
+    });
+
     return () => {
       socket.off("connect", registerListeners);
+      socket.off("typing");
+      socket.off("stop_typing");
       socket.off("new_message");
       socket.off("message_updated");
       socket.off("message_deleted");
@@ -502,6 +523,7 @@ export const MessageProvider = ({
         unmuteConversation,
         askBot,
         getBotConversation,
+        typingUsers,
       }}
     >
       {children}

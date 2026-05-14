@@ -42,15 +42,18 @@ const ContentMorePopUp: React.FC<Props> = ({
             className="w-full max-w-sm rounded-2xl bg-zinc-900 text-white duration-300 ease-out data-closed:scale-95 data-closed:opacity-0 overflow-hidden"
           >
             <div className="flex flex-col ">
-              <button
-                onClick={() => {
-                  setIsOpenReport(true);
-                  onClose();
-                }}
-                className="px-4 py-3.5  hover:bg-zinc-800 transition-colors text-center cursor-pointer text-red-400 border-b border-zinc-800 text-sm font-medium"
-              >
-                Report
-              </button>
+              {currentUser?.role === "CLIENT" && (
+                <button
+                  onClick={() => {
+                    setIsOpenReport(true);
+                    onClose();
+                  }}
+                  className="px-4 py-3.5  hover:bg-zinc-800 transition-colors text-center cursor-pointer text-red-400 border-b border-zinc-800 text-sm font-medium"
+                >
+                  Report
+                </button>
+              )}
+
               <button
                 onClick={handleCopyLink}
                 className="px-4 py-3.5 hover:bg-zinc-800 transition-colors text-center cursor-pointer text-white border-b border-zinc-800 text-sm font-medium"

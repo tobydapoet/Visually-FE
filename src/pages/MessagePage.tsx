@@ -22,6 +22,7 @@ import type { Message } from "../types/api/message.type";
 import { ParsedContent } from "../components/ParseContent";
 import { timeAgo } from "../utils/timeAgot";
 import MediaViewerModal from "../components/MediaViewerModal";
+import { getSocket } from "../utils/socket";
 
 const MessagePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,6 +40,8 @@ const MessagePage: React.FC = () => {
     updateMessage,
     deleteMessage,
     askBot,
+    typingUsers,
+    memberList,
   } = useMessage();
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -48,6 +51,10 @@ const MessagePage: React.FC = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
   const messageInputRef = useRef<MessageInputRef>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+
   const navigate = useNavigate();
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -459,6 +466,7 @@ const MessagePage: React.FC = () => {
                         )}
                       </div>
                     ))}
+
                     <div ref={messagesEndRef} />
                   </>
                 )}
@@ -493,6 +501,33 @@ const MessagePage: React.FC = () => {
                 </div>
               ) : (
                 <div className="relative">
+                  {(typingUsers[String(selectedConversation.id)] ?? []).length >
+                    0 && (
+                    <div className="flex items-center gap-2 px-4 pt-2">
+                      <div className="flex -space-x-1">
+                        {(
+                          typingUsers[String(selectedConversation.id)] ?? []
+                        ).map((userId) => {
+                          const user = memberList.find(
+                            (m) => String(m.userId) === String(userId),
+                          );
+                          return (
+                            <img
+                              key={userId}
+                              src={user?.avatarUrl || assets.profile}
+                              className="w-5 h-5 rounded-full object-cover border border-zinc-900"
+                            />
+                          );
+                        })}
+                      </div>
+                      <div className="flex gap-1 bg-gray-700 rounded-full px-3 py-2">
+                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0ms]" />
+                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:150ms]" />
+                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:300ms]" />
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex items-center pt-2">
                     <div className="flex-1 -px-2">
                       <MessageInput
@@ -500,7 +535,34 @@ const MessagePage: React.FC = () => {
                         key={inputResetKey}
                         mode="MESSAGE"
                         conversationId={selectedConversation.id}
+                        onTyping={(value) => {
+                          if (!value.trim()) {
+                            clearTimeout(typingTimeoutRef.current);
+                            const socket = getSocket(currentUser!.id);
+                            socket.emit("stop_typing", {
+                              conversationId: selectedConversation.id,
+                            });
+                            return;
+                          }
+
+                          const socket = getSocket(currentUser!.id);
+                          socket.emit("typing", {
+                            conversationId: selectedConversation.id,
+                          });
+
+                          clearTimeout(typingTimeoutRef.current);
+                          typingTimeoutRef.current = setTimeout(() => {
+                            socket.emit("stop_typing", {
+                              conversationId: selectedConversation.id,
+                            });
+                          }, 2000);
+                        }}
                         onSend={async (message, files, mentions) => {
+                          clearTimeout(typingTimeoutRef.current);
+                          const socket = getSocket(currentUser!.id);
+                          socket.emit("stop_typing", {
+                            conversationId: selectedConversation.id,
+                          });
                           if (editingId) {
                             await updateMessage(editingId, message, mentions);
                             setEditingId(null);

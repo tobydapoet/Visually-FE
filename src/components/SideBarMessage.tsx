@@ -10,6 +10,7 @@ import type { ConversationType } from "../types/api/conversation.type";
 import assets from "../assets";
 import { useMessage } from "../contexts/message.context";
 import CreateConversationPopup from "./CreateConversationPopUp";
+import { handleSearchConversation } from "../api/message.api";
 
 const SideBarMessage: React.FC = () => {
   const { currentUser } = useUser();
@@ -30,26 +31,33 @@ const SideBarMessage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const debouncedKeyword = useDebounce(keyword, 400);
   const [isOpenCreateBox, setIsOpenCreateBox] = useState(false);
+  const [conversationResults, setConversationResults] = useState<
+    ConversationType[]
+  >([]);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchSearch = async () => {
       if (!debouncedKeyword.trim()) {
         setSearchResult([]);
+        setConversationResults([]);
         setLoading(false);
         return;
       }
       setLoading(true);
       try {
-        const res = await handleSearchUser(debouncedKeyword, 0, 20, true);
-        if (res) setSearchResult(res.content);
+        const [convRes, userRes] = await Promise.all([
+          handleSearchConversation(debouncedKeyword),
+          handleSearchUser(debouncedKeyword, 0, 5, true),
+        ]);
+        setConversationResults(convRes as any);
+        setSearchResult(userRes?.content ?? []);
       } catch (error) {
         console.error("Search error:", error);
-        setSearchResult([]);
       } finally {
         setLoading(false);
       }
     };
-    fetchUser();
+    fetchSearch();
   }, [debouncedKeyword]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -100,32 +108,105 @@ const SideBarMessage: React.FC = () => {
                 <Box display="flex" justifyContent="center" py={4}>
                   <CircularProgress size={32} sx={{ color: "#3b82f6" }} />
                 </Box>
-              ) : searchResults.length > 0 ? (
-                searchResults.map((user) => (
-                  <div
-                    className="flex gap-3 items-center hover:bg-zinc-800 p-2 rounded-lg transition-colors cursor-pointer"
-                    key={user.id}
-                    onClick={() => handleSelectUser(user.id)}
-                  >
-                    <img
-                      src={user.avatar || assets.profile}
-                      alt={user.fullName}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                    <div className="flex flex-col">
-                      <div className="text-sm font-semibold text-white">
-                        {user.username}
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        {user.fullName}
-                      </div>
-                    </div>
-                  </div>
-                ))
               ) : (
-                <Box textAlign="center" py={4}>
-                  <div className="text-gray-400 text-sm">No users found</div>
-                </Box>
+                <>
+                  {conversationResults.length > 0 && (
+                    <>
+                      <div className="text-xs text-gray-500 px-2">
+                        Conversations
+                      </div>
+                      {conversationResults.map((conversation) => (
+                        <div
+                          className="flex gap-3 items-center hover:bg-zinc-800 p-2 rounded-lg transition-colors cursor-pointer"
+                          key={conversation.id}
+                          onClick={() =>
+                            handleSelectConversation(conversation.id)
+                          }
+                        >
+                          {conversation.type === "GROUP" ? (
+                            conversation.mediaUrl ? (
+                              <img
+                                src={conversation.mediaUrl}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="flex">
+                                {conversation.otherUsers
+                                  .slice(0, 3)
+                                  .map((user, index) => (
+                                    <img
+                                      key={user.userId}
+                                      src={user?.avatarUrl || assets.profile}
+                                      className="w-8 h-8 rounded-full object-cover border-2 border-white"
+                                      style={{
+                                        marginLeft: index === 0 ? "0" : "-15px",
+                                        zIndex: 3 - index,
+                                      }}
+                                    />
+                                  ))}
+                              </div>
+                            )
+                          ) : (
+                            <img
+                              src={
+                                conversation.otherUsers[0]?.avatarUrl ||
+                                assets.profile
+                              }
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          )}
+                          <div className="flex flex-col">
+                            <div className="text-sm font-semibold text-white">
+                              {conversation.name ||
+                                conversation.otherUsers[0]?.username}
+                            </div>
+                            <div className="text-xs text-gray-400 truncate max-w-50">
+                              {(conversation.lastMessage as any)?.content ||
+                                "No messages yet"}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
+
+                  {searchResults.length > 0 && (
+                    <>
+                      <div className="text-xs text-gray-500 px-2 mt-2">
+                        People
+                      </div>
+                      {searchResults.map((user) => (
+                        <div
+                          className="flex gap-3 items-center hover:bg-zinc-800 p-2 rounded-lg transition-colors cursor-pointer"
+                          key={user.id}
+                          onClick={() => handleSelectUser(user.id)}
+                        >
+                          <img
+                            src={user.avatar || assets.profile}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                          <div className="flex flex-col">
+                            <div className="text-sm font-semibold text-white">
+                              {user.username}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {user.fullName}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
+
+                  {conversationResults.length === 0 &&
+                    searchResults.length === 0 && (
+                      <Box textAlign="center" py={4}>
+                        <div className="text-gray-400 text-sm">
+                          No results found
+                        </div>
+                      </Box>
+                    )}
+                </>
               )}
             </div>
           ) : (

@@ -280,7 +280,7 @@ const ContentPage: React.FC = () => {
           className={`flex gap-2 self-end shrink-0 ${isOpenComment ? "w-100" : "w-56"}`}
         >
           <div
-            className="flex flex-col items-center pb-10 justify-end gap-5"
+            className=" flex flex-col items-center pb-10 justify-end gap-5"
             onClick={(e) => e.stopPropagation()}
           >
             <ActionBtn

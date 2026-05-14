@@ -28,6 +28,7 @@ type Props =
   | {
       mode: "MESSAGE";
       conversationId: number;
+      onTyping?: (value: string) => void;
       onSend: (
         message: string,
         files: File[],
@@ -56,6 +57,7 @@ export type MessageInputRef = {
 
 const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
   const { onSend, onReset, mode = "MESSAGE" } = props;
+  const onTyping = "onTyping" in props ? props.onTyping : undefined;
   const [isEditing, setIsEditing] = useState(false);
 
   const [messageValue, setMessageValue] = useState("");
@@ -237,6 +239,8 @@ const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
       setMentionQuery(null);
       setMentionResults([]);
     }
+
+    onTyping?.(value);
   };
 
   useEffect(() => {

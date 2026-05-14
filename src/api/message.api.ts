@@ -260,3 +260,17 @@ export const handleGetMediaConversation = async (
     throw err;
   }
 };
+
+export const handleSearchConversation = async (
+  keyword: string,
+): Promise<ConversationType> => {
+  try {
+    const res = await axiosInstance.get(
+      `${import.meta.env.VITE_API_URL}messages/conversation/search?keyword=${keyword}`,
+    );
+    return res.data;
+  } catch (err: any) {
+    console.log(err);
+    throw err;
+  }
+};
