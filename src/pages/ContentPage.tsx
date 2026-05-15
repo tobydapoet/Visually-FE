@@ -138,7 +138,7 @@ const ContentPage: React.FC = () => {
       className="relative flex items-center justify-center bg-transparent"
       style={{ scrollSnapAlign: "start" }}
     >
-      <div className="hidden md:flex items-center justify-center gap-6 w-full h-full -pb-2">
+      <div className="hidden md:flex items-center justify-center gap-6 w-full h-full -pb-2 h-screen">
         <div className="flex flex-col justify-end pb-10 w-56 shrink-0 self-end">
           <div
             className="flex items-center gap-2 mb-3 cursor-pointer w-fit"

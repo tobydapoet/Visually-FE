@@ -14,6 +14,7 @@ import { useSearchParams } from "react-router-dom";
 import MusicItem from "../components/MusicItem";
 import MusicPopUp from "../components/MusicPopUp";
 import useDebounce from "../hooks/useDebounce";
+import { useUser } from "../contexts/user.context";
 
 const MusicLibraryPage: React.FC = () => {
   const { getMusicList, musicList, totalPages, loading } = useMusic();
@@ -26,6 +27,9 @@ const MusicLibraryPage: React.FC = () => {
     (searchParams.get("status") as MusicStatus) ?? MusicStatus.ACTIVE;
 
   const [searchInput, setSearchInput] = useState(currentSearch);
+  const { currentUser } = useUser();
+
+  const isModerator = currentUser && currentUser.role === "MODERATOR";
 
   useEffect(() => {
     getMusicList(currentPage, 20, statusFilter, currentSearch || undefined);
@@ -86,6 +90,17 @@ const MusicLibraryPage: React.FC = () => {
     { key: MusicStatus.PENDING, label: "Pending", color: "yellow" },
     { key: MusicStatus.SUSPENDED, label: "Suspended", color: "gray" },
   ];
+
+  const visibleTabs = tabs.filter((tab) => {
+    if (
+      isModerator &&
+      (tab.key === MusicStatus.ACTIVE || tab.key === MusicStatus.SUSPENDED)
+    ) {
+      return false;
+    }
+
+    return true;
+  });
 
   return (
     <>
@@ -149,7 +164,11 @@ const MusicLibraryPage: React.FC = () => {
               </div>
             ) : musicList?.length > 0 ? (
               musicList.map((music) => (
-                <MusicItem key={music.id} music={music} />
+                <MusicItem
+                  key={music.id}
+                  music={music}
+                  isModerator={!!isModerator}
+                />
               ))
             ) : (
               <div className="text-center py-12 rounded-lg">

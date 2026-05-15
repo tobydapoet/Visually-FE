@@ -247,6 +247,16 @@ export const MessageProvider = ({
 
         if (selectedConversationRef.current?.id === event.conversationId) {
           handleUpdateLastSeen(event.conversationId);
+
+          const socket = getSocket(currentUser.id);
+          const memberIds =
+            selectedConversationRef.current?.otherUsers.map((u) => u.userId) ??
+            [];
+          socket.emit("seen", {
+            conversationId: event.conversationId,
+            lastSeenMessageId: event.id,
+            memberIds,
+          });
         }
       });
 

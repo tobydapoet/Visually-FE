@@ -25,6 +25,7 @@ interface MusicItemProps {
   onSelect?: (music: MusicResponse) => void;
   onEdit?: (music: MusicResponse) => void;
   onDelete?: (music: MusicResponse) => void;
+  isModerator?: boolean;
 }
 
 const statusActions: Record<
@@ -85,6 +86,7 @@ const MusicItem: React.FC<MusicItemProps> = ({
   music,
   isSelected,
   onSelect,
+  isModerator,
 }) => {
   const [searchParams] = useSearchParams();
   const currentPage = Number(searchParams.get("page") ?? 0);
@@ -93,9 +95,19 @@ const MusicItem: React.FC<MusicItemProps> = ({
     (searchParams.get("status") as MusicStatus) ?? MusicStatus.PENDING;
   const { playMusic, currentPlayingId, getMusicList } = useMusic();
   const isPlaying = currentPlayingId === music.id;
-  const actions = statusActions[music.status as MusicStatus] ?? [];
+  const actions = (statusActions[music.status as MusicStatus] ?? []).filter(
+    (action) => {
+      if (isModerator && action.status === MusicStatus.ACTIVE) {
+        return false;
+      }
+
+      return true;
+    },
+  );
   const [open, setOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const canShowActions = !isModerator || music.status === MusicStatus.PENDING;
 
   const handleTogglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -170,58 +182,60 @@ const MusicItem: React.FC<MusicItemProps> = ({
             )}
           </button>
 
-          <Menu as="div" className="relative">
-            <MenuButton
-              onClick={(e) => e.stopPropagation()}
-              className="p-1.5 bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors"
-            >
-              <MoreVertical size={14} className="text-neutral-400" />
-            </MenuButton>
+          {canShowActions && (
+            <Menu as="div" className="relative">
+              <MenuButton
+                onClick={(e) => e.stopPropagation()}
+                className="p-1.5 bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors"
+              >
+                <MoreVertical size={14} className="text-neutral-400" />
+              </MenuButton>
 
-            <MenuItems
-              transition
-              anchor="bottom end"
-              className="w-40 bg-neutral-900 origin-top-right rounded-xl border border-neutral-800 shadow-lg p-1 z-50 focus:outline-none
+              <MenuItems
+                transition
+                anchor="bottom end"
+                className="w-40 bg-neutral-900 origin-top-right rounded-xl border border-neutral-800 shadow-lg p-1 z-50 focus:outline-none
                   transition duration-150 ease-out
                   data-closed:scale-95 data-closed:opacity-0"
-            >
-              <MenuItem>
-                {({ focus }) => (
-                  <button
-                    onClick={handleEdit}
-                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
-                      focus
-                        ? "bg-neutral-800 text-white"
-                        : "text-neutral-300 hover:bg-neutral-800"
-                    }`}
-                  >
-                    <Edit size={14} />
-                    <span>Edit</span>
-                  </button>
-                )}
-              </MenuItem>
-
-              {actions.length > 0 && (
-                <div className="my-1 border-t border-neutral-800" />
-              )}
-
-              {actions.map((action) => (
-                <MenuItem key={action.status}>
+              >
+                <MenuItem>
                   {({ focus }) => (
                     <button
-                      onClick={() => handleActionClick(action.status)}
+                      onClick={handleEdit}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
-                        action.className
-                      } ${focus ? "bg-neutral-800" : ""}`}
+                        focus
+                          ? "bg-neutral-800 text-white"
+                          : "text-neutral-300 hover:bg-neutral-800"
+                      }`}
                     >
-                      {action.icon}
-                      <span>{action.label}</span>
+                      <Edit size={14} />
+                      <span>Edit</span>
                     </button>
                   )}
                 </MenuItem>
-              ))}
-            </MenuItems>
-          </Menu>
+
+                {actions.length > 0 && (
+                  <div className="my-1 border-t border-neutral-800" />
+                )}
+
+                {actions.map((action) => (
+                  <MenuItem key={action.status}>
+                    {({ focus }) => (
+                      <button
+                        onClick={() => handleActionClick(action.status)}
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
+                          action.className
+                        } ${focus ? "bg-neutral-800" : ""}`}
+                      >
+                        {action.icon}
+                        <span>{action.label}</span>
+                      </button>
+                    )}
+                  </MenuItem>
+                ))}
+              </MenuItems>
+            </Menu>
+          )}
         </div>
       </div>
 

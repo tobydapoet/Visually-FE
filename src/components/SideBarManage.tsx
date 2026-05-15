@@ -91,7 +91,6 @@ const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
       label: "Music Library",
       icon: <Music size={20} />,
       path: "/music_library",
-      adminOnly: true,
     },
   ].filter((item) => !item.adminOnly || isAdmin);
 

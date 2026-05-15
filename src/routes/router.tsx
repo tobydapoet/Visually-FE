@@ -144,11 +144,9 @@ export const router = createBrowserRouter([
       {
         path: routes.music_library,
         element: (
-          <ProtectedRoute allowedRoles={["ADMIN"]}>
-            <MusicProvider>
-              <MusicLibraryPage />
-            </MusicProvider>
-          </ProtectedRoute>
+          <MusicProvider>
+            <MusicLibraryPage />
+          </MusicProvider>
         ),
       },
       {
