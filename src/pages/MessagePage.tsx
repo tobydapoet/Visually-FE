@@ -33,6 +33,7 @@ const MessagePage: React.FC = () => {
     loading,
     inputResetKey,
     loadConversationById,
+    seenUsers,
     sendMessage,
     messagesEndRef,
     loadMoreMessages,
@@ -74,6 +75,11 @@ const MessagePage: React.FC = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  const lastMessageIndex = messages.length - 1;
+
+  console.log("seenUsers:", seenUsers[String(selectedConversation?.id)]);
+  console.log("currentUser id:", currentUser?.id);
 
   useEffect(() => {
     if (id && currentUser) {
@@ -275,7 +281,7 @@ const MessagePage: React.FC = () => {
                         <CircularProgress size={24} sx={{ color: "#a1a1aa" }} />
                       </div>
                     )}
-                    {messages.map((msg) => (
+                    {messages.map((msg, index) => (
                       <div
                         key={msg.id}
                         className={`group relative flex items-start gap-2 ${msg.isOwn ? "justify-end" : "justify-start"}`}
@@ -455,6 +461,50 @@ const MessagePage: React.FC = () => {
                               </span>
                             </div>
                           </div>
+
+                          {index === lastMessageIndex && msg.isOwn && (
+                            <div className="flex gap-1 mt-1 justify-end items-center">
+                              {(() => {
+                                const seenList = (
+                                  seenUsers[String(selectedConversation.id)] ??
+                                  []
+                                ).filter(
+                                  (uid) =>
+                                    uid !== null &&
+                                    String(uid) !== String(currentUser?.id),
+                                );
+                                const visible = seenList.slice(0, 3);
+                                const remaining =
+                                  seenList.length - visible.length;
+
+                                return (
+                                  <>
+                                    {visible.map((userId) => {
+                                      const user = memberList.find(
+                                        (m) =>
+                                          String(m.userId) === String(userId),
+                                      );
+                                      return (
+                                        <img
+                                          key={userId}
+                                          src={
+                                            user?.avatarUrl || assets.profile
+                                          }
+                                          className="w-3.5 h-3.5 rounded-full object-cover"
+                                          title={user?.username}
+                                        />
+                                      );
+                                    })}
+                                    {remaining > 0 && (
+                                      <span className="text-[10px] text-gray-400">
+                                        +{remaining}
+                                      </span>
+                                    )}
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          )}
                         </div>
 
                         {msg.isOwn && !isMobile && (

@@ -10,6 +10,7 @@ import {
   handleGetConversationMessages,
   handleGetConversationWithId,
   handleGetConversationWithUser,
+  handleGetSeenStatus,
   handleGetUnReactCount,
   handleGetUserConverstaion,
   handleMuteConversation,
@@ -53,6 +54,7 @@ type MessageContextType = {
   getBotConversation: () => Promise<void>;
   fetchMember: () => Promise<void>;
   setNullForConversation: () => void;
+  seenUsers: Record<string, string[]>;
   updateMessage: (
     id: number,
     content: string,
@@ -93,6 +95,7 @@ export const MessageProvider = ({
   const [unreadConversationCount, setUnreadConversationCount] = useState(0);
   const location = useLocation();
   const isMessagePage = location.pathname.startsWith("/inbox");
+  const [seenUsers, setSeenUsers] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     if (!isMessagePage) {
@@ -129,6 +132,9 @@ export const MessageProvider = ({
     fetchMember();
   }, [selectedConversation?.id]);
 
+  console.log("seenUsers:", seenUsers);
+  console.log("current key:", String(selectedConversation?.id));
+
   useEffect(() => {
     if (!currentUser?.id) return;
 
@@ -138,6 +144,19 @@ export const MessageProvider = ({
       socket.off("new_message");
       socket.off("message_updated");
       socket.off("message_deleted");
+      socket.off("seen");
+
+      socket.on("seen", ({ userId, conversationId }) => {
+        if (!userId) return;
+        const key = String(conversationId);
+        setSeenUsers((prev) => ({
+          ...prev,
+          [key]: [
+            ...(prev[key] ?? []).filter((id) => id !== userId && id !== null),
+            userId,
+          ],
+        }));
+      });
 
       const handleConnected = () => {
         if (selectedConversationRef.current?.id) {
@@ -273,6 +292,7 @@ export const MessageProvider = ({
       socket.off("connect", registerListeners);
       socket.off("typing");
       socket.off("stop_typing");
+      socket.off("seen");
       socket.off("new_message");
       socket.off("message_updated");
       socket.off("message_deleted");
@@ -368,16 +388,22 @@ export const MessageProvider = ({
     if (!currentUser?.id) return;
     const socket = getSocket(currentUser.id);
 
-    if (socket.connected) {
+    const doJoinAndSeen = () => {
       socket.emit("join_conversation", { conversationId });
+      setTimeout(() => {
+        socket.emit("seen", { conversationId });
+      }, 300);
+    };
+
+    if (socket.connected) {
+      doJoinAndSeen();
     } else {
-      socket.once("connect", () => {
-        socket.emit("join_conversation", { conversationId });
-      });
+      socket.once("connect", doJoinAndSeen);
     }
   };
 
   const loadConversationById = async (id: number) => {
+    setSeenUsers({});
     setLoading(true);
     try {
       const res = await handleGetConversationWithId(id);
@@ -385,6 +411,12 @@ export const MessageProvider = ({
       joinConversationRoom(res.id);
       await loadMessages(res.id);
       await handleUpdateLastSeen(res.id);
+      const seenStatus = await handleGetSeenStatus(id);
+      setSeenUsers({
+        [String(id)]: seenStatus
+          .filter((s: any) => s.userId !== currentUser?.id)
+          .map((s: any) => s.userId),
+      });
     } catch (error) {
       console.error("Failed to load conversation:", error);
       navigate("/inbox");
@@ -408,6 +440,7 @@ export const MessageProvider = ({
   const handleSelectConversation = async (id: number) => {
     const res = await handleGetConversationWithId(id);
     setSelectedConversation(res);
+    setSeenUsers({});
     navigate(`/inbox/${id}`);
     setMessages([]);
     setInputResetKey((k) => k + 1);
@@ -524,6 +557,7 @@ export const MessageProvider = ({
         askBot,
         getBotConversation,
         typingUsers,
+        seenUsers,
       }}
     >
       {children}

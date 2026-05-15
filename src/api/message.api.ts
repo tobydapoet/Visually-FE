@@ -274,3 +274,10 @@ export const handleSearchConversation = async (
     throw err;
   }
 };
+
+export const handleGetSeenStatus = async (conversationId: number) => {
+  const res = await axiosInstance.get(
+    `${import.meta.env.VITE_API_URL}messages/conversation-member/${conversationId}/seen-status`,
+  );
+  return res.data;
+};
