@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 type Props = {
   frames: string[];
   onSelect: (dataUrl: string, index: number) => void;
-  onUpload: (file: File) => void; // thêm prop này
+  onUpload: (file: File) => void;
   videoDuration?: number;
 };
 

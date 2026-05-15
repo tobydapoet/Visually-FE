@@ -96,6 +96,7 @@ export const MessageProvider = ({
   const location = useLocation();
   const isMessagePage = location.pathname.startsWith("/inbox");
   const [seenUsers, setSeenUsers] = useState<Record<string, string[]>>({});
+  const messagesRef = useRef<Message[]>([]);
 
   useEffect(() => {
     if (!isMessagePage) {
@@ -109,6 +110,7 @@ export const MessageProvider = ({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesRef.current = messages;
   }, [messages]);
 
   const fetchMember = async () => {
@@ -132,9 +134,6 @@ export const MessageProvider = ({
     fetchMember();
   }, [selectedConversation?.id]);
 
-  console.log("seenUsers:", seenUsers);
-  console.log("current key:", String(selectedConversation?.id));
-
   useEffect(() => {
     if (!currentUser?.id) return;
 
@@ -146,9 +145,13 @@ export const MessageProvider = ({
       socket.off("message_deleted");
       socket.off("seen");
 
-      socket.on("seen", ({ userId, conversationId }) => {
+      socket.on("seen", ({ userId, conversationId, lastSeenMessageId }) => {
         if (!userId) return;
         const key = String(conversationId);
+        const lastMsg = messagesRef.current[messagesRef.current.length - 1];
+
+        if (!lastMsg || lastSeenMessageId < lastMsg.id) return;
+
         setSeenUsers((prev) => ({
           ...prev,
           [key]: [
@@ -391,7 +394,14 @@ export const MessageProvider = ({
     const doJoinAndSeen = () => {
       socket.emit("join_conversation", { conversationId });
       setTimeout(() => {
-        socket.emit("seen", { conversationId });
+        const lastMsg = messagesRef.current[messagesRef.current.length - 1];
+        socket.emit("seen", {
+          conversationId,
+          memberIds:
+            selectedConversationRef.current?.otherUsers.map((u) => u.userId) ??
+            [],
+          lastSeenMessageId: lastMsg?.id ?? null,
+        });
       }, 300);
     };
 
@@ -412,11 +422,23 @@ export const MessageProvider = ({
       await loadMessages(res.id);
       await handleUpdateLastSeen(res.id);
       const seenStatus = await handleGetSeenStatus(id);
-      setSeenUsers({
-        [String(id)]: seenStatus
-          .filter((s: any) => s.userId !== currentUser?.id)
-          .map((s: any) => s.userId),
-      });
+      const lastMsg = messagesRef.current[messagesRef.current.length - 1];
+
+      const seenUserIds = seenStatus
+        .filter(
+          (s: any) =>
+            s.userId !== null &&
+            s.lastSeenMessageId !== null &&
+            lastMsg &&
+            s.lastSeenMessageId >= lastMsg.id &&
+            s.userId !== currentUser?.id,
+        )
+        .map((s: any) => s.userId);
+
+      setSeenUsers((prev) => ({
+        ...prev,
+        [String(id)]: seenUserIds,
+      }));
     } catch (error) {
       console.error("Failed to load conversation:", error);
       navigate("/inbox");

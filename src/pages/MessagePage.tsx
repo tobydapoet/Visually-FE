@@ -23,6 +23,7 @@ import { ParsedContent } from "../components/ParseContent";
 import { timeAgo } from "../utils/timeAgot";
 import MediaViewerModal from "../components/MediaViewerModal";
 import { getSocket } from "../utils/socket";
+import ConfirmDialog from "../components/ConfirmDialog";
 
 const MessagePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,6 +56,7 @@ const MessagePage: React.FC = () => {
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   const navigate = useNavigate();
 
@@ -67,6 +69,14 @@ const MessagePage: React.FC = () => {
   }>({ open: false });
 
   useEffect(() => {
+    if (!loading && selectedConversation) {
+      setTimeout(() => {
+        messageInputRef.current?.focus();
+      }, 100);
+    }
+  }, [selectedConversation?.id, loading]);
+
+  useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
@@ -77,9 +87,6 @@ const MessagePage: React.FC = () => {
   }, []);
 
   const lastMessageIndex = messages.length - 1;
-
-  console.log("seenUsers:", seenUsers[String(selectedConversation?.id)]);
-  console.log("currentUser id:", currentUser?.id);
 
   useEffect(() => {
     if (id && currentUser) {
@@ -352,7 +359,7 @@ const MessagePage: React.FC = () => {
                                     />
                                   </button>
                                   <button
-                                    onClick={() => deleteMessage(msg.id)}
+                                    onClick={() => setConfirmDeleteId(msg.id)}
                                     className="p-2 rounded-full cursor-pointer hover:bg-red-500 transition-all duration-200 shadow-lg group/delete"
                                     title="Delete message"
                                   >
@@ -628,6 +635,9 @@ const MessagePage: React.FC = () => {
                             );
                             setReplyTo(null);
                           }
+                          setTimeout(() => {
+                            messageInputRef.current?.focus();
+                          }, 0);
                         }}
                       />
                     </div>
@@ -685,6 +695,19 @@ const MessagePage: React.FC = () => {
           initialMediaId={mediaViewer.mediaId}
         />
       )}
+
+      <ConfirmDialog
+        open={confirmDeleteId !== null}
+        onClose={() => setConfirmDeleteId(null)}
+        onConfirm={async () => {
+          if (confirmDeleteId) await deleteMessage(confirmDeleteId);
+        }}
+        onConfirmClose={() => setConfirmDeleteId(null)}
+        title="Delete message?"
+        message="This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 };
