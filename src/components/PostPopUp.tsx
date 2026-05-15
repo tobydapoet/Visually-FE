@@ -131,6 +131,9 @@ const PostPopUp: React.FC<Props> = ({ open, onClose }) => {
       reset();
     } else {
       console.log(res.message);
+      toast.error(res.message);
+      onClose();
+      reset();
     }
   };
 

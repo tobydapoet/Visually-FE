@@ -182,7 +182,7 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
       onClose();
       reset();
     } else {
-      console.log(res.message);
+      toast.error(res.message);
       onClose();
       reset();
     }

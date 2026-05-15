@@ -143,6 +143,7 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
       onClose();
       reset();
     } else {
+      toast.error(res.message);
       console.log(res.message);
       onClose();
       reset();
