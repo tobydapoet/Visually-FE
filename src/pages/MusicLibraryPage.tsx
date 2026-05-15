@@ -91,17 +91,6 @@ const MusicLibraryPage: React.FC = () => {
     { key: MusicStatus.SUSPENDED, label: "Suspended", color: "gray" },
   ];
 
-  const visibleTabs = tabs.filter((tab) => {
-    if (
-      isModerator &&
-      (tab.key === MusicStatus.ACTIVE || tab.key === MusicStatus.SUSPENDED)
-    ) {
-      return false;
-    }
-
-    return true;
-  });
-
   return (
     <>
       <div className="py-6 w-full min-h-screen bg-zinc-900">
