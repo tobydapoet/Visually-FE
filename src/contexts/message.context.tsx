@@ -221,9 +221,8 @@ export const MessageProvider = ({
         fetchUnreadCount();
         refetchConversations();
 
-        if (selectedConversationRef.current?.id !== event.conversationId) {
-          return;
-        }
+        if (!isCurrentConversation) return;
+
         setMessages((prev) => {
           if (prev.some((m) => m.id === event.id)) return prev;
 
@@ -240,15 +239,12 @@ export const MessageProvider = ({
             mentions: event.mentions,
           };
 
-          const updated = [...prev, newMessage];
-
-          return updated;
+          return [...prev, newMessage];
         });
 
-        if (selectedConversationRef.current?.id === event.conversationId) {
+        if (document.visibilityState === "visible" && !isOwnMessage) {
           handleUpdateLastSeen(event.conversationId);
 
-          const socket = getSocket(currentUser.id);
           const memberIds =
             selectedConversationRef.current?.otherUsers.map((u) => u.userId) ??
             [];
@@ -403,16 +399,21 @@ export const MessageProvider = ({
 
     const doJoinAndSeen = () => {
       socket.emit("join_conversation", { conversationId });
-      setTimeout(() => {
-        const lastMsg = messagesRef.current[messagesRef.current.length - 1];
-        socket.emit("seen", {
-          conversationId,
-          memberIds:
-            selectedConversationRef.current?.otherUsers.map((u) => u.userId) ??
-            [],
-          lastSeenMessageId: lastMsg?.id ?? null,
-        });
-      }, 300);
+
+      // 👈 Chỉ emit seen khi đang xem tab
+      if (document.visibilityState === "visible") {
+        setTimeout(() => {
+          const lastMsg = messagesRef.current[messagesRef.current.length - 1];
+          socket.emit("seen", {
+            conversationId,
+            memberIds:
+              selectedConversationRef.current?.otherUsers.map(
+                (u) => u.userId,
+              ) ?? [],
+            lastSeenMessageId: lastMsg?.id ?? null,
+          });
+        }, 300);
+      }
     };
 
     if (socket.connected) {
@@ -444,6 +445,10 @@ export const MessageProvider = ({
             s.userId !== currentUser?.id,
         )
         .map((s: any) => s.userId);
+
+      if (document.visibilityState === "visible") {
+        await handleUpdateLastSeen(res.id);
+      }
 
       setSeenUsers((prev) => ({
         ...prev,
