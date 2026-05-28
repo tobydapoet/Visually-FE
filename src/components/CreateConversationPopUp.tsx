@@ -17,6 +17,7 @@ import { useUser } from "../contexts/user.context";
 import { useMessage } from "../contexts/message.context";
 import { toast } from "sonner";
 import { handleCreateConversation } from "../api/message.api";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -35,6 +36,7 @@ const CreateConversationPopup: React.FC<Props> = ({ open, onClose }) => {
     resolver: zodResolver(CreateConversationSchema),
     mode: "onBlur",
   });
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -102,7 +104,9 @@ const CreateConversationPopup: React.FC<Props> = ({ open, onClose }) => {
             data-closed:scale-95 data-closed:opacity-0"
         >
           <DialogTitle className="flex items-center justify-between px-4 py-2 border-b border-zinc-800">
-            <div className="text-md font-semibold text-white">Create box</div>
+            <div className="text-md font-semibold text-white">
+              {t("create_box")}
+            </div>
             <button
               onClick={handleClose}
               className="w-9 h-9 flex items-center cursor-pointer justify-center rounded-full hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
@@ -115,10 +119,12 @@ const CreateConversationPopup: React.FC<Props> = ({ open, onClose }) => {
               fullWidth
               size="small"
               {...register("name")}
-              placeholder="Add name"
+              placeholder={t("add_name")}
               variant="outlined"
               error={!!errors.name}
-              helperText={errors.name?.message}
+              helperText={
+                errors.name?.message ? t(errors.name.message as any) : ""
+              }
               sx={{
                 "& .MuiOutlinedInput-root": {
                   color: "white",
@@ -145,7 +151,7 @@ const CreateConversationPopup: React.FC<Props> = ({ open, onClose }) => {
                 onChange={(e) => {
                   setSearch(e.target.value);
                 }}
-                placeholder="Search user"
+                placeholder={t("search_user")}
                 variant="outlined"
                 sx={{
                   "& .MuiOutlinedInput-root": {
@@ -207,11 +213,18 @@ const CreateConversationPopup: React.FC<Props> = ({ open, onClose }) => {
             >
               {isSubmitting ? (
                 <>
-                  <CircularProgress size={20} sx={{ color: "white" }} />
+                  <CircularProgress size={20} />
                 </>
               ) : (
-                "Save"
+                t("save")
               )}
+              <button type="submit">
+                {isSubmitting ? (
+                  <CircularProgress size={20} sx={{ color: "white" }} />
+                ) : (
+                  t("save")
+                )}
+              </button>
             </button>
           </form>
         </DialogPanel>

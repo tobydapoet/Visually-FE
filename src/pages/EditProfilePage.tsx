@@ -21,11 +21,13 @@ import { toast } from "sonner";
 import assets from "../assets";
 import { manualRefreshToken } from "../api/auth.api";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "../hooks/useTranslation";
 
 const EditProfilePage: React.FC = () => {
   const { currentUser, reloadUser } = useUser();
   if (!currentUser) return;
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const {
     register,
@@ -60,7 +62,7 @@ const EditProfilePage: React.FC = () => {
 
     const res = await handleUpdateUser(formData);
     if (res.success) {
-      toast.success("Update success!");
+      toast.success(res.message);
       await manualRefreshToken();
       reloadUser();
       navigate(`/${data.username}`, { replace: true });
@@ -135,7 +137,9 @@ const EditProfilePage: React.FC = () => {
           className={inputClass}
         />
         {errors.fullName && (
-          <p className={errorClass}>{errors.fullName.message}</p>
+          <p className={errorClass}>
+            {errors.fullName.message && t(errors.fullName.message as any)}
+          </p>
         )}
       </div>
 
@@ -145,17 +149,19 @@ const EditProfilePage: React.FC = () => {
         </label>
         <input
           {...register("username")}
-          placeholder="your_username"
+          placeholder={t("your_username")}
           className={inputClass}
           onKeyDown={(e) => {
             if (e.key === " ") e.preventDefault();
           }}
         />
         {errors.username ? (
-          <p className={errorClass}>{errors.username.message}</p>
+          <p className={errorClass}>
+            {errors.username.message && t(errors.username.message as any)}
+          </p>
         ) : (
           <p className="text-xs text-neutral-500 mt-1">
-            This will be your unique username
+            {t("unique_username_hint")}
           </p>
         )}
       </div>
@@ -163,7 +169,7 @@ const EditProfilePage: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>
-            <VenusAndMars size={13} /> Gender
+            <VenusAndMars size={13} /> {t("gender")}
           </label>
           <select
             {...register("gender")}
@@ -171,20 +177,22 @@ const EditProfilePage: React.FC = () => {
             className={`${inputClass} appearance-none`}
           >
             <option value="" disabled>
-              Select gender
+              {t("select_gender")}
             </option>
-            <option value={Gender.MALE}>Male</option>
-            <option value={Gender.FEMALE}>Female</option>
-            <option value={Gender.OTHER}>Other</option>
+            <option value={Gender.MALE}>{t("gender_male")}</option>
+            <option value={Gender.FEMALE}>{t("gender_female")}</option>
+            <option value={Gender.OTHER}>{t("other")}</option>
           </select>
           {errors.gender && (
-            <p className={errorClass}>{errors.gender.message}</p>
+            <p className={errorClass}>
+              {errors.gender.message && t(errors.gender.message as any)}
+            </p>
           )}
         </div>
 
         <div>
           <label className={labelClass}>
-            <Calendar size={13} /> Date of birth
+            <Calendar size={13} /> {t("date_of_birth_label")}
           </label>
           <Controller
             name="dob"
@@ -197,26 +205,30 @@ const EditProfilePage: React.FC = () => {
               />
             )}
           />
-          {errors.dob && <p className={errorClass}>{errors.dob.message}</p>}
+          {errors.dob && (
+            <p className={errorClass}>
+              {errors.dob.message && t(errors.dob.message as any)}
+            </p>
+          )}
         </div>
       </div>
 
       <div>
         <label className={labelClass}>
-          <Info size={13} /> Bio
+          <Info size={13} /> {t("bio_label")}
         </label>
         <textarea
           {...register("bio")}
           rows={4}
           defaultValue={currentUser.bio || ""}
-          placeholder="Tell us about yourself..."
+          placeholder={t("tell_us_about_yourself")}
           className={`${inputClass} resize-none`}
         />
       </div>
 
       <div>
         <label className={labelClass}>
-          <Mail size={13} /> Email
+          <Mail size={13} /> {t("email_label")}
         </label>
         <input
           value={currentUser.email || ""}
@@ -230,7 +242,7 @@ const EditProfilePage: React.FC = () => {
           type="submit"
           className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white text-sm font-semibold px-8 py-2.5 rounded-xl transition-colors"
         >
-          Save changes
+          {t("save_changes")}
         </button>
       </div>
     </form>

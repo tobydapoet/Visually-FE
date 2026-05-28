@@ -24,6 +24,7 @@ import {
 import { Gender } from "../constants/gender.enum";
 import { handleRegister } from "../api/auth.api";
 import { toast } from "sonner";
+import { useTranslation } from "../hooks/useTranslation";
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const RegisterPage: React.FC = () => {
     resolver: zodResolver(RegisterSchema),
     mode: "onBlur",
   });
+  const { t } = useTranslation();
 
   useEffect(() => {
     const refresh_token = Cookies.get("refresh_token");
@@ -48,7 +50,7 @@ const RegisterPage: React.FC = () => {
   const onSubmit = async (data: RegisterType) => {
     const res = await handleRegister(data);
     if (res.success) {
-      toast.success("Register success!");
+      toast.success(t("register_success"));
       navigate("/login");
     } else {
       toast.error(res.message);
@@ -76,11 +78,9 @@ const RegisterPage: React.FC = () => {
 
           <div className="mb-8">
             <h1 className="font-plus text-3xl font-bold text-white">
-              Get started on Visually
+              {t("get_started")}
             </h1>
-            <p className="mt-2 text-gray-400">
-              Sign up to see photos and videos from your friends.
-            </p>
+            <p className="mt-2 text-gray-400">{t("register_subtitle")}</p>
           </div>
 
           <form
@@ -91,10 +91,10 @@ const RegisterPage: React.FC = () => {
             <div className="space-y-4">
               <div className="border-b border-gray-700 pb-2">
                 <h2 className="text-lg font-semibold text-white">
-                  Account Information
+                  {t("account_information")}
                 </h2>
                 <p className="text-sm text-gray-400 mt-1">
-                  Your login credentials
+                  {t("account_information_subtitle")}
                 </p>
               </div>
 
@@ -103,8 +103,10 @@ const RegisterPage: React.FC = () => {
                 id="email"
                 {...register("email")}
                 error={!!errors.email}
-                helperText={errors.email?.message}
-                label="Email Address"
+                helperText={
+                  errors.email?.message ? t(errors.email.message as any) : ""
+                }
+                label={t("email")}
                 variant="outlined"
                 size="medium"
                 margin="normal"
@@ -128,11 +130,15 @@ const RegisterPage: React.FC = () => {
               <TextField
                 fullWidth
                 id="password"
-                label="Password"
+                label={t("password")}
                 type="password"
                 {...register("password")}
                 error={!!errors.password}
-                helperText={errors.password?.message}
+                helperText={
+                  errors.password?.message
+                    ? t(errors.password.message as any)
+                    : ""
+                }
                 variant="outlined"
                 size="medium"
                 margin="normal"
@@ -156,11 +162,15 @@ const RegisterPage: React.FC = () => {
               <TextField
                 fullWidth
                 id="confirmPassword"
-                label="Confirm Password"
+                label={t("confirm_password")}
                 type="password"
                 {...register("confirmPassword")}
                 error={!!errors.confirmPassword}
-                helperText={errors.confirmPassword?.message}
+                helperText={
+                  errors.confirmPassword?.message
+                    ? t(errors.confirmPassword.message as any)
+                    : ""
+                }
                 variant="outlined"
                 size="medium"
                 margin="normal"
@@ -185,20 +195,24 @@ const RegisterPage: React.FC = () => {
             <div className="space-y-4">
               <div className="border-b border-gray-700 pb-2">
                 <h2 className="text-lg font-semibold text-white">
-                  Personal Information
+                  {t("personal_information")}
                 </h2>
                 <p className="text-sm text-gray-400 mt-1">
-                  Tell us about yourself
+                  {t("personal_information_subtitle")}
                 </p>
               </div>
 
               <TextField
                 fullWidth
                 id="fullName"
-                label="Full Name"
+                label={t("full_name")}
                 {...register("fullName")}
                 error={!!errors.fullName}
-                helperText={errors.fullName?.message}
+                helperText={
+                  errors.fullName?.message
+                    ? t(errors.fullName.message as any)
+                    : ""
+                }
                 variant="outlined"
                 size="medium"
                 margin="normal"
@@ -222,10 +236,19 @@ const RegisterPage: React.FC = () => {
               <TextField
                 fullWidth
                 id="username"
-                label="Username"
+                label={t("username")}
                 {...register("username")}
                 error={!!errors.username}
-                helperText={errors.username?.message}
+                helperText={
+                  errors.username?.message
+                    ? t(errors.username.message as any)
+                    : ""
+                }
+                onKeyDown={(e) => {
+                  if (e.key === " ") {
+                    e.preventDefault();
+                  }
+                }}
                 variant="outlined"
                 size="medium"
                 margin="normal"
@@ -249,10 +272,12 @@ const RegisterPage: React.FC = () => {
               <TextField
                 fullWidth
                 id="phone"
-                label="Phone Number"
+                label={t("phone")}
                 {...register("phone")}
                 error={!!errors.phone}
-                helperText={errors.phone?.message}
+                helperText={
+                  errors.phone?.message ? t(errors.phone.message as any) : ""
+                }
                 variant="outlined"
                 size="medium"
                 sx={{
@@ -292,7 +317,7 @@ const RegisterPage: React.FC = () => {
                         "&.Mui-focused": { color: "white" },
                       }}
                     >
-                      Gender
+                      {t("gender")}
                     </FormLabel>
 
                     <RadioGroup
@@ -322,7 +347,7 @@ const RegisterPage: React.FC = () => {
                             fontWeight: 500,
                           },
                         }}
-                        label="Male"
+                        label={t("male")}
                       />
 
                       <FormControlLabel
@@ -333,7 +358,7 @@ const RegisterPage: React.FC = () => {
                             checkedIcon={<Venus color="#ec4899" size={22} />}
                           />
                         }
-                        label="Female"
+                        label={t("female")}
                         sx={{
                           "& .MuiFormControlLabel-label": {
                             color: "#9ca3af",
@@ -356,7 +381,7 @@ const RegisterPage: React.FC = () => {
                             }
                           />
                         }
-                        label="Other"
+                        label={t("other")}
                         sx={{
                           "& .MuiFormControlLabel-label": {
                             color: "#9ca3af",
@@ -369,7 +394,11 @@ const RegisterPage: React.FC = () => {
                         }}
                       />
                     </RadioGroup>
-                    <FormHelperText>{errors.gender?.message}</FormHelperText>
+                    <FormHelperText>
+                      {errors.gender?.message
+                        ? t(errors.gender.message as any)
+                        : ""}
+                    </FormHelperText>
                   </FormControl>
                 )}
               />
@@ -378,7 +407,7 @@ const RegisterPage: React.FC = () => {
                 <BirthField setValue={setValue} />
 
                 <FormHelperText sx={{ mt: 1 }}>
-                  {errors.dob?.message}
+                  {errors.dob?.message ? t(errors.dob.message as any) : ""}
                 </FormHelperText>
               </FormControl>
             </div>
@@ -402,29 +431,29 @@ const RegisterPage: React.FC = () => {
                   },
                 }}
               >
-                Register
+                {t("register")}
               </Button>
 
               <div className="text-center mt-4">
-                <span className="text-gray-500">Have an account? </span>
+                <span className="text-gray-500">{t("have_account")}</span>
 
                 <Link
                   to="/"
                   className="text-blue-500 hover:text-blue-400 font-medium transition-colors"
                 >
-                  Sign In
+                  {t("sign_in")}
                 </Link>
               </div>
             </div>
 
             <div className="text-[12px] text-gray-500 mt-8 text-center">
-              By registering, you agree to our{" "}
+              {t("register_prefix")}{" "}
               <span className="text-red-400 cursor-pointer hover:underline hover:text-red-300">
-                Terms of Service
+                {t("terms_of_service")}
               </span>{" "}
-              and{" "}
+              {t("and")}{" "}
               <span className="text-red-400 cursor-pointer hover:underline hover:text-red-300">
-                Privacy Policy
+                {t("privacy_policy")}
               </span>
               .
             </div>

@@ -27,6 +27,10 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  const lang = localStorage.getItem("lang") || "en";
+  config.headers["Accept-Language"] = lang;
+
   return config;
 });
 

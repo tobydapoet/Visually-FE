@@ -8,6 +8,7 @@ import { handleSearchUserWithRole } from "../api/user.api";
 import assets from "../assets";
 import { CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -20,6 +21,7 @@ const SearchPopup: FC<Props> = ({ open, onClose }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const debouncedKeyword = useDebounce(searchInput, 500);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!open) return;
@@ -85,7 +87,9 @@ const SearchPopup: FC<Props> = ({ open, onClose }) => {
           "
         >
           <div className="flex justify-between">
-            <h2 className="text-white text-lg font-semibold mb-4">Search</h2>
+            <h2 className="text-white text-lg font-semibold mb-4">
+              {t("search")}
+            </h2>
             <button
               onClick={onClose}
               className="w-9 h-9 flex items-center cursor-pointer justify-center rounded-full hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
@@ -98,7 +102,7 @@ const SearchPopup: FC<Props> = ({ open, onClose }) => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
             <input
               type="text"
-              placeholder="Search clients..."
+              placeholder={t("search_clients")}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-neutral-900 border border-neutral-800 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-neutral-500 text-md"
@@ -115,13 +119,13 @@ const SearchPopup: FC<Props> = ({ open, onClose }) => {
 
             {!loading && users.length === 0 && debouncedKeyword && (
               <div className="text-center text-gray-400 py-4">
-                No clients found
+                {t("no_clients_found")}
               </div>
             )}
 
             {!loading && users.length === 0 && !debouncedKeyword && (
               <div className="text-center text-gray-400 py-4">
-                Type to search clients
+                {t("type_to_search_clients")}
               </div>
             )}
 

@@ -15,6 +15,7 @@ import { TextField, InputAdornment, CircularProgress } from "@mui/material";
 import { useUser } from "../contexts/user.context";
 import useDebounce from "../hooks/useDebounce";
 import assets from "../assets";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -36,6 +37,7 @@ const FollowPopUp: React.FC<Props> = ({
   const debouncedSearch = useDebounce(search, 400);
   const navigate = useNavigate();
   const { currentUser } = useUser();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchFollow = async () => {
@@ -87,7 +89,9 @@ const FollowPopUp: React.FC<Props> = ({
         >
           <DialogTitle className="flex items-center justify-between px-4 py-2 border-b border-zinc-800">
             <div className="text-md font-semibold text-white">
-              {followRelation === "FOLLOWER" ? "Followers" : "Following"}
+              {followRelation === "FOLLOWER"
+                ? t("followers_title")
+                : t("following_title")}
             </div>
             <button
               onClick={onClose}
@@ -106,7 +110,11 @@ const FollowPopUp: React.FC<Props> = ({
                 setSearch(e.target.value);
                 setPage(0);
               }}
-              placeholder={`Search ${followRelation === "FOLLOWER" ? "followers" : "following"}`}
+              placeholder={
+                followRelation === "FOLLOWER"
+                  ? t("search_followers")
+                  : t("search_following")
+              }
               variant="outlined"
               sx={{
                 "& .MuiOutlinedInput-root": {
@@ -138,7 +146,7 @@ const FollowPopUp: React.FC<Props> = ({
               <div className="flex flex-col items-center justify-center py-12 px-6">
                 <CircularProgress sx={{ color: "#71717a" }} />
                 <p className="text-sm text-zinc-500 text-center mt-4">
-                  Loading...
+                  {t("loading")}
                 </p>
               </div>
             ) : !follow || follow.length === 0 ? (
@@ -152,17 +160,17 @@ const FollowPopUp: React.FC<Props> = ({
                 </div>
                 <p className="text-white font-medium text-center">
                   {search
-                    ? `No results for "${search}"`
+                    ? t("no_results_for", { search })
                     : followRelation === "FOLLOWER"
-                      ? "No followers yet"
-                      : "Not following anyone"}
+                      ? t("no_followers_yet")
+                      : t("not_following_anyone")}
                 </p>
                 <p className="text-sm text-zinc-500 text-center mt-2">
                   {search
-                    ? "Try a different name or username"
+                    ? t("try_different_name")
                     : followRelation === "FOLLOWER"
-                      ? "When someone follows you, they'll appear here"
-                      : "When you follow someone, they'll appear here"}
+                      ? t("no_followers_subtitle")
+                      : t("not_following_subtitle")}
                 </p>
               </div>
             ) : (
@@ -204,7 +212,7 @@ const FollowPopUp: React.FC<Props> = ({
                           }
                         }}
                       >
-                        Follow
+                        {t("follow")}
                       </button>
                     ) : (
                       <button
@@ -219,7 +227,7 @@ const FollowPopUp: React.FC<Props> = ({
                           }
                         }}
                       >
-                        Following
+                        {t("following_btn")}
                       </button>
                     ))}
                 </div>

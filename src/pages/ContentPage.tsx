@@ -31,6 +31,7 @@ import MessageInput from "../components/MessageInput";
 import type { MentionItem } from "../types/api/mention.type";
 import ReportSidebar from "../components/ReportSidebar";
 import ContentMorePopUp from "../components/ContentMorePopUp";
+import { useTranslation } from "../hooks/useTranslation";
 
 export const isVideo = (url: string): boolean =>
   /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url);
@@ -41,6 +42,7 @@ const ContentPage: React.FC = () => {
   >(null);
   const [searchParams] = useSearchParams();
   const { currentUser } = useUser();
+  const { t } = useTranslation();
 
   const contentId = searchParams.get("contentId");
 
@@ -558,7 +560,7 @@ const ContentPage: React.FC = () => {
                   className="ml-1 text-white/60 font-semibold cursor-pointer"
                   onClick={() => setExpanded((v) => !v)}
                 >
-                  {expanded ? " less" : " more"}
+                  {expanded ? ` ${t("less")}` : ` ${t("more")}`}
                 </button>
               )}
             </p>

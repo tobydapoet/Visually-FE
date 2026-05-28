@@ -23,6 +23,7 @@ import type { MentionItem } from "../types/api/mention.type";
 import type { UserSummaryType } from "../types/api/user.type";
 import type { MemberType } from "../types/api/message.type";
 import useDebounce from "../hooks/useDebounce";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props =
   | {
@@ -72,6 +73,7 @@ const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
   const [mentions, setMentions] = useState<MentionItem[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   const debouncedMentionQuery = useDebounce(mentionQuery, 300);
 
@@ -299,7 +301,7 @@ const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
         <div className="flex items-center justify-between gap-2 px-3 py-1.5 mb-1 bg-blue-900/40 border border-blue-500/50 rounded-lg text-xs text-blue-300">
           <div className="flex items-center gap-2">
             <Pencil size={12} />
-            <span>Editing message</span>
+            <span>{t("editing_message")}</span>
           </div>
           <button
             onClick={() => {
@@ -319,7 +321,7 @@ const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
           <div className="flex items-center gap-2">
             <Reply size={12} />
             <span>
-              Replying to{" "}
+              {t("replying_to")}{" "}
               <span className="text-white font-semibold">
                 @{replyingToUsername}
               </span>
@@ -445,7 +447,7 @@ const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
             value={messageValue}
             onChange={handleTextareaChange}
             onKeyDown={handleKeyPress}
-            placeholder="Message..."
+            placeholder={t("message_placeholder")}
             disabled={isSending}
             className="flex-1 bg-transparent text-white placeholder-gray-400 py-2 px-1 outline-none resize-none min-h-10 max-h-32 disabled:opacity-50"
             rows={1}

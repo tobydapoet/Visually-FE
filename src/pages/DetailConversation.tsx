@@ -11,7 +11,6 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useState } from "react";
-import EditConversationPopUp from "./EditConverSationPopup";
 import type { MemberType } from "../types/api/message.type";
 import { handleGetConversationMembers } from "../api/message.api";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +22,8 @@ import { toast } from "sonner";
 import { timeAgo } from "../utils/timeAgot";
 import MutePopUp from "../components/MutePopUp";
 import { handleBlock, handleUnblock } from "../api/follow.api";
+import { useTranslation } from "../hooks/useTranslation";
+import EditConversationPopUp from "../components/EditConversationPopup";
 
 interface DetailConversationProps {
   open: boolean;
@@ -47,7 +48,7 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
   const [isOpenMutePopUp, setIsOpenMutePopUp] = useState(false);
   const [isOpenBlockDialog, setIsOpenBlockDialog] = useState(false);
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   if (!selectedConversation) return null;
 
   const currentMember = memberList.find(
@@ -86,7 +87,7 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
     );
 
     if (!myMember) {
-      toast.error("Cannot find your information in this group");
+      toast.error(t("cannot_find_member"));
       return;
     }
 
@@ -95,7 +96,7 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
       const result = await handleRemoveMemberFromConversation(myMember.id);
       if (result.success) {
         handleGetConversationMembers(selectedConversation.id);
-        toast.success("You have left the group");
+        toast.success(t("left_group_success"));
         setIsOpenLeave(false);
         setNullForConversation();
         refetchConversations();
@@ -178,7 +179,7 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
             <div className="flex items-center justify-between px-4 mb-2">
               <div className="font-semibold text-gray-300">Members</div>
               <div className="text-xs text-gray-500">
-                {memberList.length} members
+                {t("members_count", { count: String(memberList.length) })}
               </div>
             </div>
 
@@ -209,8 +210,10 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
                         </div>
                         <div className="text-xs text-gray-400">
                           {member.lastSeen === null
-                            ? "Active now"
-                            : `Active ${timeAgo(member.lastSeen)} ago`}
+                            ? t("active_now")
+                            : t("active_ago", {
+                                time: timeAgo(member.lastSeen),
+                              })}
                         </div>
                       </div>
                     </div>
@@ -261,10 +264,10 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
                 <BellOff size={18} color="#a1a1aa" />
               )}
             </div>
-            <span className="text-sm font-medium text-zinc-400 tracking-wide">
+            <span className="text-sm font-medium text-zinc-400">
               {currentMember?.isMutedAt
-                ? "Turn on notifications"
-                : "Turn off notifications"}
+                ? t("turn_on_notifications")
+                : t("turn_off_notifications")}
             </span>
           </button>
           {selectedConversation.type === "PRIVATE" && (
@@ -278,8 +281,10 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
               <div className="p-1 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
                 <ShieldBan size={18} color="#f87171" />
               </div>
-              <span className="text-sm font-medium text-red-400 tracking-wide">
-                {selectedConversation.isBlocked ? "Unblock user" : "Block user"}
+              <span className="text-sm font-medium text-red-400">
+                {selectedConversation.isBlocked
+                  ? t("unblock_user")
+                  : t("block_user")}
               </span>
             </button>
           )}
@@ -294,8 +299,8 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
               <div className="p-1 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
                 <LogOut size={18} color="#f87171" />
               </div>
-              <span className="text-sm font-medium text-red-400 tracking-wide">
-                Leave group
+              <span className="text-sm font-medium text-red-400">
+                {t("leave_group")}
               </span>
             </button>
           )}
@@ -314,10 +319,12 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
           setSelectedMember(null);
         }}
         onConfirm={handleRemoveMember}
-        title="Remove Member"
-        message={`Are you sure you want to remove "${selectedMember?.username}" from this group?`}
-        confirmText="Remove"
-        cancelText="Cancel"
+        title={t("remove_member_title")}
+        message={t("remove_member_message", {
+          username: selectedMember?.username ?? "",
+        })}
+        confirmText={t("remove")}
+        cancelText={t("cancel")}
       />
 
       <ConfirmDialog
@@ -326,10 +333,10 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
           setIsOpenLeave(false);
         }}
         onConfirm={handleLeave}
-        title="Remove Member"
-        message={`Are you sure you want to  leave from this group?`}
-        confirmText="Remove"
-        cancelText="Cancel"
+        title={t("remove_member_title")}
+        message={t("leave_group_message")}
+        confirmText={t("remove")}
+        cancelText={t("cancel")}
       />
 
       <MemberInvitePopUp
@@ -361,10 +368,12 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
           }}
           message={
             selectedConversation.isBlocked
-              ? "Do you want to unblock this user?"
-              : "Do you want to block this user?"
+              ? t("unblock_message", { username: otherMember?.username ?? "" })
+              : t("block_message")
           }
-          title={selectedConversation.isBlocked ? "Unblock user" : "Block user"}
+          title={
+            selectedConversation.isBlocked ? t("unblock_user") : t("block_user")
+          }
         />
       )}
     </>

@@ -11,6 +11,7 @@ import { handleContentSearch, handleTagSearch } from "../api/content.api";
 import { UserRole } from "../constants/userRole.enum";
 import assets from "../assets";
 import { UserComponent } from "../components/UserComponent";
+import { useTranslation } from "../hooks/useTranslation";
 
 type TabType = "users" | "contents" | "tags";
 
@@ -29,6 +30,7 @@ const SearchPage: FC = () => {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingContents, setLoadingContents] = useState(false);
   const [loadingTags, setLoadingTags] = useState(false);
+  const { t } = useTranslation();
 
   const debouncedKeyword = useDebounce(searchInput, 500);
 
@@ -138,9 +140,9 @@ const SearchPage: FC = () => {
   };
 
   const tabs = [
-    { id: "users" as TabType, label: "Users", icon: User },
-    { id: "contents" as TabType, label: "Contents", icon: FileText },
-    { id: "tags" as TabType, label: "Tags", icon: Hash },
+    { id: "users" as TabType, label: t("users"), icon: User },
+    { id: "contents" as TabType, label: t("contents"), icon: FileText },
+    { id: "tags" as TabType, label: t("tags"), icon: Hash },
   ];
 
   return (
@@ -149,7 +151,7 @@ const SearchPage: FC = () => {
         <Search className="absolute left-5 md:left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
         <input
           type="text"
-          placeholder="Search users, contents, or tags..."
+          placeholder={t("search_users_contents_tags")}
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -199,7 +201,7 @@ const SearchPage: FC = () => {
       <div className="mt-4">
         {!keyword ? (
           <div className="text-center text-gray-500 py-10">
-            Enter a keyword to search
+            {t("enter_keyword_to_search")}
           </div>
         ) : (
           <>
@@ -213,7 +215,7 @@ const SearchPage: FC = () => {
 
                 {!loadingUsers && users.length === 0 && (
                   <div className="text-center text-gray-500 py-10">
-                    No users found
+                    {t("no_users_found")}
                   </div>
                 )}
 
@@ -249,7 +251,7 @@ const SearchPage: FC = () => {
 
                 {!loadingContents && contents.length === 0 && (
                   <div className="col-span-4 text-center text-gray-500 py-10">
-                    No contents found
+                    {t("no_contents_found")}
                   </div>
                 )}
 
@@ -269,7 +271,7 @@ const SearchPage: FC = () => {
 
                 {!loadingTags && tags.length === 0 && (
                   <div className="w-full text-center text-gray-500 py-10">
-                    No tags found
+                    {t("no_tags_found")}
                   </div>
                 )}
 

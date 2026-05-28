@@ -24,6 +24,7 @@ import { timeAgo } from "../utils/timeAgot";
 import MediaViewerModal from "../components/MediaViewerModal";
 import { getSocket } from "../utils/socket";
 import ConfirmDialog from "../components/ConfirmDialog";
+import { useTranslation } from "../hooks/useTranslation";
 
 const MessagePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -67,6 +68,7 @@ const MessagePage: React.FC = () => {
     open: boolean;
     mediaId?: number;
   }>({ open: false });
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!loading && selectedConversation) {
@@ -256,8 +258,12 @@ const MessagePage: React.FC = () => {
                       {!selectedConversation.name && (
                         <div className="text-xs text-gray-400">
                           {selectedConversation.otherUsers[0].lastSeen === null
-                            ? "Active now"
-                            : `Active ${timeAgo(selectedConversation.otherUsers[0].lastSeen)} ago`}
+                            ? t("active_now")
+                            : t("active_ago", {
+                                time: timeAgo(
+                                  selectedConversation.otherUsers[0].lastSeen,
+                                ),
+                              })}
                         </div>
                       )}
                     </div>
@@ -279,7 +285,7 @@ const MessagePage: React.FC = () => {
               >
                 {messages.length === 0 ? (
                   <div className="h-full flex items-center justify-center text-gray-500">
-                    No messages yet. Start a conversation!
+                    {t("no_messages_yet")}
                   </div>
                 ) : (
                   <>
@@ -434,7 +440,9 @@ const MessagePage: React.FC = () => {
                                   }`}
                                 >
                                   {msg.replyTo.isDeleted ? (
-                                    <p className="italic">Tin nhắn đã bị xóa</p>
+                                    <p className="italic">
+                                      {t("message_deleted")}
+                                    </p>
                                   ) : (
                                     <>
                                       <p className="font-semibold">
@@ -682,7 +690,7 @@ const MessagePage: React.FC = () => {
         ) : (
           !loading && (
             <div className="h-full flex-1 flex items-center justify-center text-gray-500">
-              Select a user to start messaging
+              {t("select_user_to_message")}
             </div>
           )
         )}
@@ -703,10 +711,10 @@ const MessagePage: React.FC = () => {
           if (confirmDeleteId) await deleteMessage(confirmDeleteId);
         }}
         onConfirmClose={() => setConfirmDeleteId(null)}
-        title="Delete message?"
-        message="This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t("delete_message_title")}
+        message={t("delete_message_confirm")}
+        confirmText={t("delete")}
+        cancelText={t("cancel")}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import { UserComponent } from "./UserComponent";
 import LoadingSpinner from "./LoadingSpinner";
 import type { UseInfiniteQueryResult } from "@tanstack/react-query";
 import type { TabUserType } from "../constants/userPage.type";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   activeTab: TabUserType;
@@ -34,6 +35,7 @@ export const UserProfileTabs: React.FC<Props> = ({
   const postsEndRef = useRef<HTMLDivElement>(null);
   const shortsEndRef = useRef<HTMLDivElement>(null);
   const repostedEndRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!postsEndRef.current) return;
@@ -123,7 +125,7 @@ export const UserProfileTabs: React.FC<Props> = ({
             {posts.length === 0 && !postsQuery.isLoading ? (
               <div className="col-span-full text-center text-gray-400 py-12">
                 <Camera className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>No posts yet</p>
+                <p>{t("no_posts_yet")}</p>
               </div>
             ) : (
               <>
@@ -143,7 +145,7 @@ export const UserProfileTabs: React.FC<Props> = ({
             {shorts.length === 0 && !shortsQuery.isLoading ? (
               <div className="col-span-full text-center text-gray-400 py-12">
                 <Video className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>No shorts yet</p>
+                <p>{t("no_shorts_yet")}</p>
               </div>
             ) : (
               <>
@@ -164,7 +166,7 @@ export const UserProfileTabs: React.FC<Props> = ({
         {activeTab === "saved" && isOwner && (
           <div className="text-center text-gray-400 py-12">
             <Bookmark className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            <p>Saved content will be displayed here</p>
+            <p>{t("saved_content_here")}</p>
           </div>
         )}
 
@@ -173,7 +175,7 @@ export const UserProfileTabs: React.FC<Props> = ({
             {reposted.length === 0 && !repostedQuery.isLoading ? (
               <div className="col-span-full text-center text-gray-400 py-12">
                 <Repeat2 className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>No reposts yet</p>
+                <p>{t("no_reposts_yet")}</p>
               </div>
             ) : (
               <>

@@ -11,6 +11,7 @@ import assets from "../assets";
 import { useMessage } from "../contexts/message.context";
 import CreateConversationPopup from "./CreateConversationPopUp";
 import { handleSearchConversation } from "../api/message.api";
+import { useTranslation } from "../hooks/useTranslation";
 
 const SideBarMessage: React.FC = () => {
   const { currentUser } = useUser();
@@ -34,6 +35,7 @@ const SideBarMessage: React.FC = () => {
   const [conversationResults, setConversationResults] = useState<
     ConversationType[]
   >([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchSearch = async () => {
@@ -93,7 +95,7 @@ const SideBarMessage: React.FC = () => {
           <Search size={16} className="text-zinc-400" />
           <input
             type="text"
-            placeholder="Search"
+            placeholder={t("search")}
             onChange={(e) => setKeyword(e.target.value)}
             value={keyword}
             className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-zinc-500"
@@ -113,7 +115,7 @@ const SideBarMessage: React.FC = () => {
                   {conversationResults.length > 0 && (
                     <>
                       <div className="text-xs text-gray-500 px-2">
-                        Conversations
+                        {t("conversations")}
                       </div>
                       {conversationResults.map((conversation) => (
                         <div
@@ -162,7 +164,7 @@ const SideBarMessage: React.FC = () => {
                             </div>
                             <div className="text-xs text-gray-400 truncate max-w-50">
                               {(conversation.lastMessage as any)?.content ||
-                                "No messages yet"}
+                                t("no_messages_yet_short")}
                             </div>
                           </div>
                         </div>
@@ -173,7 +175,7 @@ const SideBarMessage: React.FC = () => {
                   {searchResults.length > 0 && (
                     <>
                       <div className="text-xs text-gray-500 px-2 mt-2">
-                        People
+                        {t("people")}
                       </div>
                       {searchResults.map((user) => (
                         <div
@@ -202,7 +204,7 @@ const SideBarMessage: React.FC = () => {
                     searchResults.length === 0 && (
                       <Box textAlign="center" py={4}>
                         <div className="text-gray-400 text-sm">
-                          No results found
+                          {t("no_results_found")}
                         </div>
                       </Box>
                     )}
@@ -276,8 +278,9 @@ const SideBarMessage: React.FC = () => {
                         <div className="text-xs text-gray-400 truncate max-w-50">
                           {typeof conversation.lastMessage === "object"
                             ? (conversation.lastMessage as any)?.content ||
-                              "No messages yet"
-                            : conversation.lastMessage || "No messages yet"}
+                              t("no_messages_yet_short")
+                            : conversation.lastMessage ||
+                              t("no_messages_yet_short")}
                         </div>
                       </div>
 
@@ -298,7 +301,7 @@ const SideBarMessage: React.FC = () => {
               ) : (
                 <Box textAlign="center" py={4}>
                   <div className="text-gray-400 text-sm">
-                    No conversations yet
+                    {t("no_conversations_yet")}
                   </div>
                 </Box>
               )}

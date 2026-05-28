@@ -279,6 +279,5 @@ export const handleGetSeenStatus = async (conversationId: number) => {
   const res = await axiosInstance.get(
     `${import.meta.env.VITE_API_URL}messages/conversation-member/${conversationId}/seen-status`,
   );
-  console.log("RES: ", res.data);
   return res.data;
 };

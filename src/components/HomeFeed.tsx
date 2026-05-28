@@ -6,6 +6,7 @@ import { FeedEnum } from "../constants/feed.enum";
 import SkeletonCard from "./SkeletionCard";
 import PostCard from "./PostCard";
 import type { FeedContentResponse } from "../types/api/feed.type";
+import { useTranslation } from "../hooks/useTranslation";
 
 const HomeFeed = () => {
   const [allFeeds, setAllFeeds] = useState<FeedContentResponse[]>([]);
@@ -13,6 +14,7 @@ const HomeFeed = () => {
   const isFetchingRef = useRef(false);
   const loaderRef = useRef<HTMLDivElement>(null);
   const scrollAnchorRef = useRef<number>(0);
+  const { t } = useTranslation();
 
   const homeQuery = useInfiniteQuery({
     queryKey: ["feed", FeedEnum.HOME],
@@ -108,7 +110,7 @@ const HomeFeed = () => {
             </>
           ) : allFeeds.length === 0 ? (
             <div className="text-center py-20 text-neutral-600 text-sm">
-              No posts yet.
+              {t("no_posts_yet")}
             </div>
           ) : (
             allFeeds.map((post, i) => (

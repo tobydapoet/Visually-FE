@@ -18,6 +18,7 @@ import ConfirmDialog from "./ConfirmDialog";
 import { handleUpdateStatusMusic } from "../api/media.api";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "../hooks/useTranslation";
 
 interface MusicItemProps {
   music: MusicResponse;
@@ -27,60 +28,6 @@ interface MusicItemProps {
   onDelete?: (music: MusicResponse) => void;
   isModerator?: boolean;
 }
-
-const statusActions: Record<
-  MusicStatus,
-  {
-    label: string;
-    status: MusicStatus;
-    icon: React.ReactNode;
-    className: string;
-  }[]
-> = {
-  [MusicStatus.PENDING]: [
-    {
-      label: "Approve",
-      status: MusicStatus.ACTIVE,
-      icon: <CheckCircle size={14} />,
-      className: "text-emerald-400 hover:bg-emerald-500/10",
-    },
-    {
-      label: "Delete",
-      status: MusicStatus.DELETED,
-      icon: <Trash2 size={14} />,
-      className: "text-red-400 hover:bg-red-500/10",
-    },
-  ],
-  [MusicStatus.ACTIVE]: [
-    {
-      label: "Suspend",
-      status: MusicStatus.SUSPENDED,
-      icon: <Ban size={14} />,
-      className: "text-amber-400 hover:bg-amber-500/10",
-    },
-    {
-      label: "Delete",
-      status: MusicStatus.DELETED,
-      icon: <Trash2 size={14} />,
-      className: "text-red-400 hover:bg-red-500/10",
-    },
-  ],
-  [MusicStatus.SUSPENDED]: [
-    {
-      label: "Activate",
-      status: MusicStatus.ACTIVE,
-      icon: <Play size={14} />,
-      className: "text-emerald-400 hover:bg-emerald-500/10",
-    },
-    {
-      label: "Delete",
-      status: MusicStatus.DELETED,
-      icon: <Trash2 size={14} />,
-      className: "text-red-400 hover:bg-red-500/10",
-    },
-  ],
-  [MusicStatus.DELETED]: [],
-};
 
 const MusicItem: React.FC<MusicItemProps> = ({
   music,
@@ -95,6 +42,65 @@ const MusicItem: React.FC<MusicItemProps> = ({
     (searchParams.get("status") as MusicStatus) ?? MusicStatus.PENDING;
   const { playMusic, currentPlayingId, getMusicList } = useMusic();
   const isPlaying = currentPlayingId === music.id;
+
+  const [open, setOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const { t } = useTranslation();
+
+  const statusActions: Record<
+    MusicStatus,
+    {
+      label: string;
+      status: MusicStatus;
+      icon: React.ReactNode;
+      className: string;
+    }[]
+  > = {
+    [MusicStatus.PENDING]: [
+      {
+        label: t("music_approve"),
+        status: MusicStatus.ACTIVE,
+        icon: <CheckCircle size={14} />,
+        className: "text-emerald-400 hover:bg-emerald-500/10",
+      },
+      {
+        label: t("action_delete"),
+        status: MusicStatus.DELETED,
+        icon: <Trash2 size={14} />,
+        className: "text-red-400 hover:bg-red-500/10",
+      },
+    ],
+    [MusicStatus.ACTIVE]: [
+      {
+        label: t("music_suspend"),
+        status: MusicStatus.SUSPENDED,
+        icon: <Ban size={14} />,
+        className: "text-amber-400 hover:bg-amber-500/10",
+      },
+      {
+        label: t("action_delete"),
+        status: MusicStatus.DELETED,
+        icon: <Trash2 size={14} />,
+        className: "text-red-400 hover:bg-red-500/10",
+      },
+    ],
+    [MusicStatus.SUSPENDED]: [
+      {
+        label: t("music_activate"),
+        status: MusicStatus.ACTIVE,
+        icon: <Play size={14} />,
+        className: "text-emerald-400 hover:bg-emerald-500/10",
+      },
+      {
+        label: t("action_delete"),
+        status: MusicStatus.DELETED,
+        icon: <Trash2 size={14} />,
+        className: "text-red-400 hover:bg-red-500/10",
+      },
+    ],
+    [MusicStatus.DELETED]: [],
+  };
+
   const actions = (statusActions[music.status as MusicStatus] ?? []).filter(
     (action) => {
       if (isModerator && action.status === MusicStatus.ACTIVE) {
@@ -104,8 +110,6 @@ const MusicItem: React.FC<MusicItemProps> = ({
       return true;
     },
   );
-  const [open, setOpen] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const canShowActions = !isModerator || music.status === MusicStatus.PENDING;
 
@@ -209,7 +213,7 @@ const MusicItem: React.FC<MusicItemProps> = ({
                       }`}
                     >
                       <Edit size={14} />
-                      <span>Edit</span>
+                      <span>{t("music_edit")}</span>
                     </button>
                   )}
                 </MenuItem>
@@ -245,10 +249,10 @@ const MusicItem: React.FC<MusicItemProps> = ({
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
         onConfirm={() => handleUpdateStatus(MusicStatus.DELETED)}
-        title="Delete Music"
-        message={`Are you sure you want to delete "${music.title}"? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t("delete_music_title")}
+        message={t("delete_music_message", { title: music.title })}
+        confirmText={t("delete")}
+        cancelText={t("cancel")}
       />
     </>
   );

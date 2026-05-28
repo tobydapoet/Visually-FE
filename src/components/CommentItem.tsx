@@ -10,6 +10,7 @@ import { ParsedContent } from "./ParseContent";
 import { Heart } from "lucide-react";
 import LikeListPopUp from "./LikeListPopUp";
 import ConfirmDialog from "./ConfirmDialog";
+import { useTranslation } from "../hooks/useTranslation";
 
 const CommentItem: React.FC<{
   contentUserId?: string;
@@ -28,6 +29,7 @@ const CommentItem: React.FC<{
   toggleCommentLike,
   contentUserId,
 }) => {
+  const { t } = useTranslation();
   const { currentUser } = useUser();
   const [showReplies, setShowReplies] = useState(false);
   const [replies, setReplies] = useState<CommentResponse[]>([]);
@@ -130,7 +132,7 @@ const CommentItem: React.FC<{
                   onClick={() => setShowLikeList((prev) => !prev)}
                   className={`text-xs transition-colors cursor-pointer text-gray-500`}
                 >
-                  Like ({likeCount})
+                  {t("like_count", { count: String(likeCount) })}
                 </button>
 
                 <LikeListPopUp
@@ -144,7 +146,7 @@ const CommentItem: React.FC<{
                   onClick={() => onReply?.(comment)}
                   className="text-xs text-gray-500 hover:text-blue-500 transition-colors cursor-pointer"
                 >
-                  Reply
+                  {t("reply")}
                 </button>
                 {currentUser &&
                   currentUser.id === comment.userId &&
@@ -154,7 +156,7 @@ const CommentItem: React.FC<{
                       onClick={() => onEdit(comment)}
                       className="text-xs text-gray-500 hover:text-blue-500 transition-colors cursor-pointer"
                     >
-                      Edit
+                      {t("edit")}
                     </button>
                   )}
 
@@ -166,7 +168,7 @@ const CommentItem: React.FC<{
                       onClick={() => setShowConfirm(true)}
                       className="text-xs text-gray-500 hover:text-red-500 transition-colors cursor-pointer"
                     >
-                      Delete
+                      {t("delete")}
                     </button>
                   )}
 
@@ -174,10 +176,10 @@ const CommentItem: React.FC<{
                   open={showConfirm}
                   onClose={() => setShowConfirm(false)}
                   onConfirm={handleDelete}
-                  title="Delete Comment"
-                  message="Are you sure you want to delete this comment?"
-                  confirmText="Delete"
-                  cancelText="Cancel"
+                  title={t("delete_comment_title")}
+                  message={t("delete_comment_message")}
+                  confirmText={t("delete")}
+                  cancelText={t("cancel")}
                 />
               </div>
             </div>
@@ -202,10 +204,10 @@ const CommentItem: React.FC<{
                 className="cursor-pointer text-xs text-gray-500 hover:text-blue-500 transition-colors px-2"
               >
                 {loadingReplies
-                  ? "Loading..."
+                  ? t("loading")
                   : showReplies
-                    ? "Hide replies"
-                    : `View replies (${comment.replyCount})`}
+                    ? t("hide_replies")
+                    : t("view_replies", { count: String(comment.replyCount) })}
               </button>
               <div className="flex-1 h-px bg-gray-500" />
             </div>
@@ -235,7 +237,7 @@ const CommentItem: React.FC<{
               disabled={loadingMore}
               className="text-xs text-gray-500 hover:text-blue-500 transition-colors cursor-pointer mt-1"
             >
-              {loadingMore ? "Loading..." : "Load more replies"}
+              {loadingMore ? t("loading") : t("load_more_replies")}
             </button>
           )}
         </div>

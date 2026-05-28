@@ -20,6 +20,7 @@ import {
   type OtpFormType,
   type ResendOtpType,
 } from "../types/schemas/resetPassword.schema";
+import { useTranslation } from "../hooks/useTranslation";
 
 const textFieldSx = {
   "& .MuiOutlinedInput-root": {
@@ -67,6 +68,7 @@ const ForgotPasswordPage: FC = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [submittedEmail, setSubmittedEmail] = useState("");
+  const { t } = useTranslation();
 
   const {
     register,
@@ -91,10 +93,10 @@ const ForgotPasswordPage: FC = () => {
 
     if (result.success) {
       setSubmittedEmail(data.email);
-      setSuccess("OTP has been sent to your email!");
+      setSuccess(t("otp_verified_success"));
       setStep("otp");
     } else {
-      setError(result.message || "Failed to send OTP. Please try again.");
+      setError(result.message || t("otp_invalid"));
     }
     setLoading(false);
   };
@@ -156,7 +158,7 @@ const ForgotPasswordPage: FC = () => {
             "&:hover": { color: "#fff", bgcolor: "transparent" },
           }}
         >
-          Back to Login
+          {t("back_to_login")}
         </Button>
 
         <Box sx={{ textAlign: "center", mb: 4 }}>
@@ -176,12 +178,12 @@ const ForgotPasswordPage: FC = () => {
             <Mail size={32} color="#3b82f6" />
           </Box>
           <Typography variant="h5" sx={{ color: "#fff", fontWeight: 700 }}>
-            Forgot Password?
+            {t("forgot_password_title")}
           </Typography>
           <Typography sx={{ color: "#6b7280", mt: 1, fontSize: 14 }}>
             {step === "email"
-              ? "Enter your email address and we'll send you a verification code"
-              : `Enter the 6-digit code sent to ${submittedEmail}`}
+              ? t("forgot_password_subtitle")
+              : t("otp_subtitle", { email: submittedEmail })}
           </Typography>
         </Box>
 
@@ -221,11 +223,13 @@ const ForgotPasswordPage: FC = () => {
             sx={{ display: "flex", flexDirection: "column", gap: 3 }}
           >
             <TextField
-              label="Email Address"
+              label={t("email_address")}
               fullWidth
               {...register("email")}
               error={!!errors.email}
-              helperText={errors.email?.message}
+              helperText={
+                errors.email?.message ? t(errors.email.message as any) : ""
+              }
               sx={textFieldSx}
             />
 
@@ -241,18 +245,17 @@ const ForgotPasswordPage: FC = () => {
               }
               sx={submitBtnSx}
             >
-              {loading ? "Sending..." : "Send Reset Code"}
+              {loading ? t("sending") : t("send_reset_code")}
             </Button>
           </Box>
         ) : (
-          /* Step: OTP */
           <Box
             component="form"
             onSubmit={otpForm.handleSubmit(handleVerifyOtpSubmit)}
             sx={{ display: "flex", flexDirection: "column", gap: 3 }}
           >
             <TextField
-              label="Email Address"
+              label={t("email_address")}
               value={submittedEmail}
               fullWidth
               disabled
@@ -260,7 +263,7 @@ const ForgotPasswordPage: FC = () => {
             />
 
             <TextField
-              label="Verification Code"
+              label={t("verification_code")}
               fullWidth
               {...otpForm.register("otp", {
                 onChange: (e) => {
@@ -269,8 +272,11 @@ const ForgotPasswordPage: FC = () => {
                     .slice(0, 6);
                 },
               })}
-              error={!!otpForm.formState.errors.otp}
-              helperText={otpForm.formState.errors.otp?.message}
+              helperText={
+                otpForm.formState.errors.otp?.message
+                  ? t(otpForm.formState.errors.otp.message as any)
+                  : ""
+              }
               inputProps={{ maxLength: 6 }}
               sx={otpFieldSx}
             />
@@ -287,7 +293,7 @@ const ForgotPasswordPage: FC = () => {
               }
               sx={submitBtnSx}
             >
-              {loading ? "Verifying..." : "Verify Code"}
+              {loading ? t("verifying") : t("verify_code")}
             </Button>
 
             <Button
@@ -299,7 +305,7 @@ const ForgotPasswordPage: FC = () => {
                 "&:hover": { color: "#60a5fa", bgcolor: "transparent" },
               }}
             >
-              ← Back to email
+              {t("back_to_email")}
             </Button>
           </Box>
         )}

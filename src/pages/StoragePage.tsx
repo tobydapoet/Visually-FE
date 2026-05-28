@@ -5,9 +5,11 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { handleGetStoryByUser } from "../api/story.api";
+import { useTranslation } from "../hooks/useTranslation";
 
 const StoragePage: React.FC = () => {
   const { currentUser } = useUser();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -75,21 +77,21 @@ const StoragePage: React.FC = () => {
         onClick={() => navigate(`/${currentUser?.username}`)}
       >
         <ArrowLeft size={20} />
-        <span className="text-lg font-semibold">Storage</span>
+        <span className="text-lg font-semibold">{t("storage")}</span>
       </div>
 
       <div className="flex gap-2 items-center justify-center border-b border-gray-700 mx-auto">
         <div className="border-b flex pb-2 gap-2 items-center">
           <SquareStar size={18} />
-          <span>Stories</span>
+          <span>{t("stories")}</span>
         </div>
       </div>
 
       {storyList.length === 0 && !isFetchingNextPage ? (
         <div className="flex flex-col items-center justify-center h-96 text-gray-500">
           <SquareStar size={48} className="mb-4 opacity-50" />
-          <p>No stories yet</p>
-          <p className="text-sm">Share your first story!</p>
+          <p>{t("no_stories_yet")}</p>
+          <p className="text-sm">{t("share_first_story")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-4 gap-4 mt-5">

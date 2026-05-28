@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import ReportPopUp from "./ReportPopUp";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/user.context";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -22,11 +23,12 @@ const ContentMorePopUp: React.FC<Props> = ({
 }) => {
   const [isOpenReport, setIsOpenReport] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleCopyLink = () => {
     const url = `${window.location.origin}/content?contentId=${targetId}&type=${targetType}`;
     navigator.clipboard.writeText(url);
-    toast.success("Link copied!");
+    toast.success(t("link_copied"));
     onClose();
   };
 
@@ -50,7 +52,7 @@ const ContentMorePopUp: React.FC<Props> = ({
                   }}
                   className="px-4 py-3.5  hover:bg-zinc-800 transition-colors text-center cursor-pointer text-red-400 border-b border-zinc-800 text-sm font-medium"
                 >
-                  Report
+                  {t("report")}
                 </button>
               )}
 
@@ -58,7 +60,7 @@ const ContentMorePopUp: React.FC<Props> = ({
                 onClick={handleCopyLink}
                 className="px-4 py-3.5 hover:bg-zinc-800 transition-colors text-center cursor-pointer text-white border-b border-zinc-800 text-sm font-medium"
               >
-                Copy link
+                {t("copy_link")}
               </button>
               <button
                 onClick={() => {
@@ -75,13 +77,13 @@ const ContentMorePopUp: React.FC<Props> = ({
                 }}
                 className="px-4 py-3.5 hover:bg-zinc-800 transition-colors text-center cursor-pointer text-white border-b border-zinc-800 text-sm font-medium"
               >
-                Go to post
+                {t("go_to_post")}
               </button>
               <button
                 onClick={onClose}
                 className="px-4 py-3.5 hover:bg-zinc-800 transition-colors text-center cursor-pointer text-zinc-400 text-sm font-medium"
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </DialogPanel>

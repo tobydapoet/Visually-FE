@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import { MenuItem } from "@mui/material";
+import { useTranslation } from "../hooks/useTranslation";
 
 interface Props {
   setValue: any;
@@ -11,6 +12,7 @@ const BirthField: React.FC<Props> = ({ setValue }) => {
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
   const [days, setDays] = useState<string[]>([]);
+  const { t } = useTranslation();
 
   const getDaysInMonth = (month: string, year: string) => {
     if (!month || !year) return 31;
@@ -65,18 +67,18 @@ const BirthField: React.FC<Props> = ({ setValue }) => {
   };
 
   const months = [
-    { value: "01", label: "January" },
-    { value: "02", label: "February" },
-    { value: "03", label: "March" },
-    { value: "04", label: "April" },
-    { value: "05", label: "May" },
-    { value: "06", label: "June" },
-    { value: "07", label: "July" },
-    { value: "08", label: "August" },
-    { value: "09", label: "September" },
-    { value: "10", label: "October" },
-    { value: "11", label: "November" },
-    { value: "12", label: "December" },
+    { value: "01", label: t("january") },
+    { value: "02", label: t("february") },
+    { value: "03", label: t("march") },
+    { value: "04", label: t("april") },
+    { value: "05", label: t("may") },
+    { value: "06", label: t("june") },
+    { value: "07", label: t("july") },
+    { value: "08", label: t("august") },
+    { value: "09", label: t("september") },
+    { value: "10", label: t("october") },
+    { value: "11", label: t("november") },
+    { value: "12", label: t("december") },
   ];
 
   const currentYear = new Date().getFullYear();
@@ -87,7 +89,7 @@ const BirthField: React.FC<Props> = ({ setValue }) => {
   return (
     <div>
       <label className="text-sm font-medium text-white mt-2 mb-1 block">
-        Date of Birth
+        {t("date_of_birth")}
       </label>
       <div className="flex gap-2">
         <TextField
@@ -117,7 +119,7 @@ const BirthField: React.FC<Props> = ({ setValue }) => {
               displayEmpty: true,
               renderValue: (value: any) => {
                 if (value === "") {
-                  return <span className="text-gray-400">Day</span>;
+                  return <span className="text-gray-400">{t("day")}</span>;
                 }
                 return value;
               },
@@ -125,7 +127,7 @@ const BirthField: React.FC<Props> = ({ setValue }) => {
           }}
         >
           <MenuItem value="" disabled>
-            Day
+            {t("day")}
           </MenuItem>
           {(month && year
             ? days
@@ -166,7 +168,7 @@ const BirthField: React.FC<Props> = ({ setValue }) => {
               displayEmpty: true,
               renderValue: (value: any) => {
                 if (value === "") {
-                  return <span className="text-gray-400">Month</span>;
+                  return <span className="text-gray-400">{t("month")}</span>;
                 }
                 const monthObj = months.find((m) => m.value === value);
                 return monthObj?.label || value;
@@ -175,7 +177,7 @@ const BirthField: React.FC<Props> = ({ setValue }) => {
           }}
         >
           <MenuItem value="" disabled>
-            Month
+            {t("month")}
           </MenuItem>
           {months.map((m) => (
             <MenuItem key={m.value} value={m.value}>
@@ -211,7 +213,7 @@ const BirthField: React.FC<Props> = ({ setValue }) => {
               displayEmpty: true,
               renderValue: (value: any) => {
                 if (value === "") {
-                  return <span className="text-gray-400">Year</span>;
+                  return <span className="text-gray-400">{t("year")}</span>;
                 }
                 return value;
               },
@@ -219,7 +221,7 @@ const BirthField: React.FC<Props> = ({ setValue }) => {
           }}
         >
           <MenuItem value="" disabled>
-            Year
+            {t("year")}
           </MenuItem>
           {years.map((y) => (
             <MenuItem key={y} value={y}>

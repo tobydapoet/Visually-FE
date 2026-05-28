@@ -25,6 +25,7 @@ export function useFileUpload({
   const [frames, setFrames] = useState<string[]>([]);
   const [framesLoading, setFramesLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const previewUrlRef = useRef<string | null>(null);
 
   const isValid = (file: File) => {
     if (accept === "*") return true;
@@ -52,8 +53,8 @@ export function useFileUpload({
 
       const total = duration ?? video.duration;
       const canvas = document.createElement("canvas");
-      canvas.width = 120;
-      canvas.height = 160;
+      canvas.width = video.videoWidth || 720;
+      canvas.height = video.videoHeight || 1280;
       const ctx = canvas.getContext("2d")!;
       const results: string[] = [];
 
@@ -74,6 +75,14 @@ export function useFileUpload({
     [frameCount],
   );
 
+  useEffect(() => {
+    return () => {
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+      }
+    };
+  }, []);
+
   const handleSelect = (f: File) => {
     if (!isValid(f)) {
       toast.error("Invalid file type");
@@ -85,6 +94,7 @@ export function useFileUpload({
 
     if (f.type.startsWith("image/") || f.type.startsWith("video/")) {
       const url = URL.createObjectURL(f);
+      previewUrlRef.current = url;
       setPreview(url);
 
       if (extractFrames && f.type.startsWith("video/")) {
@@ -99,11 +109,16 @@ export function useFileUpload({
   };
 
   const handleRemove = () => {
-    if (preview) URL.revokeObjectURL(preview);
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
+
     setFile(null);
     setPreview(null);
     setFrames([]);
     onChange?.(null);
+
     if (inputRef.current) inputRef.current.value = "";
   };
 

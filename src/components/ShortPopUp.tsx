@@ -14,13 +14,14 @@ import { useFileUpload } from "../hooks/useFileUpload";
 import { useVideoFrames } from "../hooks/useVideoFrames";
 import { VideoFrameStrip } from "./VideoFrameStrip";
 import HashTagsField from "./HashTagField";
-import { CaptionField } from "./CaptionFiled";
+import { CaptionField } from "./CaptionField";
 import type { MentionItem } from "../types/api/mention.type";
 import { handleCreateShort } from "../api/short.api";
 import { toast } from "sonner";
 import { useProgressBar } from "../hooks/useProgressBar";
 import { ProgressBar } from "./ProgressBar";
 import assets from "../assets";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = { open: boolean; onClose: () => void };
 
@@ -31,6 +32,7 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [mentions, setMentions] = useState<MentionItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const { t } = useTranslation();
 
   const { currentUser } = useUser();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -69,7 +71,7 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
           URL.revokeObjectURL(url);
 
           if (tempVideo.duration > 60) {
-            toast.error("Video must be under 1 minute");
+            toast.error(t("video_too_long"));
             video.handleRemove();
             setValue("fileVideo", undefined as any, { shouldValidate: true });
             return;
@@ -229,7 +231,7 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
             >
               <div className="w-72 space-y-3 text-center">
                 <p className="text-sm font-medium text-white">
-                  {progress < 100 ? "Is uploading..." : "Finish!"}
+                  {progress < 100 ? t("uploading_short") : t("finish")}
                 </p>
 
                 <ProgressBar
@@ -239,13 +241,17 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
                   className="h-2 bg-zinc-700"
                 />
 
-                <p className="text-xs text-zinc-400">Don't drop this window</p>
+                <p className="text-xs text-zinc-400">
+                  {t("dont_close_window")}
+                </p>
               </div>
             </div>
           )}
 
           <DialogTitle className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 sticky top-0 bg-zinc-900 z-10">
-            <span className="text-lg font-semibold">Upload Short Video</span>
+            <span className="text-lg font-semibold">
+              {t("upload_short_video")}
+            </span>
             <button
               onClick={handleClose}
               className="w-8 h-8 flex cursor-pointer items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors duration-200"
@@ -283,11 +289,11 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
                       <div className="text-center">
                         <p className="text-lg font-medium">
                           {isDragging
-                            ? "Drop your video here"
-                            : "Upload a video"}
+                            ? t("drop_video_here")
+                            : t("upload_a_video")}
                         </p>
                         <p className="text-sm text-zinc-400">
-                          Drag and drop or click to browse
+                          {t("drag_drop_or_browse")}
                         </p>
                       </div>
                     </div>
@@ -385,7 +391,7 @@ const ShortPopUp: React.FC<Props> = ({ open, onClose }) => {
                       type="submit"
                       className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 cursor-pointer font-medium transition-colors duration-200"
                     >
-                      Upload Short
+                      {t("upload_short_btn")}
                     </button>
                   </div>
                 )}

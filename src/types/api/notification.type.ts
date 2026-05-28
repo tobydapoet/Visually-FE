@@ -29,3 +29,23 @@ export type NotificationPageResponse = {
   total: number;
   content: NotificationResponse[];
 };
+
+export type NotificationSocket = {
+  id: number;
+
+  snapshotUrl?: string;
+
+  contentId: number;
+
+  contentType: NotificationContentType;
+
+  type: NotificationActionType;
+
+  username: string;
+
+  createdAt: Date;
+
+  isRead: boolean;
+
+  senderId: string;
+};

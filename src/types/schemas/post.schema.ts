@@ -2,11 +2,11 @@ import { z } from "zod";
 
 export const CreatePostSchema = z.object({
   caption: z.string().optional(),
-  tagsName: z.array(z.string("Each tag must be a string")).optional(),
+  tagsName: z.array(z.string("post.tagsName.string")).optional(),
   mentions: z
     .array(
       z.object({
-        userId: z.string().uuid("userId must be a valid UUID"),
+        userId: z.string().uuid("post.mentions.userId.uuid"),
         username: z.string(),
       }),
     )

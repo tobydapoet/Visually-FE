@@ -19,6 +19,7 @@ import { ProgressBar } from "./ProgressBar";
 import { StoryToolbar } from "./StoryToolBar";
 import { StoryMusicPicker } from "./StoryMusicPicker";
 import { handleCreateStory } from "../api/story.api";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = { open: boolean; onClose: () => void };
 
@@ -33,6 +34,7 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
   const [openMusicDialog, setOpenMusicDialog] = useState(false);
   const [selectedMusic, setSelectedMusic] = useState<MusicResponse>();
   const [musicStartTime, setMusicStartTime] = useState(0);
+  const { t } = useTranslation();
 
   const {
     progress,
@@ -65,7 +67,7 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
           URL.revokeObjectURL(url);
 
           if (tempVideo.duration > 60) {
-            toast.error("Video must be under 1 minute");
+            toast.error(t("video_too_long"));
             setValue("file", undefined as any, { shouldValidate: true });
             setTimeout(() => file.handleRemove(), 0);
             return;
@@ -165,7 +167,7 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
             <div className="absolute inset-0 z-30 rounded-2xl flex flex-col items-center justify-center gap-5 bg-zinc-900/70 backdrop-blur-sm">
               <div className="w-72 space-y-3 text-center">
                 <p className="text-sm font-medium">
-                  {progress < 100 ? "Uploading story..." : "Done!"}
+                  {progress < 100 ? t("uploading_story") : t("done")}
                 </p>
                 <ProgressBar
                   progress={progress}
@@ -174,14 +176,16 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
                   className="h-2 bg-zinc-700"
                 />
                 <p className="text-xs text-zinc-400">
-                  Please don't close this window
+                  {t("please_dont_close")}
                 </p>
               </div>
             </div>
           )}
 
           <DialogTitle className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 sticky top-0 bg-zinc-900 z-10">
-            <span className="text-lg font-semibold">Create Story</span>
+            <span className="text-lg font-semibold">
+              {t("create_story_title")}
+            </span>
             <button
               onClick={handleClose}
               disabled={isUploading || isSubmitting}
@@ -217,10 +221,10 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
                     </div>
                     <div className="text-center">
                       <p className="text-base font-medium">
-                        Upload photo or video
+                        {t("upload_photo_video")}
                       </p>
                       <p className="text-sm text-zinc-400 px-2">
-                        Drag and drop or click to browse
+                        {t("drag_drop_or_browse")}
                       </p>
                     </div>
                   </div>
@@ -269,7 +273,7 @@ const StoryPopUp: React.FC<Props> = ({ open, onClose }) => {
                           disabled={isSubmitting || isUploading}
                           className="w-full py-2 rounded-lg cursor-pointer bg-blue-600 hover:bg-blue-700 font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Share Story
+                          {t("share_story")}
                         </button>
                       </div>
                     )}

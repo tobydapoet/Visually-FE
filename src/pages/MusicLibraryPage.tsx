@@ -15,11 +15,13 @@ import MusicItem from "../components/MusicItem";
 import MusicPopUp from "../components/MusicPopUp";
 import useDebounce from "../hooks/useDebounce";
 import { useUser } from "../contexts/user.context";
+import { useTranslation } from "../hooks/useTranslation";
 
 const MusicLibraryPage: React.FC = () => {
   const { getMusicList, musicList, totalPages, loading } = useMusic();
   const [searchParams, setSearchParams] = useSearchParams();
   const [openDialog, setOpenDialog] = useState(false);
+  const { t } = useTranslation();
 
   const currentPage = Number(searchParams.get("page") ?? 0);
   const currentSearch = searchParams.get("search") ?? "";
@@ -86,9 +88,21 @@ const MusicLibraryPage: React.FC = () => {
   };
 
   const tabs = [
-    { key: MusicStatus.ACTIVE, label: "Active", color: "green" },
-    { key: MusicStatus.PENDING, label: "Pending", color: "yellow" },
-    { key: MusicStatus.SUSPENDED, label: "Suspended", color: "gray" },
+    {
+      key: MusicStatus.ACTIVE,
+      label: t("music_status_active"),
+      color: "green",
+    },
+    {
+      key: MusicStatus.PENDING,
+      label: t("music_status_pending"),
+      color: "yellow",
+    },
+    {
+      key: MusicStatus.SUSPENDED,
+      label: t("music_status_suspended"),
+      color: "gray",
+    },
   ];
 
   return (
@@ -104,7 +118,7 @@ const MusicLibraryPage: React.FC = () => {
               className="flex items-center gap-2 cursor-pointer px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 active:scale-95 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/30"
             >
               <Plus size={16} />
-              <span>Add</span>
+              <span>{t("add")}</span>
             </button>
           </div>
 
@@ -131,7 +145,9 @@ const MusicLibraryPage: React.FC = () => {
             />
             <input
               type="text"
-              placeholder={`Search ${statusFilter.toLowerCase()} songs...`}
+              placeholder={t("search_songs", {
+                status: statusFilter.toLowerCase(),
+              })}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-neutral-900 border border-neutral-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-neutral-500 text-sm"
@@ -164,8 +180,8 @@ const MusicLibraryPage: React.FC = () => {
                 <Music size={48} className="mx-auto text-gray-600 mb-2" />
                 <p className="text-gray-400 text-sm">
                   {currentSearch
-                    ? "No results found"
-                    : `No ${statusFilter.toLowerCase()} songs`}
+                    ? t("no_results_found")
+                    : t("no_songs", { status: statusFilter.toLowerCase() })}
                 </p>
               </div>
             )}

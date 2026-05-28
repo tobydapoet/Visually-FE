@@ -16,6 +16,7 @@ import { ContentStatus } from "../constants/contentStatus.enum";
 import { usePost } from "../contexts/post.context";
 import { useShort } from "../contexts/short.context";
 import ConfirmDialog from "./ConfirmDialog";
+import { useTranslation } from "../hooks/useTranslation";
 
 export interface ReportSidebarRef {
   refresh: () => void;
@@ -54,6 +55,7 @@ const ReportSidebar = forwardRef<ReportSidebarRef, ReportSidebarProps>(
     const { updatePostStatus } = usePost();
     const { updateShortStatus } = useShort();
     const [isOpenDialog, setIsOpenDialog] = useState(false);
+    const { t } = useTranslation();
 
     useEffect(() => {
       setContentStatus(status);
@@ -135,7 +137,7 @@ const ReportSidebar = forwardRef<ReportSidebarRef, ReportSidebarProps>(
         <div className="flex items-center justify-between p-4 border-b border-zinc-800 shrink-0">
           <div className="flex items-center gap-2">
             <Flag className="w-5 h-5 text-red-500" />
-            <h2 className="text-lg font-semibold text-white">Reports</h2>
+            <h2 className="text-lg font-semibold text-white">{t("reports")}</h2>
             <span className="px-2 py-0.5 text-xs bg-red-500/20 text-red-400 rounded-full">
               {total}
             </span>
@@ -148,7 +150,9 @@ const ReportSidebar = forwardRef<ReportSidebarRef, ReportSidebarProps>(
                 : "bg-red-600 hover:bg-red-700"
             }`}
           >
-            {contentStatus === ContentStatus.ACTIVE ? "Activate" : "Ban"}
+            {contentStatus === ContentStatus.ACTIVE
+              ? t("activate")
+              : t("banned")}
           </button>
         </div>
 
@@ -160,9 +164,9 @@ const ReportSidebar = forwardRef<ReportSidebarRef, ReportSidebarProps>(
           ) : reports.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 gap-2">
               <AlertCircle className="w-12 h-12 text-zinc-700" />
-              <p className="text-zinc-500 text-sm">No reports found</p>
+              <p className="text-zinc-500 text-sm">{t("no_reports_found")}</p>
               <p className="text-xs text-zinc-600 text-center px-4">
-                This content has not been reported
+                {t("content_not_reported")}
               </p>
             </div>
           ) : (
@@ -215,8 +219,8 @@ const ReportSidebar = forwardRef<ReportSidebarRef, ReportSidebarProps>(
           )}
         </div>
         <ConfirmDialog
-          message={`Do you want to ban #${contentId}?`}
-          title="Banned post"
+          message={t("ban_post_message", { id: String(contentId) })}
+          title={t("ban_post")}
           onClose={() => setIsOpenDialog(false)}
           onConfirm={() => {
             updateStatus();

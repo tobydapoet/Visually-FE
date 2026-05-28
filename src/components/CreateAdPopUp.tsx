@@ -20,6 +20,7 @@ import { savePendingAd } from "../api/ad.api";
 import { toast } from "sonner";
 import { useUser } from "../contexts/user.context";
 import { useAdPayment } from "../hooks/useAdPayment";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -32,6 +33,7 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
   const [isPaid, setIsPaid] = useState(false);
+  const { t } = useTranslation();
 
   const {
     register,
@@ -69,15 +71,13 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
     userId: currentUser?.id?.toString() ?? null,
     onSuccess: () => {
       setIsPaid(true);
-      toast.success("Payment successful! Your post is being boosted");
+      toast.success(t("payment_success_toast"));
       setTimeout(() => {
         onClose();
         reset();
       }, 2000);
     },
-    onFailed: () => {
-      toast.error("Payment failed, please try again");
-    },
+    onFailed: () => toast.error(t("payment_failed_toast")),
   });
 
   if (!currentUser) return;
@@ -185,15 +185,17 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
         <div className="w-14 h-14 bg-linear-to-br from-blue-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
           <Coins className="w-7 h-7 text-blue-400" />
         </div>
-        <h3 className="text-lg font-semibold text-white">Budget & Duration</h3>
+        <h3 className="text-lg font-semibold text-white">
+          {t("budget_duration")}
+        </h3>
         <p className="text-xs text-zinc-400 mt-1">
-          Set your daily budget and campaign duration
+          {t("budget_duration_subtitle")}
         </p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-zinc-300 mb-2">
-          Daily Budget <span className="text-red-400">*</span>
+          {t("daily_budget_label")} <span className="text-red-400">*</span>
         </label>
         <div className="relative">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">
@@ -209,7 +211,9 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
         </div>
         {errors.dailyBudget && (
           <p className="text-xs text-red-400 mt-2">
-            {errors.dailyBudget.message}
+            {errors.dailyBudget?.message
+              ? t(errors.dailyBudget.message as any)
+              : ""}
           </p>
         )}
 
@@ -231,7 +235,7 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
 
       <div>
         <label className="block text-sm font-medium text-zinc-300 mb-2">
-          Duration (hours) <span className="text-red-400">*</span>
+          {t("duration_hours")} <span className="text-red-400">*</span>
         </label>
         <div className="relative">
           <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
@@ -244,7 +248,9 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
           />
         </div>
         {errors.duration && (
-          <p className="text-xs text-red-400 mt-2">{errors.duration.message}</p>
+          <p className="text-xs text-red-400 mt-2">
+            {t(errors.duration.message as any)}
+          </p>
         )}
 
         <div className="flex gap-2 mt-3">
@@ -265,7 +271,7 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
 
       <div className="mt-4 p-4 bg-linear-to-r from-blue-500/10 to-transparent rounded-xl border border-blue-500/20">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-zinc-300">Total Budget</span>
+          <span className="text-sm text-zinc-300">{t("total_budget")}</span>
           <span className="text-xl font-bold text-white">
             {formatVND(
               watchedValues.dailyBudget *
@@ -275,7 +281,9 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
         </div>
         <div className="flex justify-between items-center text-xs text-zinc-400">
           <span>Daily: {formatVND(watchedValues.dailyBudget)}</span>
-          <span>Duration: {formatHours(watchedValues.duration)}</span>
+          <span>
+            {t("duration_label")}: {formatHours(watchedValues.duration)}
+          </span>
         </div>
       </div>
     </div>
@@ -287,15 +295,17 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
         <div className="w-14 h-14 bg-linear-to-br from-emerald-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
           <UserCheck className="w-7 h-7 text-emerald-400" />
         </div>
-        <h3 className="text-lg font-semibold text-white">Target Audience</h3>
+        <h3 className="text-lg font-semibold text-white">
+          {t("target_audience")}
+        </h3>
         <p className="text-xs text-zinc-400 mt-1">
-          Define who will see your ad
+          {t("target_audience_subtitle")}
         </p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-zinc-300 mb-3">
-          Age Range <span className="text-red-400">*</span>
+          {t("age_range_label")} <span className="text-red-400">*</span>
         </label>
         <div className="flex gap-4 items-center">
           <div className="flex-1">
@@ -319,22 +329,30 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
           </div>
         </div>
         {errors.ageMin && (
-          <p className="text-xs text-red-400 mt-2">{errors.ageMin.message}</p>
+          <p className="text-xs text-red-400 mt-2">
+            {t(errors.ageMin.message as any)}
+          </p>
         )}
         {errors.ageMax && (
-          <p className="text-xs text-red-400 mt-2">{errors.ageMax.message}</p>
+          <p className="text-xs text-red-400 mt-2">
+            {t(errors.ageMax.message as any)}
+          </p>
         )}
       </div>
 
       <div>
         <label className="block text-sm font-medium text-zinc-300 mb-2">
-          Gender <span className="text-red-400">*</span>
+          {t("gender")} <span className="text-red-400">*</span>
         </label>
         <div className="grid grid-cols-3 gap-2">
           {[
-            { value: "ALL", label: "All", desc: "Everyone" },
-            { value: "MALE", label: "Male", desc: "Men only" },
-            { value: "FEMALE", label: "Female", desc: "Women only" },
+            { value: "ALL", label: t("all_gender"), desc: t("everyone") },
+            { value: "MALE", label: t("gender_male"), desc: t("men_only") },
+            {
+              value: "FEMALE",
+              label: t("gender_female"),
+              desc: t("women_only"),
+            },
           ].map((option) => (
             <button
               key={option.value}
@@ -363,21 +381,21 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
           ))}
         </div>
         {errors.gender && (
-          <p className="text-xs text-red-400 mt-2">{errors.gender.message}</p>
+          <p className="text-xs text-red-400 mt-2">
+            {t(errors.gender.message as any)}
+          </p>
         )}
       </div>
 
       <div className="mt-4 p-4 bg-linear-to-r from-emerald-500/10 to-transparent rounded-xl border border-emerald-500/20">
         <div className="flex items-center gap-2 text-emerald-400 mb-2">
           <Users className="w-4 h-4" />
-          <span className="text-xs font-medium">Estimated Audience Size</span>
+          <span className="text-xs font-medium">{t("estimated_audience")}</span>
         </div>
         <p className="text-2xl font-bold text-white">
           ~{(getEstimatedReach() / 1000).toFixed(0)}K
         </p>
-        <p className="text-xs text-zinc-500 mt-1">
-          potential viewers based on targeting
-        </p>
+        <p className="text-xs text-zinc-500 mt-1">{t("potential_viewers")}</p>
       </div>
     </div>
   );
@@ -392,40 +410,46 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
           <div className="w-14 h-14 bg-linear-to-br from-amber-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
             <FileCheck className="w-7 h-7 text-amber-400" />
           </div>
-          <h3 className="text-lg font-semibold text-white">Review & Payment</h3>
+          <h3 className="text-lg font-semibold text-white">
+            {t("review_payment")}
+          </h3>
           <p className="text-xs text-zinc-400 mt-1">
-            Confirm your campaign details
+            {t("review_payment_subtitle")}
           </p>
         </div>
 
         <div className="bg-zinc-800/30 rounded-xl border border-zinc-700 overflow-hidden">
           <div className="p-4 border-b border-zinc-700">
             <p className="text-xs text-zinc-400 uppercase tracking-wide">
-              Campaign Summary
+              {t("campaign_summary")}
             </p>
           </div>
 
           <div className="p-4 space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-zinc-400">Daily Budget</span>
+              <span className="text-sm text-zinc-400">
+                {t("daily_budget_label")}
+              </span>
               <span className="text-sm font-semibold text-white">
                 {formatVND(watchedValues.dailyBudget)}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-zinc-400">Duration</span>
+              <span className="text-sm text-zinc-400">
+                {t("duration_label")}
+              </span>
               <span className="text-sm font-semibold text-white">
                 {formatHours(watchedValues.duration)}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-zinc-400">Age Range</span>
+              <span className="text-sm text-zinc-400">{t("age_range")}</span>
               <span className="text-sm font-semibold text-white">
                 {watchedValues.ageMin} - {watchedValues.ageMax}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-zinc-400">Gender</span>
+              <span className="text-sm text-zinc-400">{t("gender")}</span>
               <span className="text-sm font-semibold text-white">
                 {watchedValues.gender === "ALL"
                   ? "All"
@@ -436,7 +460,7 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
             </div>
             <div className="flex justify-between items-center pt-2 border-t border-zinc-700">
               <span className="text-base font-medium text-white">
-                Total Amount
+                {t("total_amount")}
               </span>
               <span className="text-xl font-bold text-emerald-400">
                 {formatVND(totalBudget)}
@@ -446,7 +470,7 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
         </div>
         {isPaid ? (
           <p className="text-center text-emerald-400 font-semibold">
-            Payment successful! Your post is being boosted
+            {t("payment_success_boost")}
           </p>
         ) : (
           <img
@@ -505,9 +529,13 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
           </DialogTitle>
 
           <div className="flex justify-between px-5 pt-4 pb-2 border-b border-zinc-800/50">
-            <StepIndicator step={1} title="Budget" icon={Coins} />
-            <StepIndicator step={2} title="Audience" icon={Users} />
-            <StepIndicator step={3} title="Payment" icon={CreditCard} />
+            <StepIndicator step={1} title={t("step_budget")} icon={Coins} />
+            <StepIndicator step={2} title={t("step_audience")} icon={Users} />
+            <StepIndicator
+              step={3}
+              title={t("step_payment")}
+              icon={CreditCard}
+            />
           </div>
 
           <div className="p-5 min-h-115 max-h-[60vh] overflow-y-auto custom-scrollbar">
@@ -530,7 +558,7 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
               `}
             >
               <ArrowLeft className="w-4 h-4" />
-              Back
+              {t("back")}
             </button>
 
             {currentStep < totalSteps && (
@@ -546,7 +574,7 @@ const CreateAdPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
                   }
                 `}
               >
-                Next
+                {t("next")}
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}

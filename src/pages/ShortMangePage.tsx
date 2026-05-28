@@ -21,6 +21,7 @@ import { ParsedContent } from "../components/ParseContent";
 import Pagination from "../components/Pagination";
 import ConfirmDialog from "../components/ConfirmDialog";
 import assets from "../assets";
+import { useTranslation } from "../hooks/useTranslation";
 
 const ShortManagePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -40,6 +41,7 @@ const ShortManagePage: React.FC = () => {
     (statusParam as ContentStatusType) || ContentStatus.ACTIVE,
   );
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const debouncedSearch = useDebounce(searchInput, 500);
   const pageSize = 10;
@@ -94,8 +96,8 @@ const ShortManagePage: React.FC = () => {
   }, [currentPage, debouncedSearch, status]);
 
   const statusOptions = [
-    { value: ContentStatus.ACTIVE, label: "Active" },
-    { value: ContentStatus.BANNED, label: "Banned" },
+    { value: ContentStatus.ACTIVE, label: t("active") },
+    { value: ContentStatus.BANNED, label: t("banned") },
   ];
 
   const getStatusBadgeColor = (statusValue: ContentStatusType) => {
@@ -119,7 +121,7 @@ const ShortManagePage: React.FC = () => {
         <div className="max-w-7xl mx-auto space-y-4">
           <div className="">
             <h1 className="text-xl sm:text-2xl font-bold text-white mb-4">
-              Shorts Management
+              {t("shorts_management")}
             </h1>
 
             <div className="flex flex-wrap gap-2 mb-4">
@@ -159,13 +161,19 @@ const ShortManagePage: React.FC = () => {
                 <thead className="bg-neutral-950 border-b border-neutral-800">
                   <tr>
                     {[
-                      { icon: <Hash className="w-3.5 h-3.5" />, label: "ID" },
-                      { label: "Thumbnail" },
-                      { label: "Caption" },
-                      { icon: <User className="w-3.5 h-3.5" />, label: "User" },
+                      {
+                        icon: <Hash className="w-3.5 h-3.5" />,
+                        label: t("id"),
+                      },
+                      { label: t("thumbnail") },
+                      { label: t("caption") },
+                      {
+                        icon: <User className="w-3.5 h-3.5" />,
+                        label: t("user"),
+                      },
                       {
                         icon: <Calendar className="w-3.5 h-3.5" />,
-                        label: "Created At",
+                        label: t("created_at"),
                       },
                     ].map(({ icon, label }) => (
                       <th
@@ -187,7 +195,7 @@ const ShortManagePage: React.FC = () => {
                       <td colSpan={5} className="px-4 py-12 text-center">
                         <Loader2 className="w-7 h-7 animate-spin text-neutral-500 mx-auto mb-2" />
                         <p className="text-neutral-500 text-sm">
-                          Loading data...
+                          {t("loading_data")}
                         </p>
                       </td>
                     </tr>
@@ -197,10 +205,10 @@ const ShortManagePage: React.FC = () => {
                         <div className="flex flex-col items-center gap-2">
                           <Filter className="w-10 h-10 text-neutral-700" />
                           <p className="text-neutral-400 text-sm">
-                            No shorts found
+                            {t("no_shorts_found")}
                           </p>
                           <p className="text-xs text-neutral-600">
-                            Try changing the filter or search keyword
+                            {t("try_changing_filter")}
                           </p>
                         </div>
                       </td>
@@ -381,7 +389,7 @@ const ShortManagePage: React.FC = () => {
 
             <div className="px-4 py-3 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-xs text-neutral-500 order-2 sm:order-1">
-                Showing{" "}
+                {t("showing")}{" "}
                 <span className="text-neutral-300">
                   {(currentPage - 1) * pageSize + 1}
                 </span>{" "}
@@ -389,7 +397,8 @@ const ShortManagePage: React.FC = () => {
                 <span className="text-neutral-300">
                   {Math.min(currentPage * pageSize, total)}
                 </span>{" "}
-                of <span className="text-neutral-300">{total}</span> shorts
+                {t("of")} <span className="text-neutral-300">{total}</span>{" "}
+                {t("shorts_count")}
               </p>
               <div className="order-1 sm:order-2">
                 <Pagination
@@ -404,8 +413,12 @@ const ShortManagePage: React.FC = () => {
       </div>
 
       <ConfirmDialog
-        message={`Do you want to ban #${selectedContentId}?`}
-        title="Banned short"
+        title={isActive ? t("ban_short") : t("unban_short")}
+        message={
+          isActive
+            ? t("ban_short_message", { id: String(selectedContentId) })
+            : t("unban_short_message", { id: String(selectedContentId) })
+        }
         onClose={() => setIsOpenDialog(false)}
         onConfirm={() => {
           if (status === "ACTIVE") {

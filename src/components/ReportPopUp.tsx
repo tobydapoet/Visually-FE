@@ -7,6 +7,7 @@ import type { ReportTargetType } from "../constants/interaction.enum";
 import { handleReport } from "../api/interaction.api";
 import { toast } from "sonner";
 import { reasonConfig } from "../constants/ReportReasoConfig";
+import { useTranslation } from "../hooks/useTranslation";
 
 export const ReportReason = {
   NOT_INTERESTED: "NOT_INTERESTED",
@@ -38,6 +39,7 @@ const ReportPopUp: React.FC<Props> = ({
   );
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleClose = () => {
     if (isLoading) return;
@@ -70,7 +72,7 @@ const ReportPopUp: React.FC<Props> = ({
         setIsLoading(false);
       }
     } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("something_went_wrong_retry"));
       console.error(error);
       setIsLoading(false);
     }
@@ -87,7 +89,7 @@ const ReportPopUp: React.FC<Props> = ({
         >
           <DialogTitle className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
             <div className="text-md font-semibold text-white">
-              {submitted ? "Report Sent" : "Report Content"}
+              {submitted ? t("report_sent") : t("report_content")}
             </div>
             {!submitted && !isLoading && (
               <button
@@ -148,10 +150,10 @@ const ReportPopUp: React.FC<Props> = ({
                   {isLoading ? (
                     <>
                       <Loader2 size={16} className="animate-spin" />
-                      Submitting...
+                      {t("submitting")}
                     </>
                   ) : (
-                    "Submit Report"
+                    t("submit_report")
                   )}
                 </button>
               </div>
@@ -159,11 +161,9 @@ const ReportPopUp: React.FC<Props> = ({
           ) : (
             <div className="py-12 text-center">
               <CheckCircle2 size={48} className="text-green-500 mx-auto mb-3" />
-              <p className="font-medium text-white">
-                Thank you for your report
-              </p>
+              <p className="font-medium text-white">{t("thank_you_report")}</p>
               <p className="text-sm text-gray-400 mt-1">
-                We'll review it shortly
+                {t("review_shortly")}
               </p>
             </div>
           )}

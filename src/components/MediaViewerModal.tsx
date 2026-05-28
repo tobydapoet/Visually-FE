@@ -94,7 +94,6 @@ const MediaViewerModal: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-black/95 backdrop-blur-sm">
-      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
         <span className="text-sm text-zinc-400">
           {mediaList.length > 0
@@ -109,7 +108,6 @@ const MediaViewerModal: React.FC<Props> = ({
         </button>
       </div>
 
-      {/* Main viewer */}
       <div className="flex-1 flex items-center justify-center relative overflow-hidden px-12">
         <button
           onClick={prev}
@@ -139,7 +137,6 @@ const MediaViewerModal: React.FC<Props> = ({
         </button>
       </div>
 
-      {/* Thumbnail strip */}
       <div
         className="flex gap-2 px-4 py-3 overflow-x-auto border-t border-zinc-800 scrollbar-thin scrollbar-thumb-zinc-700"
         onScroll={(e) => {

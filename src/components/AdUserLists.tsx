@@ -39,7 +39,7 @@ const AdUserList = ({
                     : "border-zinc-700 hover:border-zinc-600"
                 }
 
-                ${horizontal ? "min-w-[160px] md:min-w-0" : ""}
+                ${horizontal ? "min-w-40 md:min-w-0" : ""}
                 
                 `}
           >

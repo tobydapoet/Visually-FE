@@ -21,6 +21,7 @@ import LikeListPopUp from "../components/LikeListPopUp";
 import { formatCount } from "../utils/formatCount";
 import { handleView } from "../api/interaction.api";
 import { timeAgo } from "../utils/timeAgot";
+import { useTranslation } from "../hooks/useTranslation";
 
 const StoryPage: React.FC = () => {
   const {
@@ -48,6 +49,7 @@ const StoryPage: React.FC = () => {
   const [isOpenLikeList, setIsOpenLikeList] = useState(false);
   const viewStartRef = useRef<number>(Date.now());
   const hasSentViewRef = useRef<boolean>(false);
+  const { t } = useTranslation();
 
   const flushView = useCallback(() => {
     if (!currentStory || hasSentViewRef.current) return;
@@ -177,7 +179,7 @@ const StoryPage: React.FC = () => {
                         className="text-white/80 group-hover:text-white"
                       />
                       <span className="text-sm font-medium text-white/90 group-hover:text-white">
-                        Remove
+                        {t("remove")}
                       </span>
                     </button>
                   ) : (
@@ -190,7 +192,7 @@ const StoryPage: React.FC = () => {
                         className="text-white/80 group-hover:text-white"
                       />
                       <span className="text-sm font-medium text-white/90 group-hover:text-white">
-                        Highlight
+                        {t("highlight")}
                       </span>
                     </button>
                   )
@@ -232,7 +234,7 @@ const StoryPage: React.FC = () => {
                     }`}
                   >
                     {formatCount(likeCount)}{" "}
-                    {likeCount === 1 ? "like" : "likes"}
+                    {likeCount === 1 ? t("like") : t("likes")}
                   </button>
                 </div>
               </div>
@@ -249,7 +251,6 @@ const StoryPage: React.FC = () => {
         )}
 
         <ConfirmDialog
-          message="Do you want to remove this story from highlight?"
           onClose={() => setOpenRemoveDialog(false)}
           onConfirm={async () => {
             if (currentStory && currentStory.storageId)
@@ -260,7 +261,8 @@ const StoryPage: React.FC = () => {
             updateCurrentStory((s) => ({ ...s, storageId: undefined }));
           }}
           open={openRemoveDialog}
-          title="Remove from highlight"
+          title={t("remove_from_highlight")}
+          message={t("remove_highlight_message")}
         />
       </div>
 

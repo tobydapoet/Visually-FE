@@ -35,6 +35,7 @@ import EditContentPopUp from "./EditContentPopUp";
 import ConfirmDialog from "./ConfirmDialog";
 import { handleDeleteContent } from "../api/content.api";
 import { toast } from "sonner";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -55,6 +56,7 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
   const [replyingToId, setReplyingToId] = useState<number | null>(null);
   const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
   const [muted, setMuted] = useState(true);
+  const { t } = useTranslation();
   const {
     isLiked,
     isSaved,
@@ -146,7 +148,7 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
         window.location.reload();
       }, 1000);
     } else {
-      toast.error("Something wrong please try again!");
+      toast.error(t("delete_content_error"));
     }
   };
 
@@ -479,7 +481,7 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
                       className="text-lg text-white font-bold hover:underline cursor-pointer"
                       onClick={() => setIsOpenLikeList(true)}
                     >
-                      {formatCount(likeCount)} likes
+                      {t("likes_count", { count: formatCount(likeCount) })}
                     </div>
                     <div className="text-gray-400 text-xs">
                       {formatDateFull(currentContent.createdAt)}
@@ -490,7 +492,7 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors bg-blue-600 text-white hover:bg-blue-700`}
                       onClick={() => setIsOpenAd(true)}
                     >
-                      Boots post
+                      {t("boost_post")}
                     </button>
                   )}
                 </div>
@@ -540,11 +542,11 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
       />
 
       <ConfirmDialog
-        message={`Do you want to delete this ${type.toLowerCase()} ?`}
+        title={t("delete_content_title")}
+        message={t("delete_content_message", { type: type.toLowerCase() })}
         onClose={() => setIsOpenConfirmDelete(false)}
         onConfirm={handleDelete}
         open={isOpenConfirmDelete}
-        title="Delete content"
       />
     </>
   );

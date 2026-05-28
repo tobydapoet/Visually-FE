@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useMusic } from "../contexts/music.context";
 import { useSearchParams } from "react-router-dom";
 import { MusicStatus } from "../constants/music.enum";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -24,6 +25,7 @@ type Props = {
 
 const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
   const [submitting, setSubmitting] = useState(false);
+  const { t } = useTranslation();
   const [audioPreview, setAudioPreview] = useState<string | null>(
     music?.url ?? null,
   );
@@ -147,7 +149,7 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
         >
           <DialogTitle className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
             <span className="text-lg font-semibold">
-              {isEdit ? "Edit Music" : "Add New Music"}
+              {isEdit ? t("edit_music") : t("add_new_music")}
             </span>
             <button
               onClick={() => handleOnclose()}
@@ -160,12 +162,12 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
           <form onSubmit={handleSubmit(onFormSubmit)} className="p-6 space-y-5">
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-                Title <span className="text-red-400">*</span>
+                {t("title")} <span className="text-red-400">*</span>
               </label>
               <input
                 {...register("title")}
                 type="text"
-                placeholder="Enter song title"
+                placeholder={t("enter_song_title")}
                 className={`w-full px-3 py-2 bg-zinc-800 border rounded-lg focus:outline-none focus:ring-2 transition-colors text-white placeholder:text-zinc-500
                   ${
                     errors.title
@@ -175,19 +177,19 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
               />
               {errors.title && (
                 <p className="text-xs text-red-400 mt-1">
-                  {errors.title.message as string}
+                  {t(errors.title.message as any)}
                 </p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-                Artist <span className="text-red-400">*</span>
+                {t("artist")} <span className="text-red-400">*</span>
               </label>
               <input
                 {...register("artist")}
                 type="text"
-                placeholder="Enter artist name"
+                placeholder={t("enter_artist_name")}
                 className={`w-full px-3 py-2 bg-zinc-800 border rounded-lg focus:outline-none focus:ring-2 transition-colors text-white placeholder:text-zinc-500
                   ${
                     errors.artist
@@ -197,7 +199,7 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
               />
               {errors.artist && (
                 <p className="text-xs text-red-400 mt-1">
-                  {errors.artist.message as string}
+                  {t(errors.artist.message as any)}
                 </p>
               )}
             </div>
@@ -205,7 +207,7 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
             <div className="flex gap-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-                  Cover Image
+                  {t("cover_image")}
                 </label>
                 <div
                   onClick={() => imgInputRef.current?.click()}
@@ -220,7 +222,7 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
                   ) : (
                     <div className="flex flex-col items-center justify-center h-full gap-2 text-zinc-500">
                       <Image size={32} />
-                      <span className="text-xs">Upload image</span>
+                      <span className="text-xs">{t("upload_image")}</span>
                     </div>
                   )}
                   <input
@@ -233,14 +235,14 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
                 </div>
                 {errors.img && (
                   <p className="text-xs text-red-400 mt-1">
-                    {errors.img.message as string}
+                    {t(errors.img.message as any)}
                   </p>
                 )}
               </div>
 
               <div className="w-full h-40">
                 <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-                  Audio File <span className="text-red-400">*</span>
+                  {t("audio_file")} <span className="text-red-400">*</span>
                 </label>
                 <div
                   onClick={() => audioInputRef.current?.click()}
@@ -252,13 +254,13 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
                         Your browser does not support the audio element.
                       </audio>
                       <p className="text-xs text-zinc-500 text-center">
-                        Click to change
+                        {t("click_to_change")}
                       </p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center gap-2 text-zinc-500">
                       <Music size={32} />
-                      <span className="text-xs">Upload audio</span>
+                      <span className="text-xs">{t("upload_audio")}</span>
                       <span className="text-xs text-zinc-600">
                         MP3, WAV, etc
                       </span>
@@ -274,7 +276,7 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
                 </div>
                 {errors.url && (
                   <p className="text-xs text-red-400 mt-1">
-                    {errors.url.message as string}
+                    {t(errors.url.message as any)}
                   </p>
                 )}
               </div>
@@ -287,7 +289,7 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
                 disabled={submitting}
                 className="flex-1 px-4 py-2 text-sm font-medium text-zinc-300 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors disabled:opacity-50"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="submit"
@@ -297,12 +299,12 @@ const MusicPopUp: React.FC<Props> = ({ open, onClose, music }) => {
                 {submitting ? (
                   <>
                     <Loader2 size={16} className="animate-spin" />
-                    <span>Saving...</span>
+                    <span>{t("saving")}</span>
                   </>
                 ) : (
                   <>
                     <Upload size={16} />
-                    <span>{isEdit ? "Update" : "Create"}</span>
+                    <span>{isEdit ? t("update") : t("create")}</span>
                   </>
                 )}
               </button>

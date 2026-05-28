@@ -26,14 +26,7 @@ import Pagination from "../components/Pagination";
 import ConfirmDialog from "../components/ConfirmDialog";
 import assets from "../assets";
 import { UserStatus } from "../constants/userStatus";
-
-const BAN_DURATIONS = [
-  { label: "7 days", days: 7 },
-  { label: "30 days", days: 30 },
-  { label: "90 days", days: 90 },
-  { label: "180 days", days: 180 },
-  { label: "Forever", days: null },
-];
+import { useTranslation } from "../hooks/useTranslation";
 
 const UserManagePage: FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,10 +38,20 @@ const UserManagePage: FC = () => {
   const [currentPage, setCurrentPage] = useState(
     parseInt(searchParams.get("page") || "1"),
   );
+  const { t } = useTranslation();
+
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState(
     searchParams.get("keyword") || "",
   );
+
+  const BAN_DURATIONS = [
+    { label: t("days_ago", { count: "7" }), days: 7 },
+    { label: "30 days", days: 30 },
+    { label: "90 days", days: 90 },
+    { label: "180 days", days: 180 },
+    { label: t("forever"), days: null },
+  ];
 
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
@@ -150,12 +153,19 @@ const UserManagePage: FC = () => {
       if (result?.success === false) {
         toast.error(result.message || "Ban failed");
       } else {
-        const label = selectedBanDays ? `${selectedBanDays} days` : "Forever";
-        toast.success(`Banned ${selectedUser.username} for ${label}`);
+        const label = selectedBanDays
+          ? `${selectedBanDays} days`
+          : t("forever");
+        toast.success(
+          t("ban_success", {
+            username: selectedUser.username,
+            duration: label,
+          }),
+        );
         await fetchUsers();
       }
     } catch (error) {
-      toast.error("Failed to ban user");
+      toast.error(t("failed_ban_user"));
     } finally {
       setIsBanDialogOpen(false);
       setSelectedUser(null);
@@ -171,14 +181,18 @@ const UserManagePage: FC = () => {
       switch (pendingAction) {
         case "ACTIVATE":
           newStatus = UserStatus.ACTIVE;
-          successMessage = `User ${selectedUser.username} has been activated`;
+          successMessage = t("activate_success", {
+            username: selectedUser.username,
+          });
           break;
         case "DELETE":
           newStatus = UserStatus.DELETED;
-          successMessage = `User ${selectedUser.username} has been deleted`;
+          successMessage = t("delete_success", {
+            username: selectedUser.username,
+          });
           break;
         default:
-          toast.error("Invalid action");
+          toast.error(t("invalid_action"));
           setIsConfirmDialogOpen(false);
           return;
       }
@@ -191,7 +205,7 @@ const UserManagePage: FC = () => {
         await fetchUsers();
       }
     } catch (error) {
-      toast.error("Failed to update user status");
+      toast.error(t("failed_update_status"));
     } finally {
       setIsConfirmDialogOpen(false);
       setSelectedUser(null);
@@ -206,13 +220,18 @@ const UserManagePage: FC = () => {
         toast.error(result.message || "Failed to update role");
       } else {
         const newRoleLabel =
-          role === UserRole.MODERATOR ? "Moderator" : "Client";
-        toast.success(`${selectedUser.username} is now a ${newRoleLabel}`);
+          role === UserRole.MODERATOR ? t("moderators") : t("clients");
+        toast.success(
+          t("role_change_success", {
+            username: selectedUser.username,
+            role: newRoleLabel,
+          }),
+        );
         await fetchUsers();
         if (role !== activeTab) handleTabChange(role);
       }
     } catch (error) {
-      toast.error("Failed to update user role");
+      toast.error(t("failed_update_role"));
     } finally {
       setIsRoleDialogOpen(false);
       setSelectedUser(null);
@@ -220,12 +239,12 @@ const UserManagePage: FC = () => {
   };
 
   const getConfirmDialogMessage = () => {
-    if (!selectedUser) return "";
+    const name = selectedUser?.fullName || selectedUser?.username || "";
     switch (pendingAction) {
       case "ACTIVATE":
-        return `Are you sure you want to activate "${selectedUser.fullName || selectedUser.username}"?`;
+        return t("confirm_activate", { name });
       case "DELETE":
-        return `Are you sure you want to delete "${selectedUser.fullName || selectedUser.username}"? This action cannot be undone.`;
+        return t("confirm_delete", { name });
       default:
         return "";
     }
@@ -234,11 +253,11 @@ const UserManagePage: FC = () => {
   const getConfirmDialogTitle = () => {
     switch (pendingAction) {
       case "ACTIVATE":
-        return "Activate User";
+        return t("activate_user");
       case "DELETE":
-        return "Delete User";
+        return t("delete_user");
       default:
-        return "Confirm Action";
+        return t("confirm_action");
     }
   };
 
@@ -247,19 +266,19 @@ const UserManagePage: FC = () => {
       case "ACTIVE":
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <CheckCircle className="w-3 h-3" /> Active
+            <CheckCircle className="w-3 h-3" /> {t("status_active")}
           </span>
         );
       case "BANNED":
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-red-500/10 text-red-400 border border-red-500/20">
-            <Ban className="w-3 h-3" /> Banned
+            <Ban className="w-3 h-3" /> {t("status_banned")}
           </span>
         );
       case "DELETED":
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-neutral-500/10 text-neutral-400 border border-neutral-500/20">
-            <Trash2 className="w-3 h-3" /> Deleted
+            <Trash2 className="w-3 h-3" /> {t("status_deleted")}
           </span>
         );
       default:
@@ -277,13 +296,13 @@ const UserManagePage: FC = () => {
         return [
           {
             action: "BAN" as const,
-            label: "Ban",
+            label: t("action_ban"),
             icon: <Ban size={14} />,
             className: "text-red-400 hover:bg-red-500/10",
           },
           {
             action: "DELETE" as const,
-            label: "Delete",
+            label: t("action_delete"),
             icon: <Trash2 size={14} />,
             className: "text-red-400 hover:bg-red-500/10",
           },
@@ -292,13 +311,13 @@ const UserManagePage: FC = () => {
         return [
           {
             action: "ACTIVATE" as const,
-            label: "Activate",
+            label: t("action_activate"),
             icon: <CheckCircle size={14} />,
             className: "text-emerald-400 hover:bg-emerald-500/10",
           },
           {
             action: "DELETE" as const,
-            label: "Delete",
+            label: t("action_delete"),
             icon: <Trash2 size={14} />,
             className: "text-red-400 hover:bg-red-500/10",
           },
@@ -309,13 +328,13 @@ const UserManagePage: FC = () => {
         return [
           {
             action: "ACTIVATE" as const,
-            label: "Activate",
+            label: t("action_activate"),
             icon: <CheckCircle size={14} />,
             className: "text-emerald-400 hover:bg-emerald-500/10",
           },
           {
             action: "DELETE" as const,
-            label: "Delete",
+            label: t("action_delete"),
             icon: <Trash2 size={14} />,
             className: "text-red-400 hover:bg-red-500/10",
           },
@@ -326,12 +345,12 @@ const UserManagePage: FC = () => {
   const tabs = [
     {
       role: UserRole.CLIENT,
-      label: "Clients",
+      label: t("clients"),
       icon: <Users className="w-4 h-4" />,
     },
     {
       role: UserRole.MODERATOR,
-      label: "Moderators",
+      label: t("moderators"),
       icon: <Shield className="w-4 h-4" />,
     },
   ];
@@ -342,10 +361,10 @@ const UserManagePage: FC = () => {
         <div className="mx-auto max-w-7xl">
           <div className="mb-4 sm:mb-6">
             <h1 className="text-xl sm:text-2xl font-bold text-white mb-1">
-              User Management
+              {t("user_management")}
             </h1>
             <p className="text-neutral-400 text-xs sm:text-sm">
-              Manage moderators and client users
+              {t("user_management_subtitle")}
             </p>
           </div>
 
@@ -370,7 +389,11 @@ const UserManagePage: FC = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
             <input
               type="text"
-              placeholder={`Search ${activeTab === UserRole.MODERATOR ? "moderator" : "client"} by username, full name...`}
+              placeholder={
+                activeTab === UserRole.MODERATOR
+                  ? t("search_moderator")
+                  : t("search_client")
+              }
               value={searchInput}
               onChange={(e) => handleSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-neutral-900 border border-neutral-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-neutral-500 text-sm"
@@ -379,9 +402,10 @@ const UserManagePage: FC = () => {
 
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <p className="text-xs sm:text-sm text-neutral-500">
-              Total{" "}
-              {activeTab === UserRole.MODERATOR ? "moderators" : "clients"}:{" "}
-              <span className="text-white font-medium">{totalElements}</span>
+              {activeTab === UserRole.MODERATOR
+                ? t("total_moderators")
+                : t("total_clients")}
+              : <span className="text-white font-medium">{totalElements}</span>
             </p>
           </div>
 
@@ -392,9 +416,9 @@ const UserManagePage: FC = () => {
           ) : users.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 sm:py-20 gap-2">
               <Users className="w-10 h-10 sm:w-12 sm:h-12 text-neutral-700" />
-              <p className="text-neutral-500 text-sm">No users found</p>
+              <p className="text-neutral-500 text-sm">{t("no_users_found")}</p>
               <p className="text-xs text-neutral-600">
-                Try changing your search keyword
+                {t("try_changing_keyword")}
               </p>
             </div>
           ) : (
@@ -469,7 +493,9 @@ const UserManagePage: FC = () => {
                                   }`}
                                 >
                                   <RefreshCw size={14} />
-                                  <span>Change to {newRoleLabel}</span>
+                                  <span>
+                                    {t("change_to", { role: newRoleLabel })}
+                                  </span>
                                 </button>
                               )}
                             </MenuItem>
@@ -522,10 +548,10 @@ const UserManagePage: FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 w-full max-w-sm shadow-xl">
             <h2 className="text-white font-semibold text-base mb-1">
-              Ban User
+              <h2>{t("ban_user_title")}</h2>
             </h2>
             <p className="text-neutral-400 text-sm mb-4">
-              Select ban duration for{" "}
+              {t("ban_user_message")}{" "}
               <span className="text-white font-medium">
                 {selectedUser?.fullName || selectedUser?.username}
               </span>
@@ -555,13 +581,13 @@ const UserManagePage: FC = () => {
                 }}
                 className="flex-1 py-2 cursor-pointer rounded-lg border border-neutral-700 text-neutral-300 text-sm hover:bg-neutral-800 transition-colors"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 onClick={handleBanUser}
                 className="flex-1 py-2 cursor-pointer rounded-lg bg-red-500/20 border border-red-500 text-red-400 text-sm hover:bg-red-500/30 transition-colors font-medium"
               >
-                Ban confirm
+                {t("ban_confirm")}
               </button>
             </div>
           </div>
@@ -592,8 +618,13 @@ const UserManagePage: FC = () => {
               : UserRole.MODERATOR;
           handleUpdateRole(newRole);
         }}
-        title="Change Role"
-        message={`Are you sure you want to change "${selectedUser?.fullName || selectedUser?.username}" from ${activeTab === UserRole.MODERATOR ? "Moderator" : "Client"} to ${activeTab === UserRole.MODERATOR ? "Client" : "Moderator"}?`}
+        title={t("change_role_title")}
+        message={t("change_role_message", {
+          name: selectedUser?.fullName || selectedUser?.username || "",
+          from:
+            activeTab === UserRole.MODERATOR ? t("moderators") : t("clients"),
+          to: activeTab === UserRole.MODERATOR ? t("clients") : t("moderators"),
+        })}
       />
     </>
   );

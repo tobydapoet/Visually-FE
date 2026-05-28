@@ -16,8 +16,9 @@ import {
 } from "../types/schemas/content.schema";
 import HashTagsField from "./HashTagField";
 import { Chip, Box } from "@mui/material";
-import { CaptionField } from "./CaptionFiled";
+import { CaptionField } from "./CaptionField";
 import { toast } from "sonner";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Tag = { id: number; name: string };
 type Mention = { userId: string; username: string };
@@ -41,6 +42,7 @@ const EditContentPopUp: React.FC<Props> = ({
     PostDetailResponse | ShortDetailResponse | null
   >(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const [existingTags, setExistingTags] = useState<Tag[]>([]);
   const [tagsIdRemove, setTagsIdRemove] = useState<number[]>([]);
@@ -172,7 +174,9 @@ const EditContentPopUp: React.FC<Props> = ({
               >
                 {/* Caption */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-zinc-400 text-xs">Caption</label>
+                  <label className="text-zinc-400 text-xs">
+                    {t("caption_label")}
+                  </label>
                   <CaptionField
                     initialValue={currentContent.caption ?? ""}
                     initialMentions={currentContent.mentions ?? []}
@@ -203,7 +207,10 @@ const EditContentPopUp: React.FC<Props> = ({
                   />
                   {errors.caption && (
                     <p className="text-red-400 text-xs">
-                      {errors.caption.message}
+                      {t(
+                        (errors.caption.message ??
+                          "caption.must_be_string") as any,
+                      )}
                     </p>
                   )}
                 </div>
@@ -211,10 +218,12 @@ const EditContentPopUp: React.FC<Props> = ({
                 {existingTags.length > 0 && (
                   <div className="flex flex-col gap-2">
                     <label className="text-zinc-400 text-xs">
-                      Tags
+                      {t("tags_label")}
                       {tagsIdRemove.length > 0 && (
                         <span className="text-red-400 ml-1">
-                          ({tagsIdRemove.length} will be removed)
+                          {t("tags_will_remove", {
+                            count: String(tagsIdRemove.length),
+                          })}
                         </span>
                       )}
                     </label>
@@ -254,9 +263,10 @@ const EditContentPopUp: React.FC<Props> = ({
                   </div>
                 )}
 
-                {/* New tags — thêm mới */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-zinc-400 text-xs">Add new tags</label>
+                  <label className="text-zinc-400 text-xs">
+                    {t("add_new_tags")}
+                  </label>
                   <HashTagsField
                     value={newTags}
                     onChange={(tags) => {
@@ -276,7 +286,7 @@ const EditContentPopUp: React.FC<Props> = ({
                   className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-lg py-2 text-sm font-medium transition-colors flex items-center justify-center gap-2"
                 >
                   <Check className="w-4 h-4" />
-                  {isSubmitting ? "Saving..." : "Save changes"}
+                  {isSubmitting ? t("saving") : t("save_changes")}
                 </button>
               </form>
             </div>

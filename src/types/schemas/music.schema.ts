@@ -1,26 +1,27 @@
 import { z } from "zod";
 
 export const MusicCreateSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  artist: z.string().min(1, "Artist is required"),
+  title: z.string().min(1, "music.title.required"),
+  artist: z.string().min(1, "music.artist.required"),
   url: z
-    .instanceof(File, { message: "Url file is required" })
-    .refine((file) => file.size > 0, "Url file is required"),
+    .instanceof(File, { message: "music.url.required" })
+    .refine((file) => file.size > 0, "music.url.required"),
   img: z
-    .instanceof(File, { message: "Image is required" })
-    .refine((file) => file.size > 0, "Image is required"),
+    .instanceof(File, { message: "music.img.required" })
+    .refine((file) => file.size > 0, "music.img.required"),
 });
 
 export const MusicUpdateSchema = z.object({
-  title: z.string().min(1, "Title is required").optional(),
-  artist: z.string().min(1, "Artist is required").optional(),
+  title: z.string().min(1, "music.title.required").optional(),
+  artist: z.string().min(1, "music.artist.required").optional(),
   url: z
-    .instanceof(File, { message: "Url file is required" })
-    .refine((file) => file.size > 0, "Url file is required")
+    .instanceof(File, { message: "music.url.required" })
+    .refine((file) => file.size > 0, "music.url.required")
     .optional(),
+
   img: z
-    .instanceof(File, { message: "Image is required" })
-    .refine((file) => file.size > 0, "Image is required")
+    .instanceof(File, { message: "music.img.required" })
+    .refine((file) => file.size > 0, "music.img.required")
     .optional(),
 });
 

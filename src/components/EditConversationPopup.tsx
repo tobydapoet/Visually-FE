@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useState } from "react";
 import { handleUpdateConversation } from "../api/message.api";
 import { toast } from "sonner";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -25,6 +26,7 @@ const EditConversationPopUp: React.FC<Props> = ({ open, onClose }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   const {
     register,
@@ -62,7 +64,9 @@ const EditConversationPopUp: React.FC<Props> = ({ open, onClose }) => {
     setIsSubmitting(true);
     try {
       const formData = new FormData();
-      formData.append("name", data.name);
+      if (data.name) {
+        formData.append("name", data.name);
+      }
       if (data.file) formData.append("file", data.file);
 
       const res = await handleUpdateConversation(
@@ -97,7 +101,7 @@ const EditConversationPopUp: React.FC<Props> = ({ open, onClose }) => {
         >
           <DialogTitle className="flex items-center justify-between px-4 py-2 border-b border-zinc-800">
             <div className="text-md font-semibold text-white">
-              Edit Conversation
+              {t("edit_conversation")}
             </div>
             <button
               onClick={handleClose}
@@ -145,7 +149,9 @@ const EditConversationPopUp: React.FC<Props> = ({ open, onClose }) => {
                 variant="outlined"
                 size="medium"
                 error={!!errors.name}
-                helperText={errors.name?.message}
+                helperText={
+                  errors.name?.message ? t(errors.name.message as any) : ""
+                }
                 sx={{
                   "& .MuiInputLabel-root": { color: "#9ca3af" },
                   "& .MuiOutlinedInput-root": {
@@ -165,7 +171,7 @@ const EditConversationPopUp: React.FC<Props> = ({ open, onClose }) => {
                 disabled={isSubmitting}
                 className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "Saving..." : "Save"}
+                {isSubmitting ? t("saving") : t("save")}
               </button>
             </div>
           </form>

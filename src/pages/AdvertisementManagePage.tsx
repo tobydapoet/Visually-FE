@@ -9,9 +9,11 @@ import type { UserSummaryType } from "../types/api/user.type";
 import Pagination from "../components/Pagination";
 import AdPopUp from "../components/AdPopUp";
 import useDebounce from "../hooks/useDebounce";
+import { useTranslation } from "../hooks/useTranslation";
 
 const BoostedPostManagePage = () => {
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
   const [selectedUser, setSelectedUser] = useState<UserSummaryType | null>(
     null,
   );
@@ -85,7 +87,7 @@ const BoostedPostManagePage = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-zinc-900">
         <div className="bg-red-900/50 border border-red-700 text-red-200 px-6 py-4 rounded-lg">
-          <p className="font-semibold">Something went wrong!</p>
+          <p className="font-semibold">{t("something_went_wrong")}</p>
           <p className="text-sm">{error.message}</p>
         </div>
       </div>
@@ -96,10 +98,10 @@ const BoostedPostManagePage = () => {
     <div className="w-full  bg-zinc-900">
       <div className="p-6">
         <h1 className="text-xl sm:text-2xl font-bold text-white mb-1">
-          User Management
+          {t("user_management")}
         </h1>
         <p className="text-neutral-400 text-xs sm:text-sm">
-          Manage moderators and client users
+          {t("user_management_subtitle")}
         </p>
       </div>
       <div className="min-h-screen border-t md:border-zinc-800 w-full bg-zinc-900 flex flex-col md:flex-row">
@@ -112,7 +114,7 @@ const BoostedPostManagePage = () => {
               type="text"
               value={keyword}
               onChange={handleSearch}
-              placeholder="Search users..."
+              placeholder={t("search_users")}
               className="w-full bg-zinc-800 text-zinc-100 placeholder-zinc-500 text-sm
                          border border-zinc-700 rounded-lg px-3 py-2
                          focus:outline-none focus:border-zinc-500 transition-colors"
@@ -153,7 +155,7 @@ const BoostedPostManagePage = () => {
             </div>
           ) : allUsers.length === 0 ? (
             <div className="flex items-center justify-center p-6 text-zinc-500 text-sm">
-              No users found
+              {t("no_users_found")}
             </div>
           ) : (
             <AdUserList
@@ -171,7 +173,7 @@ const BoostedPostManagePage = () => {
         <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
           {!selectedUser ? (
             <div className="flex items-center justify-center h-full min-h-50 text-zinc-500 text-sm">
-              Select a user to view their boosted posts
+              {t("select_user_to_view")}
             </div>
           ) : adsLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
@@ -206,14 +208,14 @@ const BoostedPostManagePage = () => {
             </div>
           ) : ads.length === 0 ? (
             <div className="flex items-center justify-center min-h-50 text-zinc-500 text-sm">
-              This user has no boosted posts
+              {t("no_boosted_posts")}
             </div>
           ) : (
             <>
               <div className="mb-4">
                 <h2 className="text-white font-semibold text-sm md:text-base">
-                  {selectedUser.fullName || selectedUser.username}'s Boosted
-                  Posts
+                  {selectedUser.fullName || selectedUser.username}'s{" "}
+                  {t("boosted_posts")}
                 </h2>
                 <p className="text-zinc-500 text-xs mt-0.5">
                   @{selectedUser.username}

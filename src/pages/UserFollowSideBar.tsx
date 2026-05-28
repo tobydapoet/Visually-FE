@@ -6,17 +6,32 @@ import assets from "../assets";
 import { handleGetFollowingWithStatus } from "../api/follow.api";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/user.context";
+import { useTranslation } from "../hooks/useTranslation";
+import type { translations } from "../locales/translations";
 
-const getOnlineStatus = (lastSeen: Date | null) => {
-  if (lastSeen === null) return { label: "Online", color: "bg-emerald-500" };
+const getOnlineStatus = (
+  lastSeen: Date | null,
+  t: (
+    key: keyof typeof translations.en,
+    params?: Record<string, string>,
+  ) => string,
+) => {
+  if (lastSeen === null) {
+    return { label: t("online"), color: "bg-emerald-500" };
+  }
 
   const diff = Date.now() - new Date(lastSeen).getTime();
   const minutes = Math.floor(diff / 1000 / 60);
 
-  if (minutes < 60) return { label: `${minutes}m`, color: "bg-yellow-500" };
+  if (minutes < 60) {
+    return { label: `${minutes}m`, color: "bg-yellow-500" };
+  }
 
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return { label: `${hours}h`, color: "bg-neutral-500" };
+
+  if (hours < 24) {
+    return { label: `${hours}h`, color: "bg-neutral-500" };
+  }
 
   return { label: null, color: "bg-neutral-600" };
 };
@@ -24,6 +39,7 @@ const getOnlineStatus = (lastSeen: Date | null) => {
 const UserFollowSideBar: React.FC = () => {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const { currentUser, loading } = useUser();
@@ -83,7 +99,7 @@ const UserFollowSideBar: React.FC = () => {
       ) : (
         <>
           {users.map((user) => {
-            const status = getOnlineStatus(user.lastSeen);
+            const status = getOnlineStatus(user.lastSeen, t);
 
             return (
               <div
@@ -115,10 +131,10 @@ const UserFollowSideBar: React.FC = () => {
                       }`}
                     >
                       {user.lastSeen === null
-                        ? "Online"
+                        ? t("online")
                         : status.label === null
-                          ? "Offline"
-                          : `${status.label} ago`}
+                          ? t("offline")
+                          : t("time_ago", { time: status.label })}
                     </p>
                   </div>
                 )}

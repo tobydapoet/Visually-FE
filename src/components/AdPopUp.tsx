@@ -26,6 +26,7 @@ import assets from "../assets";
 import { ParsedContent } from "./ParseContent";
 import { useAd } from "../contexts/ad.context";
 import { AdStatus } from "../constants/adStatus.enum";
+import { useTranslation } from "../hooks/useTranslation";
 
 type ContentDetail = PostDetailResponse | ShortDetailResponse;
 
@@ -44,6 +45,7 @@ const AdPopUp: React.FC = () => {
   );
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [showDisableConfirm, setShowDisableConfirm] = useState(false);
+  const { t } = useTranslation();
 
   const fetchContentDetail = async () => {
     if (!ad) return;
@@ -129,11 +131,11 @@ const AdPopUp: React.FC = () => {
   const getStatusText = (status: AdStatus) => {
     switch (status) {
       case AdStatus.ACTIVE:
-        return "Active";
+        return t("ad_status_active");
       case AdStatus.INACTIVE:
-        return "Inactive";
+        return t("ad_status_inactive");
       case AdStatus.DISABLED:
-        return "Disabled";
+        return t("ad_status_disabled");
       default:
         return status;
     }
@@ -170,7 +172,7 @@ const AdPopUp: React.FC = () => {
           >
             <DialogTitle className="flex items-center justify-between px-3 sm:px-4 py-2 border-b border-zinc-800">
               <div className="text-sm sm:text-md font-semibold text-white">
-                Campaign Details
+                {t("campaign_details")}
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <div
@@ -187,7 +189,7 @@ const AdPopUp: React.FC = () => {
                         disabled={updatingStatusId === ad.id}
                         className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors
                           disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Pause campaign"
+                        title={t("pause_campaign")}
                       >
                         {updatingStatusId === ad.id ? (
                           <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
@@ -201,7 +203,7 @@ const AdPopUp: React.FC = () => {
                         disabled={updatingStatusId === ad.id}
                         className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors
                           disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Activate campaign"
+                        title={t("activate_campaign")}
                       >
                         {updatingStatusId === ad.id ? (
                           <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
@@ -216,7 +218,7 @@ const AdPopUp: React.FC = () => {
                       disabled={updatingStatusId === ad.id}
                       className="p-1.5 rounded-lg bg-zinc-800 hover:bg-red-500/20 transition-colors
                         disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Disable campaign"
+                      title={t("disable_campaign")}
                     >
                       <Ban className="w-4 h-4 text-red-400" />
                     </button>
@@ -312,23 +314,29 @@ const AdPopUp: React.FC = () => {
                       <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4">
                         <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
                           <Wallet className="w-4 h-4 text-emerald-400" />
-                          Budget Details
+                          {t("budget_details")}
                         </h4>
                         <div className="space-y-2">
                           <div className="flex justify-between text-xs sm:text-sm">
-                            <span className="text-zinc-400">Daily Budget:</span>
+                            <span className="text-zinc-400">
+                              {t("daily_budget")}:
+                            </span>
                             <span className="text-emerald-400 font-semibold">
                               {formatCurrency(ad.dailyBudget)}
                             </span>
                           </div>
                           <div className="flex justify-between text-xs sm:text-sm">
-                            <span className="text-zinc-400">Total Spent:</span>
+                            <span className="text-zinc-400">
+                              {t("total_spent")}
+                            </span>
                             <span className="text-yellow-400 font-semibold">
                               {formatCurrency(ad.spentAmount)}
                             </span>
                           </div>
                           <div className="flex justify-between text-xs sm:text-sm">
-                            <span className="text-zinc-400">Remaining:</span>
+                            <span className="text-zinc-400">
+                              {t("remaining")}:
+                            </span>
                             <span className="text-blue-400 font-semibold">
                               {formatCurrency(
                                 ad.dailyBudget * 30 - ad.spentAmount,
@@ -337,7 +345,7 @@ const AdPopUp: React.FC = () => {
                           </div>
                           <div className="flex justify-between text-xs sm:text-sm pt-2 border-t border-zinc-700">
                             <span className="text-zinc-400">
-                              Cost per View:
+                              {t("cost_per_view")}:
                             </span>
                             <span className="text-white">
                               {calculateROI(ad.spentAmount, ad.views)} VND
@@ -349,30 +357,35 @@ const AdPopUp: React.FC = () => {
                       <div className="bg-zinc-800/30 rounded-xl p-3 sm:p-4">
                         <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
                           <Target className="w-4 h-4 text-purple-400" />
-                          Targeting Details
+                          {t("targeting_details")}
                         </h4>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <p className="text-xs text-zinc-500 mb-1">
-                              Age Range
+                              {t("age_range")}
                             </p>
                             <p className="text-xs sm:text-sm text-white">
-                              {ad.ageMin} - {ad.ageMax} years
+                              {t("age_range_value", {
+                                min: String(ad.ageMin),
+                                max: String(ad.ageMax),
+                              })}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-zinc-500 mb-1">Gender</p>
+                            <p className="text-xs text-zinc-500 mb-1">
+                              {t("gender")}
+                            </p>
                             <p className="text-xs sm:text-sm text-white">
                               {ad.gender === "ALL"
-                                ? "All"
+                                ? t("gender_all")
                                 : ad.gender === "MALE"
-                                  ? "Male"
-                                  : "Female"}
+                                  ? t("gender_male")
+                                  : t("gender_female")}
                             </p>
                           </div>
                           <div className="col-span-2">
                             <p className="text-xs text-zinc-500 mb-1">
-                              Campaign Period
+                              {t("campaign_period")}
                             </p>
                             <p className="text-xs sm:text-sm text-white">
                               {formatDate(ad.startDate)} -{" "}
@@ -427,10 +440,10 @@ const AdPopUp: React.FC = () => {
         open={showDisableConfirm}
         onClose={() => setShowDisableConfirm(false)}
         onConfirm={confirmDisable}
-        title="Disable Campaign"
-        message={`Are you sure you want to disable this campaign? This action cannot be undone.`}
-        confirmText="Disable"
-        cancelText="Cancel"
+        title={t("disable_campaign_title")}
+        message={t("disable_campaign_message")}
+        confirmText={t("disable")}
+        cancelText={t("cancel")}
       />
     </>
   );

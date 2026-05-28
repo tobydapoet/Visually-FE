@@ -1,6 +1,7 @@
 import { Play, Pause } from "lucide-react";
 import { ParsedContent } from "./ParseContent";
 import { AdStatus } from "../constants/adStatus.enum";
+import { useTranslation } from "../hooks/useTranslation";
 
 interface AdPostCardProps {
   ad: any;
@@ -22,19 +23,6 @@ const getStatusColor = (status: AdStatus) => {
   }
 };
 
-const getStatusText = (status: AdStatus) => {
-  switch (status) {
-    case AdStatus.ACTIVE:
-      return "Active";
-    case AdStatus.INACTIVE:
-      return "Inactive";
-    case AdStatus.DISABLED:
-      return "Disabled";
-    default:
-      return status;
-  }
-};
-
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -48,6 +36,21 @@ const AdPostCard = ({
   onSelect,
   onUpdateStatus,
 }: AdPostCardProps) => {
+  const { t } = useTranslation();
+
+  const getStatusText = (status: AdStatus) => {
+    switch (status) {
+      case AdStatus.ACTIVE:
+        return t("ad_status_active");
+      case AdStatus.INACTIVE:
+        return t("ad_status_inactive");
+      case AdStatus.DISABLED:
+        return t("ad_status_disabled");
+      default:
+        return status;
+    }
+  };
+
   const pct =
     ad.dailyBudget > 0
       ? Math.min(Math.round((ad.spentAmount / ad.dailyBudget) * 100), 100)
@@ -107,25 +110,27 @@ const AdPostCard = ({
             <p className="text-sm font-semibold text-white">
               {ad.views.toLocaleString()}
             </p>
-            <p className="text-[11px] text-zinc-500 mt-0.5">Views</p>
+            <p className="text-[11px] text-zinc-500 mt-0.5">{t("views")}</p>
           </div>
           <div className="bg-zinc-800/60 rounded-lg p-2.5 text-center">
             <p className="text-sm font-semibold text-white">
               {formatCurrency(ad.spentAmount)}
             </p>
-            <p className="text-[11px] text-zinc-500 mt-0.5">Spent today</p>
+            <p className="text-[11px] text-zinc-500 mt-0.5">
+              {t("spent_today")}
+            </p>
           </div>
         </div>
 
         <div className="border-t border-zinc-800 mt-4 pt-3 space-y-1.5">
           <div className="flex justify-between items-center text-xs">
-            <span className="text-zinc-500">Daily budget</span>
+            <span className="text-zinc-500">{t("daily_budget")}</span>
             <span className="text-emerald-400 font-medium">
               {formatCurrency(ad.dailyBudget)}
             </span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-zinc-500">Spent</span>
+            <span className="text-zinc-500">{t("spent")}</span>
             <span className="text-yellow-400">
               {formatCurrency(ad.spentAmount)}
             </span>
@@ -145,9 +150,11 @@ const AdPostCard = ({
               />
             </div>
             <div className="flex justify-between text-[11px] text-zinc-600 mt-1">
-              <span>{pct}% used</span>
+              <span>{t("percent_used", { pct: String(pct) })}</span>
               <span>
-                {formatCurrency(ad.dailyBudget - ad.spentAmount)} left
+                {t("amount_left", {
+                  amount: formatCurrency(ad.dailyBudget - ad.spentAmount),
+                })}
               </span>
             </div>
           </div>

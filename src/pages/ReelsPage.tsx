@@ -5,6 +5,7 @@ import { handleGetFeed, handleMarkCurrentReelFeed } from "../api/feed.api";
 import { ReelCard } from "../components/ReelCard";
 import type { FeedContentResponse } from "../types/api/feed.type";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "../hooks/useTranslation";
 
 export default function ReelsPage() {
   const [reels, setReels] = useState<FeedContentResponse[]>([]);
@@ -17,6 +18,7 @@ export default function ReelsPage() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const isFetching = useRef(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (reels.length === 0) return;
@@ -169,7 +171,7 @@ export default function ReelsPage() {
             className="flex items-center justify-center"
             style={{ width: "100%", height: 120 }}
           >
-            <p className="text-white/40 text-sm">You're all caught up ✓</p>
+            <p className="text-white/40 text-sm">{t("all_caught_up")}</p>
           </div>
         )}
       </div>

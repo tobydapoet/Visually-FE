@@ -28,6 +28,8 @@ import SearchPopup from "../pages/SearchPopup";
 import NotificationPopUp from "../pages/NotificationPopUp";
 import { useNotification } from "../contexts/notification.context";
 import { useMessage } from "../contexts/message.context";
+import { useTranslation } from "../hooks/useTranslation";
+import LoadingSpinner from "./LoadingSpinner";
 
 const SideBar: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -42,6 +44,7 @@ const SideBar: React.FC = () => {
   const { unreadCount } = useNotification();
   const { unreadConversationCount } = useMessage();
   const { currentUser, loading } = useUser();
+  const { t } = useTranslation();
 
   const getActiveFromPath = (pathname: string) => {
     if (pathname === "/") return "Home";
@@ -75,12 +78,21 @@ const SideBar: React.FC = () => {
   const expanded = isExpanded || menuOpen;
 
   const menuItems = [
-    { id: "Home", icon: Home, label: "Home", hasFill: true, link: "/" },
-    { id: "Shorts", icon: SquarePlay, label: "Reels", link: "/reels" },
-    { id: "Messages", icon: MessageCircle, label: "Messages", link: "/inbox" },
-    { id: "Search", icon: Search, label: "Search" },
-    { id: "Boosted", icon: Megaphone, label: "Boosts", link: "/ad" },
-    { id: "Notifications", icon: Bell, label: "Notifications" },
+    { id: "Home", icon: Home, label: t("home"), hasFill: true, link: "/" },
+    { id: "Shorts", icon: SquarePlay, label: t("reels"), link: "/reels" },
+    {
+      id: "Messages",
+      icon: MessageCircle,
+      label: t("messages"),
+      link: "/inbox",
+    },
+    { id: "Search", icon: Search, label: t("search") },
+    { id: "Boosted", icon: Megaphone, label: t("boosts"), link: "/ad" },
+    {
+      id: "Notifications",
+      icon: Bell,
+      label: t("notifications"),
+    },
   ];
 
   const handleItemClick = (item: (typeof menuItems)[0]) => {
@@ -96,31 +108,36 @@ const SideBar: React.FC = () => {
   };
 
   const bottomNavItems = [
-    { id: "Home", icon: Home, label: "Home", hasFill: true, link: "/" },
-    { id: "Shorts", icon: SquarePlay, label: "Reels", link: "/reels" },
-    { id: "Messages", icon: MessageCircle, label: "Messages", link: "/inbox" },
-    { id: "Search", icon: Search, label: "Search" },
+    { id: "Home", icon: Home, label: t("home"), hasFill: true, link: "/" },
+    { id: "Shorts", icon: SquarePlay, label: t("reels"), link: "/reels" },
+    {
+      id: "Messages",
+      icon: MessageCircle,
+      label: t("messages"),
+      link: "/inbox",
+    },
+    { id: "Search", icon: Search, label: t("search") },
   ];
 
   const createMenuItems = [
     {
       emoji: BookPlus,
-      label: "New Post",
+      label: t("new_post"),
       onOpen: () => setOpenPostPopUp(true),
     },
     {
       emoji: Play,
-      label: "Upload Video",
+      label: t("upload_video"),
       onOpen: () => setOpenShortPopUp(true),
     },
     {
       emoji: SquareStar,
-      label: "Create Story",
+      label: t("create_story"),
       onOpen: () => setOpenStoryPopUp(true),
     },
   ];
 
-  if (loading || !currentUser) return null;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <>
@@ -209,7 +226,7 @@ const SideBar: React.FC = () => {
                         className={`text-white font-medium whitespace-nowrap transition-all duration-200
                         ${expanded ? "opacity-100 translate-x-0" : "hidden translate-x-2"}`}
                       >
-                        Create
+                        {t("create")}
                       </span>
                     </MenuButton>
                     <Transition
@@ -274,7 +291,7 @@ const SideBar: React.FC = () => {
               <span
                 className={`text-white text-sm whitespace-nowrap transition-all duration-200 ${expanded ? "opacity-100" : "opacity-0"}`}
               >
-                Profile
+                {t("profile")}
               </span>
             </div>
           </div>
@@ -374,25 +391,26 @@ const SideBar: React.FC = () => {
               </button>
             );
           })}
-
-          <button
-            onClick={() => {
-              setActiveItem("Profile");
-              navigate(`/${currentUser.username}`);
-            }}
-            className="flex flex-col items-center gap-1 flex-1 py-1 px-2 rounded-xl transition-all duration-200 active:scale-90"
-          >
-            <div
-              className={`p-1 rounded-xl transition-all duration-200
-              ${activeItem === "Profile" ? "ring-2 ring-blue-500" : ""}`}
+          {currentUser && (
+            <button
+              onClick={() => {
+                setActiveItem("Profile");
+                navigate(`/${currentUser.username}`);
+              }}
+              className="flex flex-col items-center gap-1 flex-1 py-1 px-2 rounded-xl transition-all duration-200 active:scale-90"
             >
-              <img
-                src={currentUser.avatar || assets.profile}
-                alt="avatar"
-                className="w-6 h-6 rounded-full object-cover"
-              />
-            </div>
-          </button>
+              <div
+                className={`p-1 rounded-xl transition-all duration-200
+              ${activeItem === "Profile" ? "ring-2 ring-blue-500" : ""}`}
+              >
+                <img
+                  src={currentUser.avatar || assets.profile}
+                  alt="avatar"
+                  className="w-6 h-6 rounded-full object-cover"
+                />
+              </div>
+            </button>
+          )}
         </div>
       </nav>
       <PostPopUp open={openPostPopUp} onClose={() => setOpenPostPopUp(false)} />

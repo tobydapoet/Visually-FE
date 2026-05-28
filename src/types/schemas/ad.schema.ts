@@ -6,26 +6,20 @@ export const CreateAdSchema = z
   .object({
     dailyBudget: z
       .number()
-      .min(1000, "Daily budget must be at least 1,000")
-      .max(1000000, "Daily budget cannot exceed 1,000,000"),
+      .min(1000, "daily_budget.min")
+      .max(1000000, "daily_budget.max"),
 
-    duration: z
-      .number()
-      .min(1, "Time duration must be at least 1 hour")
-      .max(720, "Time duration cannot exceed 720 hours"),
+    duration: z.number().min(1, "duration.min").max(720, "duration.max"),
 
-    ageMin: z.number().min(1, "Minimum age must be at least 1"),
+    ageMin: z.number().min(1, "age_min.min"),
+    ageMax: z.number().max(100, "age_max.max"),
 
-    ageMax: z.number().max(100, "Maximum age cannot exceed 100"),
-
-    gender: z.enum(GenderSelect, "Please select a valid gender option"),
-
-    contentType: z.enum(ContentType, "Please select a valid content type"),
-
+    gender: z.enum(GenderSelect, "gender.invalid"),
+    contentType: z.enum(ContentType, "content_type.invalid"),
     contentId: z.number(),
   })
   .refine((data) => data.ageMin <= data.ageMax, {
-    message: "Minimum age cannot be greater than maximum age",
+    message: "age_min.greater_than_max",
     path: ["ageMin"],
   });
 

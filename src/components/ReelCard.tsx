@@ -19,6 +19,7 @@ import ActionBtn from "./ActionButton";
 import { handleView } from "../api/interaction.api";
 import { useNavigate } from "react-router-dom";
 import ContentMorePopUp from "./ContentMorePopUp";
+import { useTranslation } from "../hooks/useTranslation";
 
 interface ReelCardProps {
   reel: FeedContentResponse;
@@ -32,6 +33,7 @@ export function ReelCard({ reel, isActive }: ReelCardProps) {
   const [isOpenMore, setIsOpenMore] = useState(false);
   const commentRef = useRef<CommentComponentRef>(null);
   const [replyingToId, setReplyingToId] = useState<number | null>(null);
+  const { t } = useTranslation();
 
   const messageInputRef = useRef<MessageInputRef>(null);
   const { currentUser } = useUser();
@@ -139,7 +141,7 @@ export function ReelCard({ reel, isActive }: ReelCardProps) {
                   className="ml-1 text-white/50 font-semibold cursor-pointer"
                   onClick={() => setExpanded((v) => !v)}
                 >
-                  {expanded ? " less" : " more"}
+                  {expanded ? ` ${t("less")}` : ` ${t("more")}`}
                 </button>
               )}
             </p>
@@ -407,7 +409,7 @@ export function ReelCard({ reel, isActive }: ReelCardProps) {
                   className="ml-1 text-white/60 font-semibold cursor-pointer"
                   onClick={() => setExpanded((v) => !v)}
                 >
-                  {expanded ? " less" : " more"}
+                  {expanded ? ` ${t("less")}` : ` ${t("more")}`}
                 </button>
               )}
             </p>

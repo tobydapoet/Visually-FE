@@ -2,6 +2,7 @@ import { TextField, Chip, Box } from "@mui/material";
 import type React from "react";
 import { useState } from "react";
 import { Hash } from "lucide-react";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   value: string[];
@@ -10,6 +11,7 @@ type Props = {
 
 export const HashTagsField: React.FC<Props> = ({ value = [], onChange }) => {
   const [inputValue, setInputValue] = useState("");
+  const { t } = useTranslation();
 
   const handleAdd = () => {
     const tag = inputValue.trim().replace(/^#+/, "");
@@ -19,6 +21,10 @@ export const HashTagsField: React.FC<Props> = ({ value = [], onChange }) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === " ") {
+      e.preventDefault();
+      handleAdd();
+    }
     if (e.key === "Enter") {
       e.preventDefault();
       handleAdd();
@@ -36,7 +42,7 @@ export const HashTagsField: React.FC<Props> = ({ value = [], onChange }) => {
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Add hashtag, press Enter"
+        placeholder={t("add_hashtag")}
         variant="outlined"
         InputProps={{
           endAdornment: <Hash size={18} color="gray" />,

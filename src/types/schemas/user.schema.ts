@@ -2,14 +2,14 @@ import { z } from "zod";
 import { Gender } from "../../constants/gender.enum";
 
 export const UserUpdateSchema = z.object({
-  fullName: z.string().nonempty("Please enter your full name!"),
-  username: z.string().nonempty("Please enter your username!"),
+  fullName: z.string().nonempty("user.fullName.required"),
+  username: z.string().nonempty("user.username.required"),
   dob: z.string({
-    message: "Please select your date of birth!",
+    message: "user.dob.required",
   }),
   bio: z.string(),
   gender: z.enum(Gender, {
-    message: "Please select your gender!",
+    message: "user.gender.required",
   }),
   file: z.file().optional(),
 });

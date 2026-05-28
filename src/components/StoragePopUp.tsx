@@ -8,6 +8,7 @@ import { handleAddToStorage, handleGetStorageByUser } from "../api/story.api";
 import { toast } from "sonner";
 import { CircularProgress } from "@mui/material";
 import { useStory } from "../contexts/story.context";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -24,6 +25,7 @@ const StoragePopUp: React.FC<Props> = ({ open, onClose, storyId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { currentUser } = useUser();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchStorage = async () => {
@@ -51,7 +53,7 @@ const StoragePopUp: React.FC<Props> = ({ open, onClose, storyId }) => {
 
   const onSubmit = async () => {
     if (!selectedStorageId) {
-      toast.warning("Select hight first!!");
+      toast.warning(t("select_highlight_first"));
       return;
     }
 
@@ -81,7 +83,7 @@ const StoragePopUp: React.FC<Props> = ({ open, onClose, storyId }) => {
         >
           <DialogTitle className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
             <div className="text-md font-semibold text-white">
-              Save to hightlight
+              {t("save_to_highlight")}
             </div>
             <button
               onClick={onClose}
@@ -99,12 +101,12 @@ const StoragePopUp: React.FC<Props> = ({ open, onClose, storyId }) => {
               </div>
             ) : storageList.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-400 mb-4">You don't have hightlight</p>
+                <p className="text-gray-400 mb-4">{t("no_highlight")}</p>
                 <button
                   onClick={onClose}
                   className="px-4 py-2 bg-blue-600 rounded-lg text-sm hover:bg-blue-700 transition-colors"
                 >
-                  Close
+                  {t("cancel")}
                 </button>
               </div>
             ) : (
@@ -157,7 +159,7 @@ const StoragePopUp: React.FC<Props> = ({ open, onClose, storyId }) => {
                         <CircularProgress size={20} sx={{ color: "white" }} />
                       </>
                     ) : (
-                      "Save"
+                      t("save")
                     )}
                   </button>
                 </div>

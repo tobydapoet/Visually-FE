@@ -1,6 +1,7 @@
 import { Dialog, DialogPanel } from "@headlessui/react";
 import type React from "react";
 import { useMessage } from "../contexts/message.context";
+import { useTranslation } from "../hooks/useTranslation";
 
 type MuteOption = "15m" | "1h" | "8h" | "24h" | "forever";
 
@@ -11,14 +12,6 @@ type Props = {
   isMuted: boolean;
 };
 
-const MUTE_OPTIONS: { label: string; value: MuteOption }[] = [
-  { label: "15 minutes", value: "15m" },
-  { label: "1 hour", value: "1h" },
-  { label: "8 hours", value: "8h" },
-  { label: "24 hours", value: "24h" },
-  { label: "Until I turn it back on", value: "forever" },
-];
-
 const MutePopUp: React.FC<Props> = ({
   open,
   onClose,
@@ -26,6 +19,16 @@ const MutePopUp: React.FC<Props> = ({
   isMuted,
 }) => {
   const { muteConversation, unmuteConversation } = useMessage();
+
+  const { t } = useTranslation();
+
+  const MUTE_OPTIONS: { label: string; value: MuteOption }[] = [
+    { label: t("mute_15m"), value: "15m" },
+    { label: t("mute_1h"), value: "1h" },
+    { label: t("mute_8h"), value: "8h" },
+    { label: t("mute_24h"), value: "24h" },
+    { label: t("mute_forever"), value: "forever" },
+  ];
 
   const handleMute = async (option: MuteOption) => {
     await muteConversation(converstationId, option);
@@ -44,7 +47,7 @@ const MutePopUp: React.FC<Props> = ({
         <DialogPanel className="w-full max-w-sm rounded-xl bg-zinc-900 text-white overflow-hidden">
           <div className="px-4 py-4 border-b border-zinc-700">
             <h2 className="text-center font-semibold text-base">
-              {isMuted ? "Unmute Notifications" : "Mute Notifications"}
+              {isMuted ? t("unmute_notifications") : t("mute_notifications")}
             </h2>
           </div>
 
@@ -53,7 +56,7 @@ const MutePopUp: React.FC<Props> = ({
               onClick={handleUnmute}
               className="w-full px-4 py-3 text-center cursor-pointer text-blue-400 hover:bg-zinc-800 transition-colors disabled:opacity-50"
             >
-              Turn on notifications
+              {t("turn_on_notifications")}
             </button>
           ) : (
             MUTE_OPTIONS.map((opt) => (
@@ -72,7 +75,7 @@ const MutePopUp: React.FC<Props> = ({
               onClick={onClose}
               className="w-full px-4 py-3 text-center cursor-pointer text-red-400 hover:bg-zinc-800 transition-colors"
             >
-              Cancel
+              {t("cancel")}
             </button>
           </div>
         </DialogPanel>

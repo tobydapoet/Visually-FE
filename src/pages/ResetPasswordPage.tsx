@@ -27,6 +27,7 @@ import {
   type ResetPasswordType,
 } from "../types/schemas/resetPassword.schema";
 import { handleResetPasswod } from "../api/auth.api";
+import { useTranslation } from "../hooks/useTranslation";
 
 const textFieldSx = {
   "& .MuiOutlinedInput-root": {
@@ -65,6 +66,7 @@ const ResetPasswordPage: FC = () => {
       confirmPassword: "",
     },
   });
+  const { t } = useTranslation();
 
   const onSubmit = async (data: ResetPasswordType) => {
     setGeneralError("");
@@ -73,12 +75,10 @@ const ResetPasswordPage: FC = () => {
     const result = await handleResetPasswod(data);
 
     if (result.success) {
-      setSuccess("Password reset successfully! Redirecting to login...");
+      setSuccess(t("reset_password_success"));
       setTimeout(() => navigate("/login"), 2000);
     } else {
-      setGeneralError(
-        result.message || "Failed to reset password. Please try again.",
-      );
+      setGeneralError(result.message || t("reset_password_failed"));
     }
   };
 
@@ -124,10 +124,10 @@ const ResetPasswordPage: FC = () => {
             variant="h6"
             sx={{ color: "#fff", fontWeight: 600, mb: 1 }}
           >
-            Invalid Reset Link
+            {t("invalid_reset_link")}
           </Typography>
           <Typography sx={{ color: "#6b7280", mb: 3, fontSize: 14 }}>
-            The password reset link is invalid or has expired.
+            {t("invalid_reset_link_message")}
           </Typography>
           <Button
             onClick={() => navigate("/forgot-password")}
@@ -140,7 +140,7 @@ const ResetPasswordPage: FC = () => {
               fontWeight: 600,
             }}
           >
-            Request New Reset Link
+            {t("request_new_reset_link")}
           </Button>
         </Paper>
       </Box>
@@ -179,7 +179,7 @@ const ResetPasswordPage: FC = () => {
             "&:hover": { color: "#fff", bgcolor: "transparent" },
           }}
         >
-          Back to Login
+          {t("back_to_login")}
         </Button>
 
         <Box sx={{ textAlign: "center", mb: 4 }}>
@@ -199,10 +199,10 @@ const ResetPasswordPage: FC = () => {
             <Lock size={32} color="#3b82f6" />
           </Box>
           <Typography variant="h5" sx={{ color: "#fff", fontWeight: 700 }}>
-            Reset Password
+            {t("reset_password_title")}
           </Typography>
           <Typography sx={{ color: "#6b7280", mt: 1, fontSize: 14 }}>
-            Create a new password for your account
+            {t("reset_password_subtitle")}
           </Typography>
         </Box>
 
@@ -243,13 +243,15 @@ const ResetPasswordPage: FC = () => {
           <input type="hidden" {...register("resetToken")} />
 
           <TextField
-            label="New Password"
+            label={t("new_password")}
+            placeholder={t("enter_new_password")}
             type={showPassword ? "text" : "password"}
-            placeholder="Enter new password"
             fullWidth
             {...register("password")}
             error={!!errors.password}
-            helperText={errors.password?.message}
+            helperText={
+              errors.password?.message ? t(errors.password.message as any) : ""
+            }
             sx={textFieldSx}
             InputProps={{
               endAdornment: (
@@ -266,13 +268,17 @@ const ResetPasswordPage: FC = () => {
           />
 
           <TextField
-            label="Confirm Password"
             type={showConfirmPassword ? "text" : "password"}
-            placeholder="Confirm new password"
+            label={t("confirm_password")}
+            placeholder={t("confirm_new_password")}
             fullWidth
             {...register("confirmPassword")}
             error={!!errors.confirmPassword}
-            helperText={errors.confirmPassword?.message}
+            helperText={
+              errors.confirmPassword?.message
+                ? t(errors.confirmPassword.message as any)
+                : ""
+            }
             sx={textFieldSx}
             InputProps={{
               endAdornment: (
@@ -313,7 +319,7 @@ const ResetPasswordPage: FC = () => {
               fontSize: 15,
             }}
           >
-            {isSubmitting ? "Resetting..." : "Reset Password"}
+            {isSubmitting ? t("resetting") : t("reset_password_btn")}
           </Button>
         </Box>
       </Paper>

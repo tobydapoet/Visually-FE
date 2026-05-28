@@ -1,5 +1,8 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import type { NotificationResponse } from "../types/api/notification.type";
+import type {
+  NotificationResponse,
+  NotificationSocket,
+} from "../types/api/notification.type";
 import { useUser } from "./user.context";
 import { createContext, useContext, useEffect, useState } from "react";
 import {
@@ -9,6 +12,7 @@ import {
 import { useSocket } from "../hooks/useSocket";
 import { toast } from "sonner";
 import assets from "../assets";
+import { buildNotificationContent } from "../locales/notification.translations";
 
 type NotificationContextType = {
   notifications: NotificationResponse[];
@@ -18,7 +22,7 @@ type NotificationContextType = {
   isFetchingNextPage: boolean;
   isLoading: boolean;
   markAllAsRead: () => void;
-  toastNotification: NotificationResponse | null;
+  toastNotification: NotificationSocket | null;
   clearToast: () => void;
 };
 
@@ -34,7 +38,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   const socket = useSocket(currentUser?.id ?? null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [toastNotification, setToastNotification] =
-    useState<NotificationResponse | null>(null);
+    useState<NotificationSocket | null>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
@@ -57,7 +61,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("new_notification", (newNotification: NotificationResponse) => {
+    socket.on("new_notification", (newNotification: NotificationSocket) => {
       queryClient.setQueryData(["notifications"], (old: any) => {
         setToastNotification(newNotification);
         toast.custom(
@@ -69,7 +73,12 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
               />
               <div className="flex-1">
                 <p className="text-sm text-gray-800">
-                  {newNotification.content}
+                  {buildNotificationContent(
+                    newNotification.type,
+                    newNotification.username,
+                    newNotification.contentType,
+                    localStorage.getItem("lang") ?? "en",
+                  )}
                 </p>
                 <p className="text-xs text-gray-400 mt-0.5">Just now</p>
               </div>
@@ -84,12 +93,22 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
           { duration: 4000, position: "bottom-right" },
         );
         if (!old) return old;
+        const lang = localStorage.getItem("lang") ?? "en";
+        const content = buildNotificationContent(
+          newNotification.type,
+          newNotification.username,
+          newNotification.contentType,
+          lang,
+        );
+
+        const notificationWithContent = { ...newNotification, content };
+
         return {
           ...old,
           pages: [
             {
               ...old.pages[0],
-              content: [newNotification, ...old.pages[0].content],
+              content: [notificationWithContent, ...old.pages[0].content],
               total: old.pages[0].total + 1,
             },
             ...old.pages.slice(1),

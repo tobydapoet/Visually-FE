@@ -19,9 +19,11 @@ import type { ReportReason } from "../constants/reportReason.enum";
 import useDebounce from "../hooks/useDebounce";
 import Pagination from "../components/Pagination";
 import ConfirmDialog from "../components/ConfirmDialog";
+import { useTranslation } from "../hooks/useTranslation";
 
 const ReportManagePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation();
   const [reports, setReports] = useState<ReportListResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(
@@ -145,10 +147,10 @@ const ReportManagePage: React.FC = () => {
       <div className="mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-white mb-2">
-            Report Management
+            {t("report_management")}
           </h1>
           <p className="text-neutral-400 text-sm">
-            Manage all reported content from users
+            {t("report_management_subtitle")}
           </p>
         </div>
 
@@ -157,7 +159,7 @@ const ReportManagePage: React.FC = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
             <input
               type="text"
-              placeholder="Search by username, reason"
+              placeholder={t("search_by_username_reason")}
               value={searchInput}
               onChange={(e) => handleSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-neutral-900 border border-neutral-800 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-neutral-500 text-sm"
@@ -171,7 +173,7 @@ const ReportManagePage: React.FC = () => {
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium cursor-pointer transition-colors"
               >
                 <CheckSquare className="w-4 h-4" />
-                Select
+                {t("select")}
               </button>
             ) : (
               <>
@@ -182,12 +184,12 @@ const ReportManagePage: React.FC = () => {
                   {selectedIds.size === reports.length ? (
                     <>
                       <Square className="w-4 h-4" />
-                      Deselect All
+                      {t("deselect_all")}
                     </>
                   ) : (
                     <>
                       <CheckSquare className="w-4 h-4" />
-                      Select All
+                      {t("select_all")}
                     </>
                   )}
                 </button>
@@ -198,7 +200,7 @@ const ReportManagePage: React.FC = () => {
                     className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
-                    Delete ({selectedIds.size})
+                    {t("delete_selected", { count: String(selectedIds.size) })}
                   </button>
                 )}
 
@@ -207,7 +209,7 @@ const ReportManagePage: React.FC = () => {
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium cursor-pointer transition-colors"
                 >
                   <X className="w-4 h-4" />
-                  Cancel
+                  {t("cancel")}
                 </button>
               </>
             )}
@@ -216,12 +218,12 @@ const ReportManagePage: React.FC = () => {
 
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-neutral-500">
-            Total reports:{" "}
+            {t("total_reports")}:{" "}
             <span className="text-white font-medium">{total}</span>
           </p>
           {isSelectionMode && selectedIds.size > 0 && (
             <p className="text-sm text-blue-400">
-              Selected: {selectedIds.size} report(s)
+              {t("selected_reports", { count: String(selectedIds.size) })}
             </p>
           )}
         </div>
@@ -233,10 +235,8 @@ const ReportManagePage: React.FC = () => {
         ) : reports.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 gap-2">
             <Filter className="w-12 h-12 text-neutral-700" />
-            <p className="text-neutral-500 text-sm">No reports found</p>
-            <p className="text-xs text-neutral-600">
-              Try changing your search keyword
-            </p>
+            <p>{t("no_reports_found")}</p>
+            <p>{t("try_changing_keyword")}</p>
           </div>
         ) : (
           <>
@@ -310,7 +310,9 @@ const ReportManagePage: React.FC = () => {
                         <p className="text-sm font-medium text-white">
                           {report.username}
                         </p>
-                        <p className="text-xs text-neutral-500">Reported by</p>
+                        <p className="text-xs text-neutral-500">
+                          {t("reported_by")}
+                        </p>
                       </div>
                     </div>
 
@@ -349,8 +351,10 @@ const ReportManagePage: React.FC = () => {
         open={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteManyReports}
-        title="Delete Reports"
-        message={`Are you sure you want to delete ${selectedIds.size} report(s)? This action cannot be undone.`}
+        title={t("delete_reports_title")}
+        message={t("delete_reports_message", {
+          count: String(selectedIds.size),
+        })}
       />
     </div>
   );

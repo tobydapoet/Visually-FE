@@ -1,8 +1,16 @@
 import { useState } from "react";
-import { Settings, User, HelpCircle, LogOut, ChevronRight } from "lucide-react";
+import {
+  Settings,
+  User,
+  HelpCircle,
+  LogOut,
+  ChevronRight,
+  Globe,
+} from "lucide-react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/user.context";
 import ConfirmDialog from "../components/ConfirmDialog";
+import { useTranslation } from "../hooks/useTranslation";
 
 function SettingLayout() {
   const [activeItem, setActiveItem] = useState("Profile");
@@ -10,37 +18,42 @@ function SettingLayout() {
   const [isLogoutDialog, setIsLogoutDialog] = useState(false);
   const { onLogout } = useUser();
   const navigate = useNavigate();
+  const { t, lang } = useTranslation();
 
   const menuGroups = [
     {
-      title: "General",
-      items: [{ id: "Profile", icon: User, label: "Profile" }],
+      title: t("general"),
+      items: [{ id: "Profile", icon: User, label: t("profile") }],
     },
     {
-      title: "Support",
+      title: t("support"),
       items: [
-        { id: "Help", icon: HelpCircle, label: "Help & Support" },
+        { id: "Help", icon: HelpCircle, label: t("help") },
         {
           id: "Logout",
           icon: LogOut,
-          label: "Log out",
+          label: t("logout"),
           danger: true,
           onclick: () => setIsLogoutDialog(true),
         },
       ],
     },
   ];
-
   const handleSelect = (item: any) => {
     setActiveItem(item.id);
     setIsSidebarOpen(false);
     item.onclick?.();
   };
 
+  const handleChangeLang = (newLang: string) => {
+    localStorage.setItem("lang", newLang);
+    window.location.reload();
+  };
+
   const SidebarContent = () => (
     <>
       <div className="pt-10 pb-3 px-9">
-        <h1 className="text-xl font-bold text-white">Settings</h1>
+        <h1 className="text-xl font-bold text-white">{t("settings")}</h1>
       </div>
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         {menuGroups.map((group, idx) => (
@@ -100,13 +113,46 @@ function SettingLayout() {
             </ul>
           </div>
         ))}
+        <div className="mb-6">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2">
+            Language
+          </h3>
+          <div className="flex items-center gap-2 px-3 py-3 rounded-lg hover:bg-neutral-800 transition-all">
+            <Globe size={18} className="text-gray-500" />
+            <span className="text-sm font-medium text-gray-300 flex-1">
+              {t("language")}
+            </span>
+            <div className="flex gap-1">
+              <button
+                onClick={() => handleChangeLang("en")}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
+                  lang === "en"
+                    ? "bg-blue-600 text-white"
+                    : "bg-neutral-700 text-gray-400 hover:bg-neutral-600"
+                }`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => handleChangeLang("vi")}
+                className={`px-2 py-1 rounded text-xs cursor-pointer font-medium transition-colors ${
+                  lang === "vi"
+                    ? "bg-blue-600 text-white"
+                    : "bg-neutral-700 text-gray-400 hover:bg-neutral-600"
+                }`}
+              >
+                VI
+              </button>
+            </div>
+          </div>
+        </div>
       </nav>
       <ConfirmDialog
-        message="Do you want logout?"
+        message={t("logout_confirm_message")}
+        title={t("logout_confirm_title")}
         onClose={() => setIsLogoutDialog(false)}
         onConfirm={() => onLogout(() => navigate("/login"))}
         open={isLogoutDialog}
-        title="Logout confirm"
       />
     </>
   );

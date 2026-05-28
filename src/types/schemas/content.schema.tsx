@@ -6,10 +6,8 @@ const CreateMentionContentSchema = z.object({
 });
 
 export const UpdateContentSchema = z.object({
-  caption: z.string({ message: "caption must be a string" }).optional(),
-  tagsNameAdd: z
-    .array(z.string({ message: "Each tag must be a string" }))
-    .optional(),
+  caption: z.string({ message: "caption.must_be_string" }).optional(),
+  tagsNameAdd: z.array(z.string({ message: "tag.must_be_string" })).optional(),
   tagsIdRemove: z.array(z.number()).optional(),
   mentionAdd: z.array(CreateMentionContentSchema).optional(),
   mentionUserIdRemove: z.array(z.uuid()).optional(),

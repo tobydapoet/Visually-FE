@@ -5,6 +5,7 @@ import { handleGetCommentByTarget } from "../api/interaction.api";
 import type { CommentResponse } from "../types/api/interaction.type";
 import type { MentionItem } from "../types/api/mention.type";
 import CommentItem from "./CommentItem";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   targetId: number;
@@ -44,6 +45,7 @@ const CommentComponent = forwardRef<CommentComponentRef, Props>(
   ) => {
     const queryClient = useQueryClient();
     const loadMoreRef = useRef<HTMLDivElement>(null);
+    const { t } = useTranslation();
 
     useImperativeHandle(ref, () => ({
       addComment: (newComment: CommentResponse) => {
@@ -181,7 +183,7 @@ const CommentComponent = forwardRef<CommentComponentRef, Props>(
     if (isError) {
       return (
         <div className="text-center py-8 text-red-500">
-          Error loading comments: {error?.message}
+          {t("error_loading_comments")}: {error?.message}
         </div>
       );
     }
@@ -191,7 +193,7 @@ const CommentComponent = forwardRef<CommentComponentRef, Props>(
     return (
       <div>
         <div className="font-semibold text-lg p-2">
-          Comments ({commentCount})
+          {t("comments")} ({commentCount})
         </div>
 
         <div className="space-y-3">
@@ -218,7 +220,7 @@ const CommentComponent = forwardRef<CommentComponentRef, Props>(
 
         {allComments.length === 0 && (
           <div className="text-center text-sm text-gray-500 py-8">
-            No comments yet. Be the first to comment!
+            {t("no_comments_yet")}
           </div>
         )}
       </div>

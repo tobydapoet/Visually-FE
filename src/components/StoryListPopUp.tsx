@@ -14,6 +14,7 @@ import { useRef } from "react";
 import type { StoryResponse } from "../types/api/story.type";
 import { handleCreateStorage, handleGetStoryByUser } from "../api/story.api";
 import { toast } from "sonner";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -40,6 +41,7 @@ const StoryListPopUp: React.FC<Props> = ({ open, onClose }) => {
       enabled: open,
       refetchOnMount: true,
     });
+  const { t } = useTranslation();
 
   const storyList: StoryResponse[] =
     data?.pages.flatMap((page) => page.content) || [];
@@ -99,7 +101,9 @@ const StoryListPopUp: React.FC<Props> = ({ open, onClose }) => {
           className="w-full max-w-lg rounded-xl bg-zinc-900 p-0 text-white duration-300 ease-out data-closed:scale-95 data-closed:opacity-0"
         >
           <DialogTitle className="flex items-center justify-between px-4 py-2 border-b border-zinc-800">
-            <div className="text-md font-semibold text-white">Stories</div>
+            <div className="text-md font-semibold text-white">
+              {t("stories_title")}
+            </div>
             <button
               onClick={onClose}
               className="w-9 h-9 flex items-center cursor-pointer justify-center rounded-full hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
@@ -113,10 +117,12 @@ const StoryListPopUp: React.FC<Props> = ({ open, onClose }) => {
               fullWidth
               size="small"
               {...register("name")}
-              placeholder="Add name"
+              placeholder={t("add_name")}
               variant="outlined"
               error={!!errors.name}
-              helperText={errors.name?.message}
+              helperText={
+                errors.name?.message ? t(errors.name.message as any) : ""
+              }
               sx={{
                 "& .MuiOutlinedInput-root": {
                   color: "white",
@@ -192,13 +198,13 @@ const StoryListPopUp: React.FC<Props> = ({ open, onClose }) => {
 
             {errors.storyIds && (
               <p className="text-red-400 text-xs mb-2 -mt-3">
-                {errors.storyIds.message}
+                {errors.storyIds.message && t(errors.storyIds.message as any)}
               </p>
             )}
 
             {selectedIds?.length > 0 && (
               <p className="text-zinc-400 text-xs mb-2">
-                {selectedIds.length} story selected
+                {t("stories_selected", { count: String(selectedIds.length) })}
               </p>
             )}
 
@@ -206,7 +212,7 @@ const StoryListPopUp: React.FC<Props> = ({ open, onClose }) => {
               type="submit"
               className="w-full cursor-pointer py-2 rounded-lg bg-blue-600 hover:bg-blue-700 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create
+              {t("create")}Create
             </button>
           </form>
         </DialogPanel>

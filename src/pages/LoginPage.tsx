@@ -12,10 +12,12 @@ import { handleLogin } from "../api/auth.api";
 import { toast } from "sonner";
 import parseJwt from "../utils/parseToken";
 import Cookies from "js-cookie";
+import { useTranslation } from "../hooks/useTranslation";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation();
   const toastShown = useRef(false);
   const {
     register,
@@ -45,7 +47,7 @@ const LoginPage: React.FC = () => {
   const onSubmit = async (data: LoginType) => {
     const res = await handleLogin(data);
     if (res.success) {
-      toast.success("Login success!");
+      toast.success(t("login_success"));
       const token = Cookies.get("access_token");
       if (!token) {
         navigate("/login");
@@ -80,19 +82,21 @@ const LoginPage: React.FC = () => {
 
           <div className="mb-8">
             <h1 className="font-plus text-3xl font-bold text-white">
-              Welcome back!
+              {t("welcome_back")}
             </h1>
-            <p className="mt-2 text-gray-400">Please sign in to your account</p>
+            <p className="mt-2 text-gray-400">{t("sign_in_subtitle")}</p>
           </div>
 
           <div className="flex flex-col gap-5">
             <TextField
               {...register("email")}
               error={!!errors.email}
-              helperText={errors.email?.message}
+              helperText={
+                errors.email?.message ? t(errors.email.message as any) : ""
+              }
               fullWidth
               id="email"
-              label="Email address"
+              label={t("email")}
               variant="outlined"
               size="medium"
               sx={{
@@ -114,9 +118,13 @@ const LoginPage: React.FC = () => {
               {...register("password")}
               fullWidth
               error={!!errors.password}
-              helperText={errors.password?.message}
+              helperText={
+                errors.password?.message
+                  ? t(errors.password.message as any)
+                  : ""
+              }
               id="password"
-              label="Password"
+              label={t("password")}
               type="password"
               variant="outlined"
               size="medium"
@@ -153,7 +161,7 @@ const LoginPage: React.FC = () => {
                         }}
                       />
                     }
-                    label="Remember me"
+                    label={t("remember_me")}
                     className="text-gray-400"
                   />
                 )}
@@ -186,7 +194,7 @@ const LoginPage: React.FC = () => {
                     },
                   }}
                 >
-                  Sign In
+                  {t("sign_in")}
                 </Button>
 
                 <Button
@@ -206,7 +214,7 @@ const LoginPage: React.FC = () => {
                     },
                   }}
                 >
-                  Sign Up
+                  {t("sign_up")}
                 </Button>
               </div>
 
@@ -238,19 +246,19 @@ const LoginPage: React.FC = () => {
                   },
                 }}
               >
-                Sign in with Google
+                {t("sign_in_google")}
               </Button>
             </div>
           </div>
 
           <div className="text-[12px] text-gray-500 mt-10">
-            By signing in, you agree to our{" "}
+            {t("terms_prefix")}{" "}
             <span className="text-red-400 cursor-pointer hover:underline">
-              Terms of Service
+              {t("terms_of_service")}
             </span>{" "}
-            and{" "}
+            {t("and")}{" "}
             <span className="text-red-400 cursor-pointer hover:underline">
-              Privacy Policy
+              {t("privacy_policy")}
             </span>
             .
           </div>

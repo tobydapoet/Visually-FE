@@ -4,6 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import type { MusicResponse } from "../types/api/music.type";
 import useDebounce from "../hooks/useDebounce";
 import { handleGetListMusic } from "../api/media.api";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   isOpen: boolean;
@@ -17,6 +18,8 @@ export const StoryMusicPicker: React.FC<Props> = ({
   onSelect,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
+
+  const { t } = useTranslation();
 
   const [playingId, setPlayingId] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement>(new Audio());
@@ -151,7 +154,7 @@ export const StoryMusicPicker: React.FC<Props> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search songs..."
+                placeholder={t("search_musics")}
                 className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-zinc-500"
                 autoFocus
               />
@@ -211,13 +214,13 @@ export const StoryMusicPicker: React.FC<Props> = ({
 
               {!isLoading && musicList.length === 0 && (
                 <div className="text-center py-8 text-zinc-400 text-sm">
-                  No music found
+                  {t("no_music_found")}
                 </div>
               )}
 
               {!hasNextPage && musicList.length > 0 && (
                 <div className="text-center py-3 text-zinc-500 text-xs">
-                  End of list
+                  {t("end_of_list")}
                 </div>
               )}
 

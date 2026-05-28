@@ -40,16 +40,25 @@ export const handleLogin = async (req: LoginType) => {
 
 export const handleRegister = async (req: RegisterType) => {
   try {
+    const payload = {
+      ...req,
+      dob: req.dob.toISOString().split("T")[0],
+    };
+
     const res = await axios.post(
       `${import.meta.env.VITE_API_URL}users/auth/register`,
-      req,
+      payload,
     );
+
     return {
       success: true,
       message: res.data.message,
     };
   } catch (err: any) {
     const message = err.response?.data?.message;
+
+    console.log("err: ", err.response?.data);
+
     return {
       success: false,
       message,

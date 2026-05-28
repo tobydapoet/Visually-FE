@@ -20,6 +20,7 @@ import { handleView } from "../api/interaction.api";
 import { timeAgo } from "../utils/timeAgot";
 import { toast } from "sonner";
 import type { ContentType } from "../constants/contentType.enum";
+import { useTranslation } from "../hooks/useTranslation";
 
 const isVideo = (url?: string) =>
   url?.includes(".mp4") || url?.includes("/video/");
@@ -127,6 +128,7 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
   const navigate = useNavigate();
   const [isShowContent, setIsShowContent] = useState(false);
   const [isShowReport, setIsShowReport] = useState(false);
+  const { t } = useTranslation();
 
   const {
     isLiked,
@@ -143,7 +145,7 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
   const handleCopyLink = (contentId: number, type: ContentType) => {
     const url = `${window.location.origin}/content?contentId=${contentId}&type=${type}`;
     navigator.clipboard.writeText(url);
-    toast.success("Link copied!");
+    toast.success(t("link_copied"));
   };
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -253,7 +255,7 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
                 <span className="ml-1.5 mr-1">•</span> {timeAgo(post.createdAt)}
               </span>
             </p>
-            {post.isAd && <span className="text-xs">Ad</span>}
+            {post.isAd && <span className="text-xs">{t("ad")}</span>}
           </div>
 
           <Menu>
@@ -271,7 +273,7 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
                   onClick={() => setIsShowContent(true)}
                   className="group cursor-pointer flex w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10"
                 >
-                  Show post
+                  {t("show_post")}
                 </button>
               </MenuItem>
               <MenuItem>
@@ -279,7 +281,7 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
                   onClick={() => handleCopyLink(post.id, post.contentType)}
                   className="group flex cursor-pointer w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10"
                 >
-                  Copy link
+                  {t("copy_link")}
                 </button>
               </MenuItem>
               <div className="my-1 h-px bg-white/5" />
@@ -380,7 +382,7 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
               onClick={() => setIsShowContent(true)}
               className="text-xs text-neutral-500 mb-1 cursor-pointer hover:text-neutral-300 transition-colors"
             >
-              View all {post.commentCount} comments
+              {t("view_all_comments", { count: String(post.commentCount) })}
             </p>
           )}
         </div>

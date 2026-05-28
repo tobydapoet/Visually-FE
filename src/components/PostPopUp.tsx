@@ -6,7 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser } from "../contexts/user.context";
 import HashTagsField from "./HashTagField";
-import { CaptionField } from "./CaptionFiled";
+import { CaptionField } from "./CaptionField";
 import type { MentionItem } from "../types/api/mention.type";
 import { useProgressBar } from "../hooks/useProgressBar";
 import { ProgressBar } from "./ProgressBar";
@@ -18,6 +18,7 @@ import {
 import { handleCreatePost } from "../api/post.api";
 import { toast } from "sonner";
 import assets from "../assets";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -31,6 +32,7 @@ const PostPopUp: React.FC<Props> = ({ open, onClose }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const captionRef = useRef<HTMLDivElement | null>(null);
+  const { t } = useTranslation();
 
   const { currentUser } = useUser();
   const {
@@ -154,7 +156,7 @@ const PostPopUp: React.FC<Props> = ({ open, onClose }) => {
             <div className="absolute inset-0 z-20 rounded-2xl flex flex-col items-center justify-center gap-5 bg-zinc-900/70 backdrop-blur-sm">
               <div className="w-72 space-y-3 text-center">
                 <p className="text-sm font-medium text-white">
-                  {progress < 100 ? "Uploading..." : "Done!"}
+                  {progress < 100 ? t("uploading") : t("done")}
                 </p>
                 <ProgressBar
                   progress={progress}
@@ -163,14 +165,14 @@ const PostPopUp: React.FC<Props> = ({ open, onClose }) => {
                   className="h-2 bg-zinc-700"
                 />
                 <p className="text-xs text-zinc-400">
-                  Please don't close this window
+                  {t("please_dont_close")}
                 </p>
               </div>
             </div>
           )}
 
           <DialogTitle className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 sticky top-0 bg-zinc-900 z-10">
-            <span className="text-lg font-semibold">Create Post</span>
+            <span className="text-lg font-semibold">{t("create_post")}</span>
             <button
               onClick={handleClose}
               disabled={isUploading || isSubmitting}
@@ -206,13 +208,13 @@ const PostPopUp: React.FC<Props> = ({ open, onClose }) => {
                       </div>
                       <div className="text-center">
                         <p className="text-base font-medium">
-                          Upload photos & videos
+                          {t("upload_photos_videos")}
                         </p>
                         <p className="text-sm text-zinc-400">
-                          Drag and drop or click to browse
+                          {t("drag_drop_or_browse")}
                         </p>
                         <p className="text-xs text-zinc-500 mt-1">
-                          Up to 10 files · 100MB each
+                          {t("up_to_files")}
                         </p>
                       </div>
                       {errors.files && (
@@ -342,7 +344,7 @@ const PostPopUp: React.FC<Props> = ({ open, onClose }) => {
                       disabled={isSubmitting || isUploading}
                       className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isSubmitting ? "Uploading..." : "Share Post"}
+                      {isSubmitting ? t("uploading") : t("share_post")}
                     </button>
                   </div>
                 )}

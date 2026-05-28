@@ -18,6 +18,7 @@ import {
   NotificationActionType,
   NotificationContentType,
 } from "../constants/notification.enum";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -34,6 +35,7 @@ const NotificationPopUp: FC<Props> = ({ open, onClose }) => {
     isLoading,
     markAllAsRead,
   } = useNotification();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (open && unreadCount > 0) {
@@ -102,10 +104,10 @@ const NotificationPopUp: FC<Props> = ({ open, onClose }) => {
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffMins < 1) return t("just_now");
+    if (diffMins < 60) return t("minutes_ago", { count: String(diffMins) });
+    if (diffHours < 24) return t("hours_ago", { count: String(diffHours) });
+    if (diffDays < 7) return t("days_ago", { count: String(diffDays) });
     return new Date(date).toLocaleDateString();
   };
 
@@ -209,86 +211,91 @@ const PanelContent: FC<PanelContentProps> = ({
   formatTime,
   handleScroll,
   scrollAreaClass,
-}) => (
-  <>
-    <div className="sticky top-0 bg-zinc-900 border-b border-gray-700 p-3.5 z-10">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Bell className="w-5 h-5 text-white" />
-          <h2 className="text-white text-lg font-semibold">Notifications</h2>
-          {unreadCount > 0 && (
-            <span className="px-2 py-0.5 text-xs bg-blue-500 text-white rounded-full">
-              {unreadCount}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onClose}
-            className="w-9 h-9 flex items-center cursor-pointer justify-center rounded-full hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
-          >
-            <X className="w-6 h-6" />
-          </button>
+}) => {
+  const { t } = useTranslation();
+  return (
+    <>
+      <div className="sticky top-0 bg-zinc-900 border-b border-gray-700 p-3.5 z-10">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Bell className="w-5 h-5 text-white" />
+            <h2 className="text-white text-lg font-semibold">
+              {t("notifications_title")}
+            </h2>
+            {unreadCount > 0 && (
+              <span className="px-2 py-0.5 text-xs bg-blue-500 text-white rounded-full">
+                {unreadCount}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onClose}
+              className="w-9 h-9 flex items-center cursor-pointer justify-center rounded-full hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div className={scrollAreaClass} onScroll={handleScroll}>
-      {isLoading ? (
-        <div className="flex justify-center items-center py-20">
-          <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-        </div>
-      ) : notifications.length === 0 ? (
-        <div className="text-center py-20">
-          <Bell className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-400">No notifications yet</p>
-          <p className="text-gray-500 text-sm mt-1">
-            When you get notifications, they'll appear here
-          </p>
-        </div>
-      ) : (
-        <>
-          {notifications.map((notification) => (
-            <div
-              key={notification.id}
-              onClick={() => handleNotificationClick(notification)}
-              className={`
+      <div className={scrollAreaClass} onScroll={handleScroll}>
+        {isLoading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+          </div>
+        ) : notifications.length === 0 ? (
+          <div className="text-center py-20">
+            <Bell className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+            <p className="text-gray-400">{t("no_notifications_yet")}</p>
+            <p className="text-gray-500 text-sm mt-1">
+              {t("no_notifications_subtitle")}
+            </p>
+          </div>
+        ) : (
+          <>
+            {notifications.map((notification) => (
+              <div
+                key={notification.id}
+                onClick={() => handleNotificationClick(notification)}
+                className={`
                 flex items-start gap-3 p-4 cursor-pointer transition-colors
                 hover:bg-zinc-800 border-b border-gray-800
                 ${!notification.isRead ? "bg-blue-500/5" : ""}
               `}
-            >
-              <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
-                {notification.snapshotUrl ? (
-                  <img
-                    src={notification.snapshotUrl}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  getNotificationIcon(notification)
+              >
+                <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
+                  {notification.snapshotUrl ? (
+                    <img
+                      src={notification.snapshotUrl}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    getNotificationIcon(notification)
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white">{notification.content}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formatTime(notification.createdAt)}
+                  </p>
+                </div>
+                {!notification.isRead && (
+                  <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1" />
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-white">{notification.content}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {formatTime(notification.createdAt)}
-                </p>
+            ))}
+            {isFetchingNextPage && (
+              <div className="flex justify-center py-4">
+                <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
               </div>
-              {!notification.isRead && (
-                <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1" />
-              )}
-            </div>
-          ))}
-          {isFetchingNextPage && (
-            <div className="flex justify-center py-4">
-              <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  </>
-);
+            )}
+          </>
+        )}
+      </div>
+    </>
+  );
+};
 
 export default NotificationPopUp;

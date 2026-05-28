@@ -6,6 +6,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { handleGetLikeByTarget } from "../api/interaction.api";
 import assets from "../assets";
 import type { LikeTargetType } from "../constants/interaction.enum";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -21,6 +22,7 @@ const LikeListPopUp: React.FC<Props> = ({
   targetType,
 }) => {
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
@@ -60,7 +62,9 @@ const LikeListPopUp: React.FC<Props> = ({
           className="w-full max-w-lg rounded-xl bg-zinc-900 p-0 text-white duration-300 ease-out data-closed:scale-95 data-closed:opacity-0"
         >
           <DialogTitle className="flex items-center justify-between px-4 py-2 border-b border-zinc-800">
-            <div className="text-md font-semibold text-white">Likes</div>
+            <div className="text-md font-semibold text-white">
+              {t("likes_title")}
+            </div>
             <button
               onClick={onClose}
               className="w-9 h-9 flex items-center cursor-pointer justify-center rounded-full hover:bg-zinc-800 transition-colors text-gray-400 hover:text-white"
@@ -76,7 +80,7 @@ const LikeListPopUp: React.FC<Props> = ({
               </div>
             ) : allLikes.length === 0 ? (
               <div className="text-sm text-gray-500 text-center py-8">
-                No likes yet
+                {t("no_likes_yet")}
               </div>
             ) : (
               allLikes.map((like: any) => (

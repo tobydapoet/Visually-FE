@@ -12,6 +12,7 @@ import {
 import { useUser } from "../contexts/user.context";
 import { NavLink, useNavigate, useMatch } from "react-router-dom";
 import assets from "../assets";
+import { useTranslation } from "../hooks/useTranslation";
 
 type ChildMenuItem = {
   id: string;
@@ -38,6 +39,7 @@ const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({
     content: true,
   });
+  const { t } = useTranslation();
   const { currentUser, loading } = useUser();
   const isAdmin = currentUser?.role === "ADMIN";
   const navigate = useNavigate();
@@ -50,18 +52,18 @@ const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
   const menuItems: MenuItem[] = [
     {
       id: "content",
-      label: "Content",
+      label: t("menu_content"),
       icon: <LayoutDashboard size={20} />,
       children: [
         {
           id: "short",
-          label: "Short",
+          label: t("menu_short"),
           icon: <Film size={18} />,
           path: "/content/short",
         },
         {
           id: "post",
-          label: "Post",
+          label: t("menu_post"),
           icon: <FileText size={18} />,
           path: "/content/post",
         },
@@ -69,26 +71,26 @@ const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
     },
     {
       id: "report",
-      label: "Report",
+      label: t("menu_report"),
       icon: <BarChart3 size={20} />,
       path: "/report",
     },
     {
       id: "user",
-      label: "User",
+      label: t("menu_user"),
       icon: <Users size={20} />,
       path: "/user",
       adminOnly: true,
     },
     {
       id: "advertisement",
-      label: "Advertisement",
+      label: t("menu_advertisement"),
       icon: <Megaphone size={20} />,
       path: "/manage/ad",
     },
     {
       id: "music",
-      label: "Music Library",
+      label: t("menu_music_library"),
       icon: <Music size={20} />,
       path: "/music_library",
     },
@@ -105,7 +107,7 @@ const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
           <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
             <span className="font-bold text-lg">A</span>
           </div>
-          <span className="font-semibold text-lg">Admin Panel</span>
+          <span className="font-semibold text-lg">{t("admin_panel")}</span>
         </div>
         <button
           className="md:hidden p-1 rounded-lg hover:bg-zinc-800 transition-colors"

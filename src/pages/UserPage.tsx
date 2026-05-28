@@ -35,6 +35,7 @@ import {
 } from "../api/follow.api";
 import { handleGetConversationWithUser } from "../api/message.api";
 import ConfirmDialog from "../components/ConfirmDialog";
+import { useTranslation } from "../hooks/useTranslation";
 
 const UserPage: React.FC = () => {
   const { username } = useParams();
@@ -49,6 +50,7 @@ const UserPage: React.FC = () => {
   const [isOpenBlockDialog, setIsOpenBlockDialog] = useState(false);
   const { currentUser } = useUser();
   const [isOpenUnBlock, setIsOpenUnblock] = useState(user?.isBlocked || false);
+  const { t } = useTranslation();
 
   const activeTab = ((): TabUserType => {
     const tab = searchParams.get("tab") as TabUserType;
@@ -64,10 +66,10 @@ const UserPage: React.FC = () => {
     useUserPageData(user, activeTab);
 
   const tabs = [
-    { id: "posts" as const, label: "Posts", icon: Grid },
-    { id: "shorts" as const, label: "Shorts", icon: Video },
-    { id: "saved" as const, label: "Saved", icon: Bookmark },
-    { id: "reposted" as const, label: "Repost", icon: Repeat2 },
+    { id: "posts" as const, label: t("posts"), icon: Grid },
+    { id: "shorts" as const, label: t("shorts"), icon: Video },
+    { id: "saved" as const, label: t("saved"), icon: Bookmark },
+    { id: "reposted" as const, label: t("repost"), icon: Repeat2 },
   ];
 
   const visibleTabs =
@@ -124,15 +126,17 @@ const UserPage: React.FC = () => {
         {user.isBlocked && (
           <ConfirmDialog
             open={isOpenUnBlock}
-            message={`@${user.username} Do you want to unblock them?`}
             onConfirm={async () => {
               await handleUnblock(user.id);
               setUser((prev) => (prev ? { ...prev, isBlocked: false } : prev));
             }}
             onConfirmClose={() => setIsOpenUnblock(false)}
             onClose={() => navigate(-1)}
-            title="Unblock user"
-            cancelText="Go back"
+            title={t("unblock_user")}
+            cancelText={t("go_back")}
+            message={t("unblock_message", {
+              username: user.username,
+            })}
           />
         )}
 
@@ -158,14 +162,14 @@ const UserPage: React.FC = () => {
                     className="flex-1 min-w-30 bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-600 transition-all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
                     onClick={() => navigate("/account/edit")}
                   >
-                    <Pencil className="w-4 h-4" /> Edit profile
+                    <Pencil className="w-4 h-4" /> {t("edit_profile")}
                   </button>
 
                   <button
                     onClick={() => navigate("/storage")}
                     className="flex-1 min-w-30 bg-blue-500/10 text-blue-400 font-semibold py-3 px-6 rounded-xl hover:bg-blue-500/20 transition-all transform hover:scale-105 flex items-center justify-center gap-2 border border-blue-500/30"
                   >
-                    <Archive className="w-4 h-4" /> View storage
+                    <Archive className="w-4 h-4" /> {t("view_storage")}
                   </button>
                 </div>
               ) : (
@@ -176,7 +180,7 @@ const UserPage: React.FC = () => {
                         onClick={() => onFollow()}
                         className="cursor-pointer flex-1 w-full max-w-145 min-w-30 bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-600 transition-all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
                       >
-                        <UserPlus className="w-4 h-4" /> Follow
+                        <UserPlus className="w-4 h-4" /> {t("follow")}
                       </button>
                       <button
                         onClick={() => setIsOpenBlockDialog(true)}
@@ -191,7 +195,7 @@ const UserPage: React.FC = () => {
                         onClick={() => onUnfollow()}
                         className="cursor-pointer flex-1 min-w-30 bg-blue-500/10 text-blue-400 font-semibold py-3 px-6 rounded-xl hover:bg-blue-500/20 transition-all transform hover:scale-105 flex items-center justify-center gap-2 border border-blue-500/30"
                       >
-                        <UserMinus className="w-4 h-4" /> Unfollow
+                        <UserMinus className="w-4 h-4" /> {t("unfollow")}
                       </button>
                       <button
                         onClick={async () => {
@@ -202,7 +206,7 @@ const UserPage: React.FC = () => {
                         }}
                         className="cursor-pointer flex-1 min-w-30 bg-blue-500/10 text-blue-400 font-semibold py-3 px-6 rounded-xl hover:bg-blue-500/20 transition-all transform hover:scale-105 flex items-center justify-center gap-2 border border-blue-500/30"
                       >
-                        <MessageCircle className="w-4 h-4" /> Message
+                        <MessageCircle className="w-4 h-4" /> {t("message")}
                       </button>
                       <button
                         onClick={() => setIsOpenBlockDialog(true)}
@@ -252,8 +256,8 @@ const UserPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <p className="text-center text-sm text-gray-400 mt-3ransition-colors">
-                    New
+                  <p className="text-center text-sm text-gray-400 mt-3 transition-colors">
+                    {t("new")}
                   </p>
                 </div>
               )}
@@ -294,8 +298,8 @@ const UserPage: React.FC = () => {
           await handleBlock(user.id);
           window.location.reload();
         }}
-        message="Du you want to block this user?"
-        title="Block user"
+        message={t("block_message")}
+        title={t("block_user")}
       />
     </>
   );

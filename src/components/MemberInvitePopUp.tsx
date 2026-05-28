@@ -14,6 +14,7 @@ import {
 } from "../api/message.api";
 import { toast } from "sonner";
 import type { MemberType } from "../types/api/message.type";
+import { useTranslation } from "../hooks/useTranslation";
 
 type Props = {
   open: boolean;
@@ -27,6 +28,7 @@ const MemberInvitePopUp: React.FC<Props> = ({ open, onClose }) => {
   const [follows, setFollows] = useState<FollowType[]>();
   const [memberIds, setMemberIds] = useState<string[]>([]);
   const { selectedConversation, fetchMember, memberList } = useMessage();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchFollow = async () => {
@@ -70,7 +72,7 @@ const MemberInvitePopUp: React.FC<Props> = ({ open, onClose }) => {
       memberIds,
     );
     await fetchMember();
-    toast.success("Invite success!");
+    toast.success(t("invite_success"));
     await handleGetUserConverstaion(selectedConversation.id);
     handleClose();
   };
@@ -164,7 +166,7 @@ const MemberInvitePopUp: React.FC<Props> = ({ open, onClose }) => {
               className="flex-1 px-4 py-2 w-full mt-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               onClick={() => onSubmit()}
             >
-              Invite
+              {t("invite")}
             </button>
           </div>
         </DialogPanel>

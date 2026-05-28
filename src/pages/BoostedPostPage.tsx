@@ -6,9 +6,11 @@ import AdPopUp from "../components/AdPopUp";
 import { useAd } from "../contexts/ad.context";
 import Pagination from "../components/Pagination";
 import AdPostCard from "../components/AdPostCard";
+import { useTranslation } from "../hooks/useTranslation";
 
 const BoostedPostPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation();
   const {
     ads,
     totalPages,
@@ -41,10 +43,10 @@ const BoostedPostPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-blue-500 bg-clip-text">
-                Boosted Posts
+                {t("boosted_posts_title")}
               </h1>
               <p className="text-zinc-400 text-sm mt-1">
-                Manage and track your advertising campaigns
+                {t("boosted_posts_subtitle")}
               </p>
             </div>
           </div>
@@ -58,11 +60,9 @@ const BoostedPostPage: React.FC = () => {
               <TrendingUp className="w-12 h-12 text-zinc-600" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
-              No boosted posts yet
+              {t("no_boosted_posts_yet")}
             </h3>
-            <p className="text-zinc-400">
-              Start boosting your content to reach more audience
-            </p>
+            <p className="text-zinc-400">{t("no_boosted_posts_description")}</p>
           </div>
         ) : (
           <>

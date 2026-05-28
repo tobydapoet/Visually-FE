@@ -19,8 +19,8 @@ export function useVideoFrames(frameCount = 12) {
       const duration = video.duration;
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d")!;
-      canvas.width = 60;
-      canvas.height = 80;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
 
       const results: string[] = [];
 
