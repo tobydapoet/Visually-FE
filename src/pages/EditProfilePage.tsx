@@ -117,7 +117,7 @@ const EditProfilePage: React.FC = () => {
         </div>
         <label className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white text-xs font-medium px-3 py-2 rounded-lg flex items-center gap-1.5 transition-colors">
           <Camera size={14} />
-          Change photo
+          {t("change_photo")}
           <input
             type="file"
             accept="image/*"
@@ -129,11 +129,11 @@ const EditProfilePage: React.FC = () => {
 
       <div>
         <label className={labelClass}>
-          <User size={13} /> Full name
+          <User size={13} /> {t("full_name")}
         </label>
         <input
           {...register("fullName")}
-          placeholder="Your full name"
+          placeholder={t("your_full_name")}
           className={inputClass}
         />
         {errors.fullName && (

@@ -1,16 +1,22 @@
 import { useState } from "react";
-import {
-  Settings,
-  User,
-  HelpCircle,
-  LogOut,
-  ChevronRight,
-  Globe,
-} from "lucide-react";
+import { Settings, User, LogOut, ChevronRight, Globe } from "lucide-react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/user.context";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useTranslation } from "../hooks/useTranslation";
+
+type MenuItem = {
+  id: string;
+  icon: any;
+  label: string;
+  danger?: boolean;
+  onclick?: () => void;
+};
+
+type MenuGroup = {
+  title: string;
+  items: MenuItem[];
+};
 
 function SettingLayout() {
   const [activeItem, setActiveItem] = useState("Profile");
@@ -20,7 +26,7 @@ function SettingLayout() {
   const navigate = useNavigate();
   const { t, lang } = useTranslation();
 
-  const menuGroups = [
+  const menuGroups: MenuGroup[] = [
     {
       title: t("general"),
       items: [{ id: "Profile", icon: User, label: t("profile") }],
@@ -28,7 +34,6 @@ function SettingLayout() {
     {
       title: t("support"),
       items: [
-        { id: "Help", icon: HelpCircle, label: t("help") },
         {
           id: "Logout",
           icon: LogOut,
@@ -39,9 +44,14 @@ function SettingLayout() {
       ],
     },
   ];
-  const handleSelect = (item: any) => {
-    setActiveItem(item.id);
+
+  const handleSelect = (item: MenuItem) => {
     setIsSidebarOpen(false);
+
+    if (!item.onclick) {
+      setActiveItem(item.id);
+    }
+
     item.onclick?.();
   };
 

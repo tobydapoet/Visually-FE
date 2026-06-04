@@ -69,7 +69,7 @@ const DetailConversation: React.FC<DetailConversationProps> = ({ open }) => {
         refetchConversations?.();
         fetchMember();
         handleGetConversationMembers(selectedConversation.id);
-        toast.success(result.message);
+        toast.success(t("remove_success"));
       } else {
         console.error("Remove failed:", result.message);
       }
