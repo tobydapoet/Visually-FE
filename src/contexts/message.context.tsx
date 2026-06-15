@@ -400,10 +400,10 @@ export const MessageProvider = ({
     const doJoinAndSeen = () => {
       socket.emit("join_conversation", { conversationId });
 
-      // 👈 Chỉ emit seen khi đang xem tab
       if (document.visibilityState === "visible") {
         setTimeout(() => {
           const lastMsg = messagesRef.current[messagesRef.current.length - 1];
+          if (!lastMsg?.id) return;
           socket.emit("seen", {
             conversationId,
             memberIds:
