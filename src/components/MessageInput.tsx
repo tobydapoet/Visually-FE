@@ -85,7 +85,7 @@ const MessageInput = forwardRef<MessageInputRef, Props>((props, ref) => {
     handleRemove,
     handleRemoveAll,
   } = useMultiFileUpload({
-    accept: "image/*,video/*,application/pdf,.doc,.docx,.txt",
+    accept: "*",
     maxFiles: 10,
     maxSizeMB: 50,
     maxVideoDurationSec: 60,

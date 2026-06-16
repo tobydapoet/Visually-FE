@@ -231,6 +231,7 @@ export const MessageProvider = ({
             content: event.content,
             files: [],
             filePreviews: event.mediaUrls?.map((m: any) => m.url) ?? [],
+            fileNames: event.mediaUrls?.map((m: any) => m.fileName) ?? [],
             createdAt: new Date(event.createdAt),
             isOwn: event.senderId === currentUser.id,
             senderUsername: event.senderUsername,
@@ -360,6 +361,7 @@ export const MessageProvider = ({
           content: msg.content,
           files: [],
           filePreviews: msg.mediaUrls?.map((m: any) => m.url) ?? [],
+          fileNames: msg.mediaUrls?.map((m: any) => m.fileName) ?? [],
           createdAt: new Date(msg.createdAt),
           isOwn: msg.senderId === currentUser?.id,
           senderUsername: msg.senderUsername,
@@ -535,7 +537,9 @@ export const MessageProvider = ({
     try {
       await handleSendMessage(formData);
     } catch (err) {
-      console.error("Failed to send message:", err);
+      toast.error(
+        err instanceof Error ? err.message : "Failed to send message",
+      );
     }
   };
 

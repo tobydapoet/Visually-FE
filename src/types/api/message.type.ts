@@ -3,6 +3,7 @@ export type Message = {
   content: string;
   files: File[];
   filePreviews: string[];
+  fileNames?: string[];
   createdAt: Date;
   isOwn: boolean;
   senderUsername?: string;

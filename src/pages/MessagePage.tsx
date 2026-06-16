@@ -16,6 +16,7 @@ import {
   X,
   ChevronLeft,
   BotMessageSquare,
+  File,
 } from "lucide-react";
 import DetailConversation from "./DetailConversation";
 import type { Message } from "../types/api/message.type";
@@ -414,20 +415,53 @@ const MessagePage: React.FC = () => {
                               {(msg.files?.length > 0 ||
                                 msg.filePreviews?.length > 0) && (
                                 <div className="flex flex-wrap gap-2 mb-2">
-                                  {msg.filePreviews.map((preview, index) => (
-                                    <img
-                                      key={index}
-                                      src={preview}
-                                      alt={`media-${index}`}
-                                      onClick={() =>
-                                        setMediaViewer({
-                                          open: true,
-                                          mediaId: msg.id,
-                                        })
-                                      }
-                                      className="max-w-40 max-h-40 rounded-lg object-cover cursor-pointer"
-                                    />
-                                  ))}
+                                  {msg.filePreviews.map((preview, index) => {
+                                    const file = msg.files?.[index];
+                                    const mime = file?.type || "";
+
+                                    if (mime.startsWith("image/")) {
+                                      return (
+                                        <img
+                                          key={index}
+                                          src={preview}
+                                          alt={`media-${index}`}
+                                          onClick={() =>
+                                            setMediaViewer({
+                                              open: true,
+                                              mediaId: msg.id,
+                                            })
+                                          }
+                                          className="max-w-40 max-h-40 rounded-lg object-cover cursor-pointer"
+                                        />
+                                      );
+                                    }
+
+                                    if (mime.startsWith("video/")) {
+                                      return (
+                                        <video
+                                          key={index}
+                                          src={preview}
+                                          controls
+                                          className="max-w-60 max-h-40 rounded-lg"
+                                        />
+                                      );
+                                    }
+
+                                    return (
+                                      <a
+                                        key={index}
+                                        href={preview}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg text-sm text-gray-300 hover:text-white"
+                                      >
+                                        <File />{" "}
+                                        {file?.name ||
+                                          msg.fileNames?.[index] ||
+                                          "File"}
+                                      </a>
+                                    );
+                                  })}
                                 </div>
                               )}
 
