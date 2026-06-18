@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { CircularProgress, Pagination } from "@mui/material";
-import { Shield, User, Megaphone, FileText, Search } from "lucide-react";
+import { User, Megaphone, FileText, Search } from "lucide-react";
 import { useAuditLogs, type AuditService } from "../hooks/useAuditLogs";
 import { useTranslation } from "../hooks/useTranslation";
 import useDebounce from "../hooks/useDebounce";
 
-// Định nghĩa kiểu cho translation keys
 type TranslationKey = string;
 
 const serviceOptions: {
@@ -69,14 +68,11 @@ const AuditLogPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-zinc-900 p-3 sm:p-4 md:p-6 w-full">
       <div className="flex items-center gap-3 mb-6">
-        <div className="bg-purple-500/10 border border-purple-500/20 p-2 rounded-xl">
-          <Shield size={18} className="text-purple-400" />
-        </div>
         <div>
-          <h1 className="text-white font-semibold text-xl">
+          <h1 className="text-2xl font-bold text-white mb-2">
             {t("audit_log" as any)}
           </h1>
-          <p className="text-zinc-500 text-xs mt-0.5">
+          <p className="text-neutral-400 text-sm">
             {t("audit_log_subtitle" as any)}
           </p>
         </div>
@@ -136,19 +132,19 @@ const AuditLogPage: React.FC = () => {
 
       <div className="bg-zinc-800/60 border border-zinc-700/50 rounded-2xl overflow-hidden">
         <div className="grid grid-cols-12 gap-2 px-4 py-3 border-b border-zinc-700/50">
-          <p className="col-span-2 text-zinc-500 text-xs">
+          <p className="col-span-3 text-zinc-500 text-xs">
             {t("actor" as any)}
           </p>
           <p className="col-span-2 text-zinc-500 text-xs">
             {t("action" as any)}
           </p>
-          <p className="col-span-2 text-zinc-500 text-xs">
+          <p className="col-span-3 text-zinc-500 text-xs">
             {t("target_id" as any)}
           </p>
           <p className="col-span-2 text-zinc-500 text-xs">
             {t("target_type" as any)}
           </p>
-          <p className="col-span-4 text-zinc-500 text-xs text-right">
+          <p className="col-span-2 text-zinc-500 text-xs text-right">
             {t("time" as any)}
           </p>
         </div>
@@ -180,7 +176,7 @@ const AuditLogPage: React.FC = () => {
                   key={log.id}
                   className="grid grid-cols-12 gap-2 px-4 py-3 border-b border-zinc-700/30 hover:bg-zinc-700/20 transition-colors"
                 >
-                  <div className="col-span-2">
+                  <div className="col-span-3">
                     <p className="text-zinc-200 text-xs font-medium">
                       {log.actorUsername || "Unknown"}
                     </p>
@@ -195,7 +191,7 @@ const AuditLogPage: React.FC = () => {
                       {log.action}
                     </span>
                   </div>
-                  <div className="col-span-2 flex items-center">
+                  <div className="col-span-3 flex items-center">
                     <p className="text-zinc-400 text-xs truncate">
                       {log.targetId ?? "—"}
                     </p>
@@ -205,8 +201,8 @@ const AuditLogPage: React.FC = () => {
                       {log.targetType || "—"}
                     </span>
                   </div>
-                  <div className="col-span-4 flex items-center justify-end">
-                    <p className="text-zinc-500 text-xs">
+                  <div className="col-span-2 flex items-center justify-end">
+                    <p className="text-zinc-500 text-xs whitespace-nowrap">
                       {log.createdAt
                         ? new Date(log.createdAt).toLocaleString(
                             document.documentElement.lang === "vi"

@@ -9,6 +9,7 @@ import {
   FileText,
   Music,
   Layers,
+  FileClock,
 } from "lucide-react";
 import { useUser } from "../contexts/user.context";
 import { NavLink, useNavigate, useMatch } from "react-router-dom";
@@ -60,8 +61,8 @@ const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
     },
     {
       id: "audit",
-      label: t("menu_dashboard"),
-      icon: <LayoutDashboard size={18} />,
+      label: t("audit"),
+      icon: <FileClock size={18} />,
       path: "/audit",
       adminOnly: true,
     },

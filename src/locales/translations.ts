@@ -560,6 +560,7 @@ export const translations = {
     user_service: "User",
     ad_service: "Ad",
     content_service: "Content",
+    audit: "Audit log",
   },
   vi: {
     settings: "Cài đặt",
@@ -1124,5 +1125,6 @@ export const translations = {
     user_service: "Người dùng",
     ad_service: "Quảng cáo",
     content_service: "Nội dung",
+    audit: "Nhật ký hệ thống",
   },
 };
