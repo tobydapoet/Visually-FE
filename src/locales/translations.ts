@@ -1121,7 +1121,7 @@ export const translations = {
     time: "Thời gian",
     no_logs: "Không có log nào",
     action_placeholder: "Hành động (LOGIN, UPDATE_AD_ACTIVE...)",
-    actor_username_placeholder: "Username người thực hiện",
+    actor_username_placeholder: "Người thực hiện",
     user_service: "Người dùng",
     ad_service: "Quảng cáo",
     content_service: "Nội dung",

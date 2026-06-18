@@ -119,7 +119,7 @@ const AuditLogPage: React.FC = () => {
             <Search size={13} className="absolute left-3 text-zinc-500" />
             <input
               type="text"
-              placeholder={t("actor_id_placeholder" as any)}
+              placeholder={t("actor_username_placeholder" as any)}
               value={actorUsername}
               onChange={(e) => {
                 setActorUsername(e.target.value);
