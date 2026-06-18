@@ -62,8 +62,16 @@ const UserPage: React.FC = () => {
   const setActiveTab = (tab: TabUserType) => {
     setSearchParams({ tab }, { replace: true });
   };
-  const { posts, shorts, reposted, postsQuery, shortsQuery, repostedQuery } =
-    useUserPageData(user, activeTab);
+  const {
+    posts,
+    shorts,
+    reposted,
+    saved,
+    postsQuery,
+    shortsQuery,
+    repostedQuery,
+    savedQuery,
+  } = useUserPageData(user, activeTab);
 
   const tabs = [
     { id: "posts" as const, label: t("posts"), icon: Grid },
@@ -271,9 +279,11 @@ const UserPage: React.FC = () => {
                 posts={posts}
                 shorts={shorts}
                 reposted={reposted}
+                saved={saved}
                 postsQuery={postsQuery}
                 shortsQuery={shortsQuery}
                 repostedQuery={repostedQuery}
+                savedQuery={savedQuery}
                 isOwner={isOwner}
               />
             </div>

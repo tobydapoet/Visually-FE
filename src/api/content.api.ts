@@ -1,5 +1,8 @@
 import type { ContentType } from "../constants/contentType.enum";
-import type { ContentSearchResponse } from "../types/api/content.type";
+import type {
+  ContentDefaultPageResponse,
+  ContentSearchResponse,
+} from "../types/api/content.type";
 import type { TagPageResponse } from "../types/api/tag.type";
 import type { UpdateContentType } from "../types/schemas/content.schema";
 import axiosInstance from "../utils/axiosInstance";
@@ -88,4 +91,15 @@ export const handleDeleteContent = async (id: number, type: ContentType) => {
   } catch (err: any) {
     return { success: false, message: err?.response?.data };
   }
+};
+
+export const handleGetSaveContentByUser = async (
+  id: string,
+  page = 1,
+  size = 10,
+): Promise<ContentDefaultPageResponse> => {
+  const res = await axiosInstance.get(
+    `${import.meta.env.VITE_API_URL}contents/content/save/userId=${id}?page=${page}&size=${size}`,
+  );
+  return res.data;
 };

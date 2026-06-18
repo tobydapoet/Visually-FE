@@ -13,6 +13,8 @@ type Props = {
   posts: any[];
   shorts: any[];
   reposted: any[];
+  saved: any[];
+  savedQuery: UseInfiniteQueryResult<any>;
   postsQuery: UseInfiniteQueryResult<any>;
   shortsQuery: UseInfiniteQueryResult<any>;
   repostedQuery: UseInfiniteQueryResult<any>;
@@ -27,6 +29,8 @@ export const UserProfileTabs: React.FC<Props> = ({
   posts,
   shorts,
   reposted,
+  saved,
+  savedQuery,
   postsQuery,
   shortsQuery,
   repostedQuery,
@@ -35,6 +39,7 @@ export const UserProfileTabs: React.FC<Props> = ({
   const postsEndRef = useRef<HTMLDivElement>(null);
   const shortsEndRef = useRef<HTMLDivElement>(null);
   const repostedEndRef = useRef<HTMLDivElement>(null);
+  const savedEndRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -90,6 +95,27 @@ export const UserProfileTabs: React.FC<Props> = ({
     observer.observe(repostedEndRef.current);
     return () => observer.disconnect();
   }, [repostedQuery.hasNextPage, repostedQuery.isFetchingNextPage, activeTab]);
+
+  useEffect(() => {
+    if (!savedEndRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          savedQuery.hasNextPage &&
+          !savedQuery.isFetchingNextPage
+        ) {
+          savedQuery.fetchNextPage();
+        }
+      },
+      { threshold: 0.5 },
+    );
+
+    observer.observe(savedEndRef.current);
+
+    return () => observer.disconnect();
+  }, [savedQuery.hasNextPage, savedQuery.isFetchingNextPage, activeTab]);
 
   return (
     <>
@@ -164,9 +190,26 @@ export const UserProfileTabs: React.FC<Props> = ({
         )}
 
         {activeTab === "saved" && isOwner && (
-          <div className="text-center text-gray-400 py-12">
-            <Bookmark className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            <p>{t("saved_content_here")}</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {saved.length === 0 && !savedQuery.isLoading ? (
+              <div className="col-span-full text-center text-gray-400 py-12">
+                <Bookmark className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                <p>{t("saved_content_here")}</p>
+              </div>
+            ) : (
+              <>
+                {saved.map((item) => (
+                  <UserComponent data={item} key={item.id} />
+                ))}
+
+                <div
+                  ref={savedEndRef}
+                  className="col-span-full py-2 flex justify-center"
+                >
+                  {savedQuery.isFetchingNextPage && <LoadingSpinner />}
+                </div>
+              </>
+            )}
           </div>
         )}
 
