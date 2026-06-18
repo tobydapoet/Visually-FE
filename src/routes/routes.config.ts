@@ -29,4 +29,6 @@ export const routes = {
   reel: "/reels",
   reels: "/reels/:feedId",
   content_manage: "/manage/content",
+  dashboard: "/dashboard",
+  audit: "/audit",
 };

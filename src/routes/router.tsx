@@ -32,6 +32,8 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import BoostedPostMangePage from "../pages/AdvertisementManagePage";
 import ProtectedRoute from "../components/ProtectedRoute";
+import DashboardPage from "../pages/DashboardPage";
+import AuditLogPage from "../pages/AuditLogPage";
 
 export const router = createBrowserRouter([
   {
@@ -141,6 +143,14 @@ export const router = createBrowserRouter([
   {
     element: <ManageLayout />,
     children: [
+      {
+        path: routes.dashboard,
+        element: <DashboardPage />,
+      },
+      {
+        path: routes.audit,
+        element: <AuditLogPage />,
+      },
       {
         path: routes.music_library,
         element: (

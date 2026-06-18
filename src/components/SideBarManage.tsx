@@ -8,6 +8,7 @@ import {
   Film,
   FileText,
   Music,
+  Layers,
 } from "lucide-react";
 import { useUser } from "../contexts/user.context";
 import { NavLink, useNavigate, useMatch } from "react-router-dom";
@@ -51,9 +52,23 @@ const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
 
   const menuItems: MenuItem[] = [
     {
+      id: "dashboard",
+      label: t("menu_dashboard"),
+      icon: <LayoutDashboard size={18} />,
+      path: "/dashboard",
+      adminOnly: true,
+    },
+    {
+      id: "audit",
+      label: t("menu_dashboard"),
+      icon: <LayoutDashboard size={18} />,
+      path: "/audit",
+      adminOnly: true,
+    },
+    {
       id: "content",
       label: t("menu_content"),
-      icon: <LayoutDashboard size={20} />,
+      icon: <Layers size={20} />,
       children: [
         {
           id: "short",
@@ -75,6 +90,7 @@ const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
       icon: <BarChart3 size={20} />,
       path: "/report",
     },
+
     {
       id: "user",
       label: t("menu_user"),
