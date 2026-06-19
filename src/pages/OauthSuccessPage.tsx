@@ -20,7 +20,7 @@ function OauthSuccessPage() {
 
     const payload = parseJwt(accessToken);
     if (payload?.role !== "CLIENT") {
-      navigate("/content/post", { replace: true });
+      navigate("/audit", { replace: true });
     } else {
       navigate("/", { replace: true });
     }

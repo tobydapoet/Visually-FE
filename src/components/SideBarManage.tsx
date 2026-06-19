@@ -39,7 +39,7 @@ type Props = {
 
 const SidebarManage: React.FC<Props> = ({ isMobileOpen, setIsMobileOpen }) => {
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({
-    content: true,
+    content: false,
   });
   const { t } = useTranslation();
   const { currentUser, loading } = useUser();

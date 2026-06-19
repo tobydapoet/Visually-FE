@@ -98,10 +98,10 @@ const BoostedPostManagePage = () => {
     <div className="w-full  bg-zinc-900">
       <div className="p-6">
         <h1 className="text-xl sm:text-2xl font-bold text-white mb-1">
-          {t("user_management")}
+          {t("ad_management")}
         </h1>
         <p className="text-neutral-400 text-xs sm:text-sm">
-          {t("user_management_subtitle")}
+          {t("ad_management_subtitle")}
         </p>
       </div>
       <div className="min-h-screen border-t md:border-zinc-800 w-full bg-zinc-900 flex flex-col md:flex-row">

@@ -561,6 +561,10 @@ export const translations = {
     ad_service: "Ad",
     content_service: "Content",
     audit: "Audit log",
+    ad_management: "Advertisement Management",
+    ad_management_subtitle:
+      "Manage advertisements, campaigns, and ad performance",
+    subtitle_music_library: "Manage and organize song content",
   },
   vi: {
     settings: "Cài đặt",
@@ -1009,6 +1013,7 @@ export const translations = {
     menu_user: "Người dùng",
     menu_advertisement: "Quảng cáo",
     menu_music_library: "Thư viện nhạc",
+    subtitle_music_library: "Quản lý các bài hát trên nền tảng",
     menu_dashboard: "Thống kê",
     conversations: "Cuộc trò chuyện",
     people: "Mọi người",
@@ -1126,5 +1131,8 @@ export const translations = {
     ad_service: "Quảng cáo",
     content_service: "Nội dung",
     audit: "Nhật ký hệ thống",
+    ad_management: "Quản lý quảng cáo",
+    ad_management_subtitle:
+      "Quản lý quảng cáo, chiến dịch và hiệu suất quảng cáo",
   },
 };

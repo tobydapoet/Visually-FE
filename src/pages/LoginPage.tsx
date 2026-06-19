@@ -55,7 +55,7 @@ const LoginPage: React.FC = () => {
         const payload = parseJwt(token);
         const isAdmin = payload?.role !== "CLIENT";
         if (isAdmin) {
-          navigate("/music_library");
+          navigate("/audit");
         } else {
           navigate("/");
         }

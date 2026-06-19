@@ -108,10 +108,15 @@ const MusicLibraryPage: React.FC = () => {
   return (
     <>
       <div className="py-6 w-full min-h-screen bg-zinc-900">
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-white">Music Library</h1>
+            <div className="px-2 items-center gap-2">
+              <h1 className="text-2xl font-bold text-white mb-1">
+                {t("menu_music_library")}
+              </h1>
+              <p className="text-neutral-400 text-xs sm:text-sm">
+                {t("subtitle_music_library")}
+              </p>
             </div>
             <button
               onClick={() => setOpenDialog(true)}
