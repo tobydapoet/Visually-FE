@@ -36,15 +36,23 @@ import ConfirmDialog from "./ConfirmDialog";
 import { handleDeleteContent } from "../api/content.api";
 import { toast } from "sonner";
 import { useTranslation } from "../hooks/useTranslation";
+import type { FeedContentResponse } from "../types/api/feed.type";
 
 type Props = {
   open: boolean;
-  onClose: () => void;
+  onClose: (updatedContent?: PostDetailResponse | ShortDetailResponse) => void;
   contentId: number;
   type: "POST" | "SHORT";
+  postData?: FeedContentResponse;
 };
 
-const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
+const ContentPopUp: React.FC<Props> = ({
+  open,
+  onClose,
+  contentId,
+  type,
+  postData,
+}) => {
   const [currentContent, setCurrentContent] = useState<
     PostDetailResponse | ShortDetailResponse | null
   >(null);
@@ -75,8 +83,38 @@ const ContentPopUp: React.FC<Props> = ({ open, onClose, contentId, type }) => {
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const { currentUser } = useUser();
 
+  useEffect(() => {
+    if (open && postData) {
+      setCurrentContent((prev) =>
+        prev
+          ? {
+              ...prev,
+              isLiked: postData.isLiked,
+              isSaved: postData.isSaved,
+              isReposted: postData.isReposted,
+              likeCount: postData.likeCount,
+              commentCount: postData.commentCount,
+              repostCount: postData.repostCount,
+            }
+          : null,
+      );
+    }
+  }, [postData, open]);
+
   const handleOnclose = () => {
-    onClose();
+    if (currentContent) {
+      const updatedContent = {
+        ...currentContent,
+        isLiked,
+        isSaved,
+        isReposted,
+        likeCount,
+        commentCount,
+      };
+      onClose(updatedContent);
+    } else {
+      onClose();
+    }
     setCurrentMediaIndex(0);
   };
 

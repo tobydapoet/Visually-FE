@@ -21,6 +21,8 @@ import { timeAgo } from "../utils/timeAgot";
 import { toast } from "sonner";
 import type { ContentType } from "../constants/contentType.enum";
 import { useTranslation } from "../hooks/useTranslation";
+import type { PostDetailResponse } from "../types/api/post.type";
+import type { ShortDetailResponse } from "../types/api/short.type";
 
 const isVideo = (url?: string) =>
   url?.includes(".mp4") || url?.includes("/video/");
@@ -128,6 +130,13 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
   const navigate = useNavigate();
   const [isShowContent, setIsShowContent] = useState(false);
   const [isShowReport, setIsShowReport] = useState(false);
+  const [postData, setPostData] = useState(post);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    setPostData(post);
+  }, [post.id]);
+
   const { t } = useTranslation();
 
   const {
@@ -140,7 +149,30 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
     toggleLike,
     toggleSave,
     toggleRepost,
-  } = useContentInteraction(post, post.contentType as "POST" | "SHORT");
+  } = useContentInteraction(
+    postData,
+    postData.contentType as "POST" | "SHORT",
+    refreshKey,
+  );
+
+  const handleCloseContent = (
+    updatedContent?: PostDetailResponse | ShortDetailResponse,
+  ) => {
+    if (updatedContent) {
+      setPostData((prev) => ({
+        ...prev,
+        likeCount: updatedContent.likeCount,
+        commentCount: updatedContent.commentCount,
+        repostCount: updatedContent.repostCount,
+        isLiked: updatedContent.isLiked,
+        isSaved: updatedContent.isSaved,
+        isReposted: updatedContent.isReposted,
+        isCommented: updatedContent.isCommented,
+      }));
+      setRefreshKey((prev) => prev + 1);
+    }
+    setIsShowContent(false);
+  };
 
   const handleCopyLink = (contentId: number, type: ContentType) => {
     const url = `${window.location.origin}/content?contentId=${contentId}&type=${type}`;
@@ -223,9 +255,10 @@ const PostCard = ({ post }: { post: FeedContentResponse }) => {
     <>
       <ContentPopUp
         open={isShowContent}
-        onClose={() => setIsShowContent(false)}
+        onClose={handleCloseContent}
         contentId={post.id}
         type={post.contentType}
+        postData={postData}
       />
       <ReportPopUp
         onClose={() => setIsShowReport(false)}

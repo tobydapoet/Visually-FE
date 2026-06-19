@@ -27,6 +27,7 @@ export const useContentInteraction = (
     | FeedContentResponse
     | null,
   type: "POST" | "SHORT",
+  refreshKey?: number,
 ) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isCommented, setIsCommented] = useState(false);
@@ -48,7 +49,7 @@ export const useContentInteraction = (
     setCommentCount(content.commentCount ?? 0);
     setRepostCount(content.repostCount ?? 0);
     setSaveCount(content.saveCount ?? 0);
-  }, [content]);
+  }, [content, refreshKey]);
 
   const toggleLike = async () => {
     if (!content) return;
