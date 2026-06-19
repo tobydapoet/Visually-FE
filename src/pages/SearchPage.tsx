@@ -130,8 +130,8 @@ const SearchPage: FC = () => {
     }
   };
 
-  const handleUserClick = (userId: string) => {
-    navigate(`/${userId}`);
+  const handleUserClick = (username: string) => {
+    navigate(`/${username}`);
   };
 
   const handleTagClick = (tagName: string) => {
@@ -222,7 +222,7 @@ const SearchPage: FC = () => {
                 {users.map((user) => (
                   <div
                     key={user.id}
-                    onClick={() => handleUserClick(user.id)}
+                    onClick={() => handleUserClick(user.username)}
                     className="flex items-center gap-3 p-3 rounded-lg hover:bg-neutral-900 cursor-pointer transition-colors"
                   >
                     <img
